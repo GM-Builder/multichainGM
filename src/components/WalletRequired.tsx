@@ -33,7 +33,9 @@ const WalletRequired: React.FC<WalletRequiredProps> = ({
           </div>
         </div>
         
-        <h2 className="text-2xl font-bold text-emerald-700">Welcome to GM Onchain</h2>
+        <h2 className="text-2xl font-bold text-emerald-700">Welcome to
+          <span className="bg-gradient-to-r from-cyan-700 to-emerald-300 text-transparent bg-clip-text"> MultiChainGM</span>
+        </h2>
         
         <p className="text-gray-600">
           Start your day with a friendly GM on the Tea blockchain. Connect your wallet to check-in daily and join the community.
@@ -61,8 +63,9 @@ const WalletRequired: React.FC<WalletRequiredProps> = ({
         />
         
         <div className="text-xs text-gray-500 flex items-center justify-center gap-2">
+          <div className="h-1.5 w-1.5 bg-cyan-700 rounded-full"></div>
           <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full"></div>
-          <span>Powered by Tea Sepolia Testnet</span>
+          <div className="h-1.5 w-1.5 bg-cyan-500 rounded-full"></div>
         </div>
       </div>
       
