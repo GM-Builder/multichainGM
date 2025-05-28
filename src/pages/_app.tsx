@@ -24,7 +24,7 @@ function GMApp({ Component, pageProps }: AppProps) {
   const currentNetwork = chainId ? getChainConfig(chainId) : null
   const networkInfo = currentNetwork ? {
     name: currentNetwork.chainName,
-    logo: currentNetwork.logo
+    logoUrl: currentNetwork.logoUrl
   } : null
   
   // Determine if the current route should be wrapped with WalletRequired

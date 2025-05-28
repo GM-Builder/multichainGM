@@ -20,6 +20,7 @@ import {
   delay
 } from '@/utils/web3';
 import { ethers } from 'ethers';
+import ChainLogo from '@/components/ChainLogo';
 
 // Define types
 type NetworkType = 'all' | 'mainnet' | 'testnet';
@@ -35,7 +36,7 @@ interface ChainCheckinStatus {
 interface Chain {
   id: number;
   chainName: string;
-  logo: string;
+  logoUrl: string;
   status: ChainCheckinStatus;
   chainId: string;
   nativeCurrency: {
@@ -46,7 +47,7 @@ interface Chain {
   rpcUrls: string[];
   blockExplorerUrls?: string[];
   contractAddress?: string;
-  [key: string]: any; // For any other properties
+  [key: string]: any; 
 }
 
 interface MultiChainCheckinGridProps {
@@ -596,8 +597,8 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
             disabled={isLoading || !isConnected}
             className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 shadow-sm ${
               isLoading 
-                ? 'bg-gray-100 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 cursor-not-allowed border border-gray-200 dark:border-gray-700' 
-                : 'bg-gradient-to-r from-blue-500/10 to-emerald-500/10 backdrop-blur-xl text-slate-700 dark:text-slate-300 hover:from-blue-500/20 hover:to-emerald-500/20 border border-blue-200/50 dark:border-emerald-400/30'
+                ? 'bg-gradient-to-r from-cyan-300/10 to-emerald-300/10 backdrop-blur-xl text-slate-500 dark:text-slate-100 hover:from-blue-300/20 hover:to-emerald-300/20 border border-blue-200/50 dark:border-emerald-400/30' 
+                : 'bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 backdrop-blur-xl text-slate-700 dark:text-slate-300 hover:from-blue-500/20 hover:to-emerald-500/20 border border-blue-200/50 dark:border-emerald-400/30'
             }`}
           >
             {isLoading ? (
@@ -723,7 +724,12 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                           ? 'bg-gradient-to-br from-blue-100 to-emerald-100 dark:from-blue-900 dark:to-emerald-900/30' 
                           : 'bg-gray-100 dark:bg-slate-700/50'
                       } transition-all duration-300`}>
-                        <span className="text-lg">{chain.logo}</span>
+                        <ChainLogo 
+                          logoUrl={chain.logoUrl}
+                          altText={chain.chainName}
+                          size="lg"
+                          fallbackIcon="🔗"
+                        />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-tight">{chain.chainName}</h3>

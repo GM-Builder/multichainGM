@@ -13,10 +13,11 @@ import {
   FaCopy,
 } from "react-icons/fa"
 import ConnectWalletButton from "./ConnectWalletButton"
+import ChainLogo from "@/components/ChainLogo"
 
 interface NetworkInfo {
   name: string;
-  logo: string;
+  logoUrl: string;
 }
 
 interface NavbarProps {
@@ -133,8 +134,17 @@ const Navbar: React.FC<NavbarProps> = ({
               <ThemeToggle />
               {networkInfo && (
                 <div className="flex items-center px-3 py-1.5 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-sm text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-700/50 shadow-inner backdrop-blur-sm">
-                  <div className="mr-2 text-lg">{networkInfo.logo || '🔗'}</div>
-                  <span>{networkInfo.name || 'Unknown Network'}</span>
+                  <div className="mr-2 text-lg">
+                    {networkInfo && (
+                      <ChainLogo 
+                        logoUrl={networkInfo.logoUrl}
+                        altText={networkInfo.name}
+                        size="md"
+                        fallbackIcon="🔗"
+                      />
+                    )}
+                  </div>
+                  <span>{networkInfo?.name || 'Unknown Network'}</span>
                 </div>
               )}
 
@@ -210,8 +220,17 @@ const Navbar: React.FC<NavbarProps> = ({
             <div className="flex md:hidden items-center space-x-3">
               {networkInfo && (
                 <div className="flex items-center px-2 py-1 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-xs text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-700/50 shadow-inner backdrop-blur-sm">
-                  <div className="mr-1 text-sm">{networkInfo.logo || '🔗'}</div>
-                  <span>{networkInfo.name}</span>
+                  <div className="mr-1 text-sm">
+                    {networkInfo && (
+                      <ChainLogo 
+                        logoUrl={networkInfo.logoUrl}
+                        altText={networkInfo.name}
+                        size="md" // Using smaller size for mobile
+                        fallbackIcon="🔗"
+                      />
+                    )}
+                  </div>
+                  <span>{networkInfo?.name}</span>
                 </div>
               )}
               

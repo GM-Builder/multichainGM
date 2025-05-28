@@ -12,6 +12,7 @@ import {
 } from '@/utils/constants';
 import { performCheckin, switchToChain } from '@/utils/web3';
 import { ethers } from 'ethers';
+import ChainLogo from '@/components/ChainLogo';
 
 interface ChainGridProps {
   canCheckin: boolean;
@@ -276,7 +277,12 @@ const ChainGrid: React.FC<ChainGridProps> = ({
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center">
                   <div className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mr-3">
-                    <span className="text-xl">{chain.logo}</span>
+                    <ChainLogo 
+                      logoUrl={chain.logoUrl}
+                      altText={chain.chainName}
+                      size="md"
+                      fallbackIcon="🔗"
+                    />
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-900 dark:text-gray-100">{chain.chainName}</h3>
@@ -297,17 +303,17 @@ const ChainGrid: React.FC<ChainGridProps> = ({
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-xs text-gray-500 dark:text-gray-400">Fee:</span>
                   <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                    {CHECKIN_FEE} {chain.chainName.includes('Tea') ? 'TEA' : 'ETH'}
+                    {CHECKIN_FEE} {chain.nativeCurrency.symbol}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-gray-500 dark:text-gray-400">Status:</span>
                   <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    chain.status === 'Ready!' 
+                    isChainSupported(chain.id) 
                       ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' 
                       : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
                   }`}>
-                    {chain.status}
+                    {isChainSupported(chain.id) ? 'Ready!' : 'Not Supported'}
                   </span>
                 </div>
               </div>
@@ -318,7 +324,7 @@ const ChainGrid: React.FC<ChainGridProps> = ({
                   !canCheckin || 
                   !isConnected || 
                   isCountdownActive || 
-                  chain.status !== 'Ready!' || 
+                  !isChainSupported(chain.id) || 
                   processingChainId !== null || 
                   isLoading
                 }
