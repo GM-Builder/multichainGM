@@ -10,14 +10,11 @@ interface AudioPlayerProps {
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
-  // Refs
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Router
   const router = useRouter();
   
-  // State
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(initialVolume);
@@ -25,26 +22,20 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [fadeTimeout, setFadeTimeout] = useState<NodeJS.Timeout | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const [isProfileTab, setIsProfileTab] = useState(false); // Track if we're on profile tab
-
-  // Initialize audio element
+  const [isProfileTab, setIsProfileTab] = useState(false); 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Create audio element
       const audio = new Audio();
       audio.loop = true;
-      audio.volume = 0; // Start with volume at 0 to allow for fade-in
+      audio.volume = 0; 
       audioRef.current = audio;
 
-      // Check if music should be enabled based on localStorage
       const musicEnabled = localStorage.getItem('musicEnabled') !== 'false';
       setIsPlaying(musicEnabled);
 
-      // Check theme
       const savedTheme = localStorage.getItem('theme');
       setIsDarkMode(savedTheme !== 'light');
 
-      // Clean up audio element and intervals on unmount
       return () => {
         if (audioRef.current) {
           audioRef.current.pause();
@@ -62,7 +53,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     }
   }, []);
 
-  // Listen for theme changes
   useEffect(() => {
     const handleThemeChange = () => {
       const savedTheme = localStorage.getItem('theme');
@@ -78,16 +68,13 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     };
   }, []);
 
-  // Listen for tab changes
   useEffect(() => {
     const handleTabChange = (event: CustomEvent) => {
       if (event.detail && event.detail.tab) {
-        // Only check if it's the profile tab or not
         setIsProfileTab(event.detail.tab === 'profile');
       }
     };
 
-    // Add event listener for tab changes
     window.addEventListener('tabChanged', handleTabChange as EventListener);
     
     return () => {
@@ -95,23 +82,18 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     };
   }, []);
 
-  // Handle music changes based on profile tab status
   useEffect(() => {
     if (!audioRef.current) return;
 
-    // Determine which music to play
     const musicPath = isProfileTab ? PROFILE_MUSIC : DEFAULT_MUSIC;
     
-    // Only change the music if it's different from current or not playing but should be
     if (currentMusic !== musicPath || (isPlaying && audioRef.current.paused)) {
       setCurrentMusic(musicPath);
       
-      // Fade out current music if playing
       if (audioRef.current.paused === false) {
         fadeOutCurrentMusic().then(() => {
-          if (!audioRef.current) return; // Check if component was unmounted
+          if (!audioRef.current) return; 
           
-          // After fade out, change source and play new music
           audioRef.current.src = musicPath;
           if (isPlaying) {
             audioRef.current.play().catch(error => {
@@ -121,18 +103,15 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
           }
         });
       } else if (isPlaying) {
-        // Just change source and play if nothing was playing but should be
         audioRef.current.src = musicPath;
         audioRef.current.play().catch(error => {
           console.warn('Audio autoplay was prevented:', error);
         });
         fadeInMusic();
       } else {
-        // Just update the source but don't play
         audioRef.current.src = musicPath;
       }
     } else if (!isPlaying && audioRef.current.paused === false) {
-      // Should not be playing but is playing
       fadeOutCurrentMusic().then(() => {
         if (audioRef.current) {
           audioRef.current.pause();
@@ -141,7 +120,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     }
   }, [isPlaying, currentMusic, isProfileTab]);
 
-  // Listen for music toggle events
   useEffect(() => {
     const handleMusicToggle = (event: Event) => {
       const customEvent = event as CustomEvent<{ enabled: boolean }>;
@@ -151,7 +129,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
       
       if (newPlayingState) {
         if (audioRef.current) {
-          // Determine which music to play based on current tab
           const musicPath = isProfileTab ? PROFILE_MUSIC : DEFAULT_MUSIC;
           
           if (currentMusic !== musicPath) {
@@ -181,11 +158,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     };
   }, [currentMusic, isProfileTab]);
 
-  // Fade out current music
   const fadeOutCurrentMusic = async (): Promise<void> => {
     if (!audioRef.current || audioRef.current.paused) return Promise.resolve();
     
-    // Clear any existing fade interval
     if (fadeIntervalRef.current) {
       clearInterval(fadeIntervalRef.current);
       fadeIntervalRef.current = null;
@@ -195,7 +170,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     if (currentVolume <= 0.01) return Promise.resolve();
     
     const steps = 20;
-    const interval = 50; // milliseconds
+    const interval = 50; 
     const decrementAmount = currentVolume / steps;
     
     return new Promise<void>((resolve) => {
@@ -224,22 +199,20 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     });
   };
 
-  // Fade in music
   const fadeInMusic = (): void => {
     if (!audioRef.current) return;
     
-    // Clear any existing fade interval
     if (fadeIntervalRef.current) {
       clearInterval(fadeIntervalRef.current);
       fadeIntervalRef.current = null;
     }
     
     audioRef.current.volume = 0;
-    if (isMuted) return; // Don't fade in if muted
+    if (isMuted) return; 
     
     const targetVolume = volume;
     const steps = 20;
-    const interval = 50; // milliseconds
+    const interval = 50; 
     const incrementAmount = targetVolume / steps;
     
     let step = 0;
@@ -265,7 +238,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     }, interval);
   };
 
-  // Toggle music play/pause
   const togglePlay = (): void => {
     if (!audioRef.current) return;
     
@@ -273,7 +245,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     setIsPlaying(newPlayingState);
     
     if (newPlayingState) {
-      // Starting playback
       const musicPath = isProfileTab ? PROFILE_MUSIC : DEFAULT_MUSIC;
       
       if (currentMusic !== musicPath) {
@@ -288,7 +259,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
       
       fadeInMusic();
     } else {
-      // Stopping playback
       fadeOutCurrentMusic().then(() => {
         if (audioRef.current) {
           audioRef.current.pause();
@@ -296,11 +266,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
       });
     }
     
-    // Save preference to localStorage
     localStorage.setItem('musicEnabled', newPlayingState.toString());
   };
 
-  // Toggle mute
   const toggleMute = (): void => {
     if (!audioRef.current) return;
     
@@ -308,15 +276,12 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     setIsMuted(newMutedState);
     
     if (newMutedState) {
-      // Muting
       fadeOutCurrentMusic();
     } else {
-      // Unmuting
       fadeInMusic();
     }
   };
 
-  // Show control briefly when changing state
   useEffect(() => {
     setIsVisible(true);
     
@@ -337,7 +302,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     };
   }, [isPlaying, isMuted]);
 
-  // Show control when hovering
   const handleMouseEnter = (): void => {
     setIsVisible(true);
     if (fadeTimeout) {

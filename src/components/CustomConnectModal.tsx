@@ -1,4 +1,3 @@
-// components/CustomConnectModal.tsx
 import React, { useState } from 'react';
 import { FaTimes, FaEnvelope, FaPhone, FaDiscord, FaSun, FaMoon, FaWallet } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
@@ -116,7 +115,6 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
   const [selectedWalletType, setSelectedWalletType] = useState<string | null>(null);
   const [showWalletOptions, setShowWalletOptions] = useState(false);
   
-  // Social Auth Options - Row 1 (Icons only)
   const socialIconsRow = [
     {
       id: "google",
@@ -140,7 +138,6 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
     }
   ];
 
-  // Other Auth Options
   const otherAuthOptions = [
     {
       id: "email",
@@ -159,7 +156,6 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
     }
   ];
 
-  // External Wallets with proper logo paths
   const externalWallets = [
     {
       id: "metamask",
@@ -198,7 +194,6 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
     }
   ];
 
-  // Create inApp wallet instance
   const inAppWalletInstance = inAppWallet({
     auth: {
       options: [
@@ -298,12 +293,10 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
           className="relative bg-white dark:bg-gradient-to-br dark:from-slate-900/95 dark:via-gray-900/95 dark:to-slate-800/95 backdrop-blur-2xl rounded-3xl border border-gray-200 dark:border-cyan-500/20 shadow-2xl shadow-gray-500/10 dark:shadow-cyan-500/5 w-full max-w-sm max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Animated Background Elements (Dark Mode Only) */}
           <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent dark:from-cyan-500/5 dark:via-transparent dark:to-emerald-500/5"></div>
           <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-transparent to-transparent dark:from-cyan-400/10 dark:to-transparent rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-transparent to-transparent dark:from-emerald-400/10 dark:to-transparent rounded-full blur-2xl"></div>
           
-          {/* Header */}
           <div className="relative flex items-center justify-between p-6 pb-4">
             <div className="flex items-center gap-3">
               {showWalletOptions && (
@@ -336,11 +329,9 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
             </div>
           </div>
           
-          {/* Content */}
           <div className="relative px-6 pb-6">
             <AnimatePresence mode="wait">
               {showWalletOptions ? (
-                // Wallet Options
                 <motion.div
                   key="wallets"
                   initial={{ opacity: 0, x: 20 }}
@@ -386,7 +377,6 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                   ))}
                 </motion.div>
               ) : (
-                // Main Sign In Options
                 <motion.div
                   key="main"
                   initial={{ opacity: 0, x: -20 }}
@@ -395,7 +385,6 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                   transition={{ duration: 0.2 }}
                   className="space-y-4"
                 >
-                  {/* Row 1: Social Icons */}
                   <div className="grid grid-cols-4 gap-3">
                     {socialIconsRow.map((social, index) => (
                       <motion.button
@@ -421,7 +410,6 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                     ))}
                   </div>
 
-                  {/* Other Auth Options */}
                   <div className="space-y-2">
                     {otherAuthOptions.map((auth, index) => (
                       <motion.button
@@ -457,14 +445,12 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                     ))}
                   </div>
 
-                  {/* Divider */}
                   <div className="flex items-center gap-3 my-6">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-slate-600 to-transparent"></div>
                     <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/30 rounded-full">or</span>
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-slate-600 to-transparent"></div>
                   </div>
 
-                  {/* Connect Wallet Option */}
                   <motion.button
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -492,7 +478,6 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
               )}
             </AnimatePresence>
 
-            {/* Footer */}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

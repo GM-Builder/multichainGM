@@ -14,7 +14,6 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Initialize theme on component mount
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -27,7 +26,6 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
     document.documentElement.classList.toggle('dark', shouldBeDark);
   }, [forceTheme]);
 
-  // Handle forced theme changes from parent
   useEffect(() => {
     if (forceTheme !== null) {
       const newDarkMode = forceTheme === 'dark';
@@ -42,13 +40,10 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
     const newTheme = !isDarkMode;
     setIsDarkMode(newTheme);
     
-    // Update DOM class
     document.documentElement.classList.toggle('dark', newTheme);
     
-    // Save preference
     localStorage.setItem('theme', newTheme ? 'dark' : 'light');
     
-    // Notify parent component if callback provided
     if (onThemeChange) {
       onThemeChange(newTheme ? 'dark' : 'light');
     }
@@ -62,7 +57,6 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
       aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       <div className="relative w-5 h-5">
-        {/* Sun Icon */}
         <FaSun
           className={`absolute inset-0 w-5 h-5 text-yellow-500 transition-all duration-300 ${
             isDarkMode 
@@ -71,7 +65,6 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
           }`}
         />
         
-        {/* Moon Icon */}
         <FaMoon
           className={`absolute inset-0 w-5 h-5 text-gray-600 dark:text-gray-300 transition-all duration-300 ${
             isDarkMode 
@@ -81,7 +74,6 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
         />
       </div>
       
-      {/* Subtle glow effect */}
       <div className={`absolute inset-0 rounded-lg transition-all duration-300 ${
         isDarkMode 
           ? 'bg-blue-500/10 shadow-inner' 

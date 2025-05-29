@@ -13,10 +13,8 @@ import { LOADING_STATES, getChainConfig } from '@/utils/constants';
 import { motion } from 'framer-motion';
 import AudioPlayer from '@/components/AudioPlayer';
 
-// Type definitions
 type NetworkTabType = 'all' | 'mainnet' | 'testnet';
 
-// SVG Patterns for animation
 const BlobPatternBottomLeft: React.FC = () => (
   <div className="fixed bottom-0 left-0 w-64 h-64 -mb-32 -ml-32 opacity-10 dark:opacity-5 pointer-events-none z-0">
     <motion.svg 
@@ -62,7 +60,6 @@ const SquigglyPatternTopRight: React.FC = () => (
 );
 
 const CheckinPageIntegration: React.FC = () => {
-  // State management
   const { 
     web3State, 
     connectWallet: rawConnectWallet, 
@@ -72,10 +69,8 @@ const CheckinPageIntegration: React.FC = () => {
     getCurrentChainInfo 
   } = useWalletState();
   
-  // Wrap connectWallet to return void instead of boolean
   const connectWallet = useCallback(async (): Promise<void> => {
     await rawConnectWallet();
-    // Return type is void
   }, [rawConnectWallet]);
   
   const [totalGlobalCheckins, setTotalGlobalCheckins] = useState<number>(0);
@@ -85,13 +80,10 @@ const CheckinPageIntegration: React.FC = () => {
   const [lastCheckinChainId, setLastCheckinChainId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showCheckinTutorial, setShowCheckinTutorial] = useState<boolean>(false);
-  
-  // New states for notifications and tabs
   const [showSuccessNotification, setShowSuccessNotification] = useState<boolean>(false);
   const [showErrorNotification, setShowErrorNotification] = useState<boolean>(false);
   const [networkTab, setNetworkTab] = useState<NetworkTabType>('testnet');
 
-  // Fetch total checkins data
   useEffect(() => {
     const fetchTotalCheckins = async (): Promise<void> => {
       if (!web3State.isConnected || !web3State.contract) return;
@@ -99,11 +91,9 @@ const CheckinPageIntegration: React.FC = () => {
       try {
         setLoadingState(LOADING_STATES.LOADING);
         
-        // Get global checkin count
         const totalCount = await getTotalCheckins(web3State.contract);
         setTotalGlobalCheckins(totalCount);
         
-        // Get user total checkins
         if (web3State.address) {
           try {
             const metrics = await web3State.contract.getNavigatorMetrics(web3State.address);
@@ -123,7 +113,6 @@ const CheckinPageIntegration: React.FC = () => {
     fetchTotalCheckins();
   }, [web3State.isConnected, web3State.contract, web3State.address]);
 
-  // Handle checkin success
   const handleCheckinSuccess = useCallback((chainId: number, txHash: string): void => {
     setLastTxHash(txHash);
     setLastCheckinChainId(chainId);
@@ -132,7 +121,6 @@ const CheckinPageIntegration: React.FC = () => {
     setShowSuccessNotification(true);
   }, []);
 
-  // Handle error
   const handleError = useCallback((errorMessage: string): void => {
     setError(errorMessage);
     setShowErrorNotification(true);
@@ -144,7 +132,6 @@ const CheckinPageIntegration: React.FC = () => {
       <SquigglyPatternTopRight />
       <AudioPlayer />
       
-      {/* Success Notification */}
       <Notification
         isOpen={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
@@ -155,7 +142,6 @@ const CheckinPageIntegration: React.FC = () => {
         chainId={lastCheckinChainId}
       />
       
-      {/* Error Notification */}
       <Notification
         isOpen={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
@@ -164,7 +150,6 @@ const CheckinPageIntegration: React.FC = () => {
         message={error || "An unknown error occurred. Please try again."}
       />
       
-      {/* Main Content */}
       <div className="pt-32 max-w-7xl mx-auto px-4 py-6 relative z-10">
         <div className="flex justify-center mb-8">
           <div className="flex bg-white dark:bg-gray-800/80 px-2 py-1 rounded-full backdrop-blur-sm shadow-md">
@@ -212,7 +197,6 @@ const CheckinPageIntegration: React.FC = () => {
           </div>
         </div>
         
-        {/* Main Checkin Grid */}
         <FixedMultiChainCheckinGrid
           isConnected={web3State.isConnected}
           currentChainId={web3State.chainId}

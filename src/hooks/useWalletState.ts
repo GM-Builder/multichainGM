@@ -31,20 +31,17 @@ export function useWalletState() {
     chainId: null,
   });
 
-  // Check wallet connection on initial load
   useEffect(() => {
     const checkConnection = async () => {
       const wasConnected = localStorage.getItem("walletConnected") === "true";
       const storedAddress = localStorage.getItem("walletAddress");
       
       if (wasConnected && storedAddress) {
-        // Check if wallet is still connected
         const isStillConnected = await checkWalletConnected();
         
         if (isStillConnected) {
           handleConnectWallet();
         } else {
-          // Clean up localStorage if wallet is not connected anymore
           localStorage.removeItem("walletConnected");
           localStorage.removeItem("walletAddress");
         }
@@ -54,7 +51,6 @@ export function useWalletState() {
     checkConnection();
   }, []);
 
-  // Gunakan custom hook untuk event handling
   useEthereumEvents({
     accountsChanged: (accounts) => {
       console.log('Accounts changed:', accounts);
@@ -66,14 +62,12 @@ export function useWalletState() {
     },
     chainChanged: (chainId) => {
       console.log('Chain changed:', chainId);
-      // Refresh the connection to update contract and chain info
       if (web3State.isConnected) {
         handleConnectWallet();
       }
     }
   });
 
-  // Check if wallet is connected (works with thirdweb)
   const checkWalletConnected = async (): Promise<boolean> => {
     try {
       if (typeof window === 'undefined') return false;
@@ -96,37 +90,30 @@ export function useWalletState() {
       console.log("Connecting wallet...");
       setWeb3State((prev) => ({ ...prev, isLoading: true, error: null }));
 
-      // Check if window.ethereum is available (should be after thirdweb connection)
       if (typeof window === 'undefined' || !window.ethereum) {
         throw new Error("No Ethereum provider found. Please connect your wallet first.");
       }
 
       const ethereum = window.ethereum;
       
-      // Get accounts (should already be connected via thirdweb)
       const accounts = await ethereum.request({ method: 'eth_accounts' });
       
       if (!accounts || accounts.length === 0) {
-        // If no accounts, request them (fallback)
         const requestedAccounts = await ethereum.request({ method: 'eth_requestAccounts' });
         if (!requestedAccounts || requestedAccounts.length === 0) {
           throw new Error("No accounts returned from wallet");
         }
       }
 
-      // Create provider and signer
       const provider = new ethers.providers.Web3Provider(ethereum, "any");
       const signer = provider.getSigner();
       const address = accounts[0] || await signer.getAddress();
       
-      // Get network info
       const network = await provider.getNetwork();
       const chainId = network.chainId;
       
-      // Get contract for the current chain
       const contract = getContract(signer, chainId);
 
-      // Update state
       setWeb3State({
         isConnected: true,
         address,
@@ -138,7 +125,6 @@ export function useWalletState() {
         chainId,
       });
 
-      // Store connection info in localStorage
       localStorage.setItem("walletConnected", "true");
       localStorage.setItem("walletAddress", address);
 
@@ -154,7 +140,6 @@ export function useWalletState() {
         error: error.message || "Failed to connect wallet",
       }));
 
-      // Clear any stored connection data
       localStorage.removeItem("walletConnected");
       localStorage.removeItem("walletAddress");
       return false;
@@ -162,7 +147,6 @@ export function useWalletState() {
   }, [web3State.isLoading]);
 
   const handleDisconnectWallet = useCallback(() => {
-    // Reset web3 state
     setWeb3State({
       isConnected: false,
       address: null,
@@ -174,7 +158,6 @@ export function useWalletState() {
       chainId: null,
     });
 
-    // Clear local storage
     localStorage.removeItem("walletConnected");
     localStorage.removeItem("walletAddress");
 
@@ -186,7 +169,7 @@ export function useWalletState() {
       setWeb3State((prev) => ({ ...prev, isLoading: true }));
       
       if (!targetChainId) {
-        targetChainId = 10218; // Tea Sepolia Chain ID as default
+        targetChainId = 10218;
       }
       
       const chainConfig = getChainConfig(targetChainId);
@@ -199,7 +182,6 @@ export function useWalletState() {
         throw new Error("No Ethereum provider found");
       }
 
-      // Buat objek baru dengan hanya properti standar EIP-3085
       const standardChainConfig = {
         chainId: chainConfig.chainId,
         chainName: chainConfig.chainName,
@@ -209,24 +191,21 @@ export function useWalletState() {
       };
 
       try {
-        // Try to switch to the chain
         await ethereum.request({
           method: "wallet_switchEthereumChain",
           params: [{ chainId: chainConfig.chainId }],
         });
       } catch (switchError: any) {
-        // If chain is not added, add it
         if (switchError.code === 4902) {
           await ethereum.request({
             method: "wallet_addEthereumChain",
-            params: [standardChainConfig], // Gunakan config yang sudah difilter
+            params: [standardChainConfig], 
           });
         } else {
           throw switchError;
         }
       }
       
-      // Reconnect wallet after network switch to update contract
       await handleConnectWallet();
       
       return true;

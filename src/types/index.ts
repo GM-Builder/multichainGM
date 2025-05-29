@@ -1,6 +1,5 @@
 import { ethers } from "ethers";
 
-// Web3 State Interface
 export interface Web3State {
   isConnected: boolean;
   address: string | null;
@@ -12,7 +11,6 @@ export interface Web3State {
   chainId: number | null;
 }
 
-// Checkin Stats Interface
 export interface CheckinStats {
   timeUntilNextCheckin: number;
   lastCheckinTime?: number;
@@ -20,7 +18,6 @@ export interface CheckinStats {
   canCheckin?: boolean;
 }
 
-// Chain Configuration Interface
 export interface ChainConfig {
   chainId: string;
   chainName: string;
@@ -36,13 +33,11 @@ export interface ChainConfig {
   status: string;
 }
 
-// Navigation Event Interface
 export interface NavigationEvent {
   tab: string;
   subtab?: string;
 }
 
-// Audio Player State Interface
 export interface AudioState {
   isPlaying: boolean;
   volume: number;
@@ -51,7 +46,6 @@ export interface AudioState {
   isVisible: boolean;
 }
 
-// Ambient Sound Configuration
 export interface AmbientSound {
   name: string;
   description: string;
@@ -60,10 +54,8 @@ export interface AmbientSound {
   type: OscillatorType;
 }
 
-// Theme Type
 export type Theme = 'light' | 'dark';
 
-// Notification Interface
 export interface Notification {
   id: string;
   message: string;
@@ -71,13 +63,11 @@ export interface Notification {
   duration?: number;
 }
 
-// Contract Transaction Response
 export interface ContractTransactionResponse {
   hash: string;
   wait: () => Promise<ethers.providers.TransactionReceipt>;
 }
 
-// Navigator Metrics from Smart Contract
 export interface NavigatorMetrics {
   lastBeacon: ethers.BigNumber;
   crystalCount: ethers.BigNumber;

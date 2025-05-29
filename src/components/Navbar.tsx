@@ -225,7 +225,7 @@ const Navbar: React.FC<NavbarProps> = ({
                       <ChainLogo 
                         logoUrl={networkInfo.logoUrl}
                         altText={networkInfo.name}
-                        size="md" // Using smaller size for mobile
+                        size="md" 
                         fallbackIcon="🔗"
                       />
                     )}

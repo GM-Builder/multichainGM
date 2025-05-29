@@ -22,7 +22,6 @@ import {
 import { ethers } from 'ethers';
 import ChainLogo from '@/components/ChainLogo';
 
-// Define types
 type NetworkType = 'all' | 'mainnet' | 'testnet';
 type FilterType = 'all' | 'available' | 'checked' | 'favorites';
 type SortOptionType = 'name' | 'status';
@@ -67,9 +66,8 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
   signer,
   provider,
   onCheckinSuccess,
-  networkType = 'all' // Default value
+  networkType = 'all' 
 }) => {
-  // States
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [processingChainId, setProcessingChainId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -81,7 +79,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState<boolean>(false);
   const [networkSwitchingChainId, setNetworkSwitchingChainId] = useState<number | null>(null);
   
-  // Load favorites from localStorage
   useEffect(() => {
     try {
       const savedFavorites = localStorage.getItem('favoriteChains');
@@ -94,12 +91,10 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
     }
   }, []);
 
-  // Save favorites to localStorage
   useEffect(() => {
     localStorage.setItem('favoriteChains', JSON.stringify(favoriteChains));
   }, [favoriteChains]);
 
-  // Clear success message after timeout
   useEffect(() => {
     if (successChainId) {
       const timer = setTimeout(() => setSuccessChainId(null), 5000);
@@ -107,7 +102,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
     }
   }, [successChainId]);
 
-  // Clear error message after timeout
   useEffect(() => {
     if (errorMessage) {
       const timer = setTimeout(() => setErrorMessage(null), 5000);
@@ -115,7 +109,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
     }
   }, [errorMessage]);
 
-  // Update timers every second
   useEffect(() => {
     if (!isConnected) return;
 
@@ -134,7 +127,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
               timeUntilNextCheckin: status.timeUntilNextCheckin - 1
             };
             
-            // If timer reached zero, update canCheckin
             if (newMap[chainId].timeUntilNextCheckin === 0) {
               newMap[chainId].canCheckin = true;
               updated = true;
@@ -149,17 +141,14 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
     return () => clearInterval(interval);
   }, [isConnected]);
 
-  // Check chain status whenever the connection state changes
   useEffect(() => {
     if (isConnected && address && signer) {
       checkAllChainsStatus();
     } else {
-      // Reset statuses when disconnected
       setChainStatusMap({});
     }
   }, [isConnected, address, signer]);
 
-  // Toggle favorite status for a chain
   const toggleFavorite = useCallback((chainId: number): void => {
     setFavoriteChains(prev => {
       if (prev.includes(chainId)) {
@@ -170,7 +159,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
     });
   }, []);
 
-  // Check status for all chains
   const checkAllChainsStatus = async (): Promise<void> => {
     if (!isConnected || !signer || !address) {
       console.log("Not connected or missing signer/address");
@@ -182,8 +170,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
     const statusMap: Record<number, ChainCheckinStatus> = {};
 
     try {
-      // For each chain, set a default status (assuming they can check in)
-      // This ensures buttons are enabled by default until we know otherwise
       supportedChainIds.forEach(chainId => {
         statusMap[chainId] = {
           canCheckin: true,
@@ -192,20 +178,16 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
         };
       });
       
-      // Update the status map with these default values first
       setChainStatusMap(statusMap);
 
-      // Proses chain dalam batch untuk menghindari rate limiting
       const BATCH_SIZE = 3;
-      const DELAY_BETWEEN_REQUESTS = 500; // ms
+      const DELAY_BETWEEN_REQUESTS = 500; 
       
       for (let i = 0; i < supportedChainIds.length; i += BATCH_SIZE) {
         const batchChainIds = supportedChainIds.slice(i, i + BATCH_SIZE);
         
-        // Proses batch secara paralel
         const batchPromises = batchChainIds.map(async (chainId) => {
           try {
-            // Tambahkan jeda kecil antar permintaan dalam batch
             await delay(Math.random() * 200);
             
             const contractAddress = getContractAddress(chainId);
@@ -214,7 +196,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
             const provider = new ethers.providers.JsonRpcProvider(SUPPORTED_CHAINS[chainId].rpcUrls[0]);
             const contract = new ethers.Contract(contractAddress, abi, provider);
             
-            // Cek status
             let canActivate = true;
             let lastBeacon = null;
             let timeRemaining = 0;
@@ -236,7 +217,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
               }
             } catch (error) {
               console.error(`Error checking status for chain ${chainId}:`, error);
-              // Untuk chain yang tidak bisa diperiksa, gunakan nilai default
             }
             
             return {
@@ -255,17 +235,14 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
         
         const batchResults = await Promise.allSettled(batchPromises);
         
-        // Update statusMap dengan hasil batch
         batchResults.forEach(result => {
           if (result.status === 'fulfilled') {
             statusMap[result.value.chainId] = result.value.status;
           }
         });
         
-        // Update UI setelah setiap batch
         setChainStatusMap({...statusMap});
         
-        // Tambahkan jeda antar batch untuk menghindari rate limiting
         if (i + BATCH_SIZE < supportedChainIds.length) {
           await delay(DELAY_BETWEEN_REQUESTS);
         }
@@ -277,29 +254,23 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
     }
   };
 
-  // Handle checkin for a specific chain
   const handleCheckin = async (chainId: number): Promise<void> => {
-    // Cek apakah kita bisa melakukan transaksi
     if (!isConnected || !signer || processingChainId !== null) {
       console.log("Not connected, missing signer, or already processing");
       return;
     }
     
     try {
-      // Set state untuk menunjukkan proses sedang berjalan
       setProcessingChainId(chainId);
       setErrorMessage(null);
       
-      // Cek apakah perlu switch network
       if (currentChainId !== chainId) {
         try {
           setNetworkSwitchingChainId(chainId);
           console.log(`Switching to chain ${chainId} from ${currentChainId}`);
           
-          // Switch network
           await switchToChain(chainId);
           
-          // Tunggu sebentar agar wallet benar-benar berpindah
           await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
         } catch (switchError: any) {
           console.error("Error switching network:", switchError);
@@ -312,7 +283,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
         }
       }
       
-      // Dapatkan provider dan signer yang fresh setelah switch network
       const updatedProvider = getProvider();
       if (!updatedProvider) {
         throw new Error("Provider not available after network switch");
@@ -320,47 +290,38 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
       
       const updatedSigner = updatedProvider.getSigner();
       
-      // Dapatkan contract untuk chain ini
       const contract = getContract(updatedSigner, chainId);
       
       console.log(`Performing checkin on chain ${chainId}`);
       
-      // Log parameter-parameter penting untuk debugging
       console.log("Before performCheckin:", { 
         contract, 
         chainId, 
         checkinFee: CHECKIN_FEE
       });
       
-      // Kirim transaksi
       const tx = await performCheckin(contract, chainId);
       console.log("Transaction sent:", tx.hash);
       
-      // Segera anggap sebagai sukses setelah hash transaksi diterima
-      // Tidak perlu menunggu konfirmasi untuk update UI
       if (tx.hash) {
         console.log("Transaction hash received:", tx.hash);
         
-        // Update success state
         setSuccessChainId(chainId);
         
-        // Update chain status
         setChainStatusMap(prev => ({
           ...prev,
           [chainId]: {
             ...prev[chainId],
             canCheckin: false,
             lastCheckin: Math.floor(Date.now() / 1000),
-            timeUntilNextCheckin: 24 * 60 * 60 // Approximate 24 hours
+            timeUntilNextCheckin: 24 * 60 * 60 
           }
         }));
         
-        // Panggil callback onCheckinSuccess
         if (onCheckinSuccess) {
           onCheckinSuccess(chainId, tx.hash);
         }
         
-        // Tunggu konfirmasi di background tanpa blocking UI
         tx.wait()
           .then(receipt => {
             console.log("Transaction confirmed:", receipt);
@@ -375,12 +336,10 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
       console.error("Error performing checkin:", error);
       setErrorMessage(error.message || "Failed to send GM");
     } finally {
-      // Selalu reset processing state
       setProcessingChainId(null);
     }
   };
 
-  // Format time string
   const formatTime = (seconds: number): string => {
     if (seconds <= 0) return "Available";
     
@@ -397,7 +356,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
     }
   };
   
-  // Check if a chain is testnet or mainnet
   const isTestnet = (chain: Chain): boolean => {
     return chain.chainName.toLowerCase().includes('testnet') || 
            chain.chainName.toLowerCase().includes('sepolia') ||
@@ -406,14 +364,12 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
            chain.chainName.toLowerCase().includes('alfajores') ||
            chain.chainName.toLowerCase().includes('fuji') ||
            chain.chainName.toLowerCase().includes('holesky') ||
-           chain.id === 11155111 || // Sepolia
-           chain.id === 5 ||       // Goerli
-           chain.id === 80001 ||   // Mumbai
-           chain.id === 43113 ||   // Fuji
-           chain.id === 17000;     // Holesky
+           chain.id === 11155111 || 
+           chain.id === 5 ||       
+           chain.id === 43113 ||   
+           chain.id === 17000;     
   };
   
-  // Get all supported chains
   const supportedChains: Chain[] = getSupportedChainIds().map(id => ({
     id,
     ...SUPPORTED_CHAINS[id],
@@ -424,11 +380,9 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
     }
   }));
 
-  // Filter and sort chains
   const getFilteredAndSortedChains = (): Chain[] => {
     let filteredChains = [...supportedChains];
     
-    // Filter berdasarkan tipe jaringan (mainnet/testnet)
     if (networkType !== 'all') {
       filteredChains = filteredChains.filter(chain => {
         if (networkType === 'testnet') {
@@ -439,7 +393,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
       });
     }
     
-    // Apply filters
     switch (filter) {
       case 'available':
         filteredChains = filteredChains.filter(chain => 
@@ -458,18 +411,15 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
         break;
     }
     
-    // Apply sorting
     switch (sortOption) {
       case 'name':
         filteredChains.sort((a, b) => a.chainName.localeCompare(b.chainName));
         break;
       case 'status':
         filteredChains.sort((a, b) => {
-          // Available chains first
           if (a.status.canCheckin && !b.status.canCheckin) return -1;
           if (!a.status.canCheckin && b.status.canCheckin) return 1;
           
-          // Then sort by time remaining
           return a.status.timeUntilNextCheckin - b.status.timeUntilNextCheckin;
         });
         break;
@@ -480,12 +430,10 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
   
   const filteredChains = getFilteredAndSortedChains();
 
-  // Count available chains
   const availableChainCount = filteredChains.filter(
     chain => chain.status.canCheckin && chain.status.timeUntilNextCheckin === 0
   ).length;
 
-  // Get network icon and colors based on network type
   const getNetworkConfig = () => {
     switch (networkType) {
       case 'testnet':
@@ -517,7 +465,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
 
   return (
     <div className="w-full pt-10">
-      {/* Filter and Sort Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -618,7 +565,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
         </motion.div>
       </div>
 
-      {/* Error Message */}
       <AnimatePresence>
         {errorMessage && (
           <motion.div
@@ -644,7 +590,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Not Connected Message */}
       {!isConnected && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -668,7 +613,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
         </motion.div>
       )}
 
-      {/* No Results Message */}
       {isConnected && filteredChains.length === 0 && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -691,7 +635,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
         </motion.div>
       )}
 
-      {/* Chain Grid - 5 columns */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {filteredChains.map((chain, index) => {
           const chainStatus = chain.status;

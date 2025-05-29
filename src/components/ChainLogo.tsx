@@ -1,4 +1,3 @@
-// @/components/ui/ChainLogo.tsx
 import React, { useState } from 'react';
 import Image from 'next/image';
 
@@ -20,7 +19,6 @@ const ChainLogo: React.FC<ChainLogoProps> = ({
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Size configurations
   const sizeConfig = {
     sm: { width: 20, height: 20, className: 'w-5 h-5' },
     md: { width: 24, height: 24, className: 'w-6 h-6' },
@@ -39,7 +37,6 @@ const ChainLogo: React.FC<ChainLogoProps> = ({
     setIsLoading(false);
   };
 
-  // Show fallback if image failed to load
   if (imageError) {
     return (
       <div 
@@ -57,12 +54,9 @@ const ChainLogo: React.FC<ChainLogoProps> = ({
 
   return (
     <div className={`${config.className} ${className} relative overflow-hidden rounded`}>
-      {/* Loading skeleton */}
       {isLoading && (
         <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
       )}
-      
-      {/* ✅ SAFE: Using Next.js Image component with string path */}
       <Image
         src={logoUrl}
         alt={altText}
@@ -73,9 +67,8 @@ const ChainLogo: React.FC<ChainLogoProps> = ({
         }`}
         onError={handleImageError}
         onLoad={handleImageLoad}
-        // Optimasi Next.js
-        priority={false} // Set true untuk gambar above-the-fold
-        placeholder="blur" // Opsi: tambahkan blurDataURL jika diinginkan
+        priority={false} 
+        placeholder="blur" 
         blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8A0aQoFgpA/9k="
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
       />

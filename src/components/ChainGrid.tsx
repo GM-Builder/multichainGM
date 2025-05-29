@@ -35,7 +35,6 @@ const ChainGrid: React.FC<ChainGridProps> = ({
   onCheckinSuccess,
   contract
 }) => {
-  // States
   const [isLoading, setIsLoading] = useState<boolean>(isLoadingProp);
   const [processingChainId, setProcessingChainId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -43,11 +42,9 @@ const ChainGrid: React.FC<ChainGridProps> = ({
   const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all');
   const [favoriteChains, setFavoriteChains] = useState<number[]>([]);
   
-  // Countdown timer state
   const [secondsRemaining, setSecondsRemaining] = useState<number>(timeUntilNextCheckin);
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(timeUntilNextCheckin > 0);
 
-  // Load favorites from localStorage
   useEffect(() => {
     const savedFavorites = localStorage.getItem('favoriteChains');
     if (savedFavorites) {
@@ -60,17 +57,14 @@ const ChainGrid: React.FC<ChainGridProps> = ({
     }
   }, []);
 
-  // Save favorites to localStorage
   useEffect(() => {
     localStorage.setItem('favoriteChains', JSON.stringify(favoriteChains));
   }, [favoriteChains]);
 
-  // Update loading state from props
   useEffect(() => {
     setIsLoading(isLoadingProp);
   }, [isLoadingProp]);
 
-  // Countdown effect
   useEffect(() => {
     setSecondsRemaining(timeUntilNextCheckin);
     setIsCountdownActive(timeUntilNextCheckin > 0);
@@ -99,7 +93,6 @@ const ChainGrid: React.FC<ChainGridProps> = ({
     };
   }, [isCountdownActive, onCountdownComplete]);
 
-  // Clear success message after timeout
   useEffect(() => {
     if (successChainId) {
       const timer = setTimeout(() => setSuccessChainId(null), 5000);
@@ -107,7 +100,6 @@ const ChainGrid: React.FC<ChainGridProps> = ({
     }
   }, [successChainId]);
 
-  // Clear error message after timeout
   useEffect(() => {
     if (errorMessage) {
       const timer = setTimeout(() => setErrorMessage(null), 5000);
@@ -115,7 +107,6 @@ const ChainGrid: React.FC<ChainGridProps> = ({
     }
   }, [errorMessage]);
 
-  // Toggle favorite status for a chain
   const toggleFavorite = (chainId: number) => {
     setFavoriteChains(prev => {
       if (prev.includes(chainId)) {
@@ -126,7 +117,6 @@ const ChainGrid: React.FC<ChainGridProps> = ({
     });
   };
 
-  // Handle checkin for a specific chain
   const handleCheckin = async (chainId: number) => {
     if (!canCheckin || isLoading || !contract || processingChainId !== null) return;
     
@@ -134,15 +124,12 @@ const ChainGrid: React.FC<ChainGridProps> = ({
       setProcessingChainId(chainId);
       setErrorMessage(null);
       
-      // Ensure we're on the right chain first
       if (currentChainId !== chainId) {
         await switchToChain(chainId);
       }
       
-      // Perform the checkin
       const tx = await performCheckin(contract, chainId);
       
-      // Wait for transaction to be mined
       const receipt = await tx.wait();
       
       setSuccessChainId(chainId);
@@ -172,20 +159,17 @@ const ChainGrid: React.FC<ChainGridProps> = ({
     }
   };
   
-  // Get supported chains
   const supportedChains = getSupportedChainIds().map(id => ({
     id,
     ...SUPPORTED_CHAINS[id]
   }));
 
-  // Filter chains based on active tab
   const displayedChains = activeTab === 'favorites' 
     ? supportedChains.filter(chain => favoriteChains.includes(chain.id))
     : supportedChains;
 
   return (
     <div className="w-full">
-      {/* Tab Navigation */}
       <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
         <button
           className={`py-2 px-4 text-sm font-medium ${
@@ -209,7 +193,6 @@ const ChainGrid: React.FC<ChainGridProps> = ({
         </button>
       </div>
 
-      {/* Error Message */}
       <AnimatePresence>
         {errorMessage && (
           <motion.div
@@ -228,7 +211,6 @@ const ChainGrid: React.FC<ChainGridProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Countdown Display */}
       {isCountdownActive && (
         <div className="mb-6 bg-emerald-50 dark:bg-emerald-900/10 rounded-lg p-4 border border-emerald-100 dark:border-emerald-800/30">
           <div className="flex items-center justify-center">
@@ -250,14 +232,12 @@ const ChainGrid: React.FC<ChainGridProps> = ({
         </div>
       )}
 
-      {/* Empty Favorites Message */}
       {activeTab === 'favorites' && favoriteChains.length === 0 && (
         <div className="text-center py-10 px-4 bg-gray-50 dark:bg-gray-800/20 rounded-lg border border-gray-200 dark:border-gray-700">
           <p className="text-gray-600 dark:text-gray-300">No favorite networks yet. Add some from the "All Networks" tab.</p>
         </div>
       )}
 
-      {/* Chain Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {displayedChains.map((chain) => {
           const isCurrentChain = currentChainId === chain.id;

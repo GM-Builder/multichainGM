@@ -19,7 +19,6 @@ interface NotificationProps {
   chainId?: number | null;
 }
 
-// Fixed Notification Component with proper centering
 const Notification: React.FC<NotificationProps> = ({ 
   isOpen, 
   onClose, 
@@ -29,7 +28,6 @@ const Notification: React.FC<NotificationProps> = ({
   txHash = null, 
   chainId = null 
 }) => {
-  // Get explorer URL for transaction
   const getTxExplorerUrl = (): string | null => {
     if (!txHash || !chainId) return null;
     
@@ -45,7 +43,6 @@ const Notification: React.FC<NotificationProps> = ({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Full screen backdrop with higher z-index */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -54,7 +51,6 @@ const Notification: React.FC<NotificationProps> = ({
             onClick={onClose}
           />
           
-          {/* Modal container - perfectly centered */}
           <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -62,7 +58,7 @@ const Notification: React.FC<NotificationProps> = ({
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="max-w-md w-full p-6 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700
                          bg-white dark:bg-gray-800 backdrop-filter backdrop-blur-lg bg-opacity-95 dark:bg-opacity-95"
-              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+              onClick={(e) => e.stopPropagation()} 
             >
               <div className="flex items-start justify-between mb-4">
                 <div className={`p-3 rounded-full ${

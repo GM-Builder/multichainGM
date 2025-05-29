@@ -9,7 +9,7 @@ import Footer from "@/components/Footer"
 import WalletRequired from "@/components/WalletRequired"
 import { useWalletState } from "@/hooks/useWalletState"
 import Navbar from "@/components/Navbar"
-import { getChainConfig } from "@/utils/constants" // Import getChainConfig
+import { getChainConfig } from "@/utils/constants" 
 
 function GMApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -20,14 +20,12 @@ function GMApp({ Component, pageProps }: AppProps) {
     await connectWallet()
   }
   
-  // Calculate network info for Navbar
   const currentNetwork = chainId ? getChainConfig(chainId) : null
   const networkInfo = currentNetwork ? {
     name: currentNetwork.chainName,
     logoUrl: currentNetwork.logoUrl
   } : null
   
-  // Determine if the current route should be wrapped with WalletRequired
   const shouldRequireWallet = !router.pathname.includes("/auth") && !router.pathname.includes("/landing")
   
   return (
@@ -45,7 +43,6 @@ function GMApp({ Component, pageProps }: AppProps) {
         />
       </Head>
       
-      {/* Google Analytics */}
       <Script
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=G-LCY12CWTZ4`}
@@ -64,7 +61,6 @@ function GMApp({ Component, pageProps }: AppProps) {
       />
      
       <ThirdwebProvider>
-        {/* Navbar - Added here so it's present on all pages */}
         <Navbar 
           address={address}
           connectWallet={adaptedConnectWallet}

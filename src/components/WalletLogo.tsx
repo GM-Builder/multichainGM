@@ -1,4 +1,3 @@
-// components/WalletLogo.tsx
 import React from 'react';
 import Image from 'next/image';
 
@@ -17,7 +16,6 @@ const WalletLogo: React.FC<WalletLogoProps> = ({
   className = '',
   fallbackIcon = '💳'
 }) => {
-  // Size configurations
   const sizeConfig = {
     sm: { width: 20, height: 20 },
     md: { width: 24, height: 24 },
@@ -27,7 +25,6 @@ const WalletLogo: React.FC<WalletLogoProps> = ({
 
   const { width, height } = sizeConfig[size];
 
-  // Simple error handling with fallback icon
   const [error, setError] = React.useState(false);
 
   if (error) {
