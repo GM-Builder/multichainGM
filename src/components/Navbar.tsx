@@ -205,10 +205,10 @@ const Navbar: React.FC<NavbarProps> = ({
                       <div className="py-1">
                         <button
                           onClick={disconnectWallet}
-                          className="px-4 py-3 w-full flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-emerald-900/10 transition-colors text-left"
+                          className="px-4 py-3 w-full flex items-center gap-2 hover:bg-red-50 dark:hover:bg-emerald-900/10 transition-colors text-left"
                         >
-                          <FaSignOutAlt className="text-emerald-500" size={14} />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">Disconnect</span>
+                          <FaSignOutAlt className="text-red-500" size={14} />
+                          <span className="text-sm text-red-500 hover:text-red-800">Disconnect</span>
                         </button>
                       </div>
                     </div>
