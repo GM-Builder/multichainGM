@@ -1,9 +1,9 @@
 import { ethers } from "ethers";
-import GMOnchainABI from "../abis/GMOnchainABI.json";
 import { 
   SUPPORTED_CHAINS, 
   getChainConfig, 
   getContractAddress,
+  getChainAbi,
   isChainSupported,
   TEA_SEPOLIA_CHAIN_ID,
   DEPLOY_BLOCK,
@@ -93,28 +93,16 @@ export const switchToTeaSepolia = async () => {
 
 export const getContract = (
   signerOrProvider: ethers.Signer | ethers.providers.Provider, 
-  chainId?: number
+  chainId: number,
 ) => {
-  let contractAddress;
-  
-  if (chainId) {
-    contractAddress = getContractAddress(chainId);
-  } else {
-    if ('provider' in signerOrProvider && signerOrProvider.provider) {
-      const provider = signerOrProvider.provider as ethers.providers.Provider;
-      provider.getNetwork().then(network => {
-        contractAddress = getContractAddress(network.chainId);
-      }).catch(() => {
-        contractAddress = getContractAddress(TEA_SEPOLIA_CHAIN_ID);
-      });
-    } else {
-      contractAddress = getContractAddress(TEA_SEPOLIA_CHAIN_ID);
-    }
+  const contractAddress = getContractAddress(chainId);
+  const contractAbi = getChainAbi(chainId);
+
+  if (!contractAddress || !contractAbi) {
+    throw new Error(`Konfigurasi tidak ditemukan untuk chain ID: ${chainId}`);
   }
-  
-  contractAddress = contractAddress || getContractAddress(TEA_SEPOLIA_CHAIN_ID);
-  
-  return new ethers.Contract(contractAddress, GMOnchainABI, signerOrProvider);
+
+  return new ethers.Contract(contractAddress, contractAbi, signerOrProvider);
 };
 
 export const delay = (ms: number): Promise<void> => {
@@ -310,7 +298,7 @@ export const performCheckin = async (
   contract: ethers.Contract, 
   chainId: number
 ): Promise<ethers.ContractTransaction> => {
-  try {
+  
     const chainConfig = getChainConfig(chainId);
     if (!chainConfig) {
       throw new Error(`Unsupported chain: ${chainId}`);
@@ -330,10 +318,6 @@ export const performCheckin = async (
     });
     
     return tx;
-  } catch (error) {
-    console.error("Error performing checkin:", error);
-    throw error;
-  }
 };
 
 export { isChainSupported, getChainConfig };

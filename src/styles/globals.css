@@ -601,3 +601,22 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(16, 185, 129, 0.4);
 }
+
+/* --- Styling Notifikasi Toast Modern --- */
+.custom-toast {
+  border-radius: 12px !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+}
+
+/* Style untuk Dark Mode */
+.dark .custom-toast {
+  background: rgba(30, 41, 59, 0.9) !important; 
+  color: #f9fafb !important; 
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Opcional: Membuat ikon lebih kontras di dark mode */
+.dark .custom-toast > div[role="status"] > div:first-child {
+  filter: invert(10%) sepia(80%) saturate(150%) hue-rotate(180deg);
+}

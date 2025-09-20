@@ -18,7 +18,8 @@ import {
   isChainSupported,
   getChainConfig,
   TEA_SEPOLIA_CHAIN_ID,
-  ChainConfig
+  ChainConfig,
+  getChainAbi
 } from '@/utils/constants';
 import { 
   getProvider,
@@ -260,12 +261,15 @@ const AdminDashboard: React.FC = () => {
     try {
       // Create contract instance for the specific chain
       const contractAddress = getContractAddress(chainId);
-      const GMOnchainABI = require("../abis/GMOnchainABI.json");
+      const contractAbi = getChainAbi(chainId);
+      if (!contractAddress || !contractAbi) {
+        throw new Error(`Configuration not found for chain ID: ${chainId}`);
+      }
       
       // Use chain-specific RPC provider
       const chainConfig = getChainConfig(chainId);
       const rpcProvider = new ethers.providers.JsonRpcProvider(chainConfig?.rpcUrls[0]);
-      const contract = new ethers.Contract(contractAddress, GMOnchainABI, rpcProvider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, rpcProvider);
 
       const [systemMetrics, topMetrics] = await Promise.all([
         contract.getSystemMetrics(),

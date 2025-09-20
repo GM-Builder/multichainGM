@@ -10,6 +10,7 @@ import WalletRequired from "@/components/WalletRequired"
 import { useWalletState } from "@/hooks/useWalletState"
 import Navbar from "@/components/Navbar"
 import { getChainConfig } from "@/utils/constants" 
+import { Toaster } from 'react-hot-toast';
 
 function GMApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -61,6 +62,21 @@ function GMApp({ Component, pageProps }: AppProps) {
       />
      
       <ThirdwebProvider>
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+          toastOptions={{
+            className: 'custom-toast',
+            
+            style: {
+              background: 'rgba(255, 255, 255, 0.9)',
+              color: '#1f2937',
+              backdropFilter: 'blur(8px)',
+            },
+            
+            duration: 5000,
+          }}
+        />
         <Navbar 
           address={address}
           connectWallet={adaptedConnectWallet}

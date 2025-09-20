@@ -10,6 +10,7 @@ import {
   SUPPORTED_CHAINS, 
   getSupportedChainIds,
   getContractAddress,
+  getChainAbi,
   isChainSupported 
 } from '@/utils/constants';
 import { 
@@ -21,6 +22,7 @@ import {
 } from '@/utils/web3';
 import { ethers } from 'ethers';
 import ChainLogo from '@/components/ChainLogo';
+import toast from 'react-hot-toast';
 
 type NetworkType = 'all' | 'mainnet' | 'testnet';
 type FilterType = 'all' | 'available' | 'checked' | 'favorites';
@@ -70,7 +72,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [processingChainId, setProcessingChainId] = useState<number | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successChainId, setSuccessChainId] = useState<number | null>(null);
   const [favoriteChains, setFavoriteChains] = useState<number[]>([]);
   const [chainStatusMap, setChainStatusMap] = useState<Record<number, ChainCheckinStatus>>({});
@@ -101,13 +102,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
       return () => clearTimeout(timer);
     }
   }, [successChainId]);
-
-  useEffect(() => {
-    if (errorMessage) {
-      const timer = setTimeout(() => setErrorMessage(null), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [errorMessage]);
 
   useEffect(() => {
     if (!isConnected) return;
@@ -191,7 +185,11 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
             await delay(Math.random() * 200);
             
             const contractAddress = getContractAddress(chainId);
-            const abi = require("../abis/GMOnchainABI.json");
+            const abi = getChainAbi(chainId);
+            if (!abi) {
+              console.warn(`ABI not found for chain ${chainId}`);
+              return { chainId, status: statusMap[chainId] };
+            }
             
             const provider = new ethers.providers.JsonRpcProvider(SUPPORTED_CHAINS[chainId].rpcUrls[0]);
             const contract = new ethers.Contract(contractAddress, abi, provider);
@@ -217,6 +215,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
               }
             } catch (error) {
               console.error(`Error checking status for chain ${chainId}:`, error);
+              return { chainId, status: statusMap[chainId] };
             }
             
             return {
@@ -256,87 +255,74 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
 
   const handleCheckin = async (chainId: number): Promise<void> => {
     if (!isConnected || !signer || processingChainId !== null) {
-      console.log("Not connected, missing signer, or already processing");
       return;
     }
     
+    setProcessingChainId(chainId);
+
+    const toastId = toast.loading('Preparing transaction...');
+
     try {
-      setProcessingChainId(chainId);
-      setErrorMessage(null);
-      
       if (currentChainId !== chainId) {
-        try {
-          setNetworkSwitchingChainId(chainId);
-          console.log(`Switching to chain ${chainId} from ${currentChainId}`);
-          
-          await switchToChain(chainId);
-          
-          await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
-        } catch (switchError: any) {
-          console.error("Error switching network:", switchError);
-          setErrorMessage(`Failed to switch to ${SUPPORTED_CHAINS[chainId].chainName}: ${switchError.message}`);
-          setProcessingChainId(null);
-          setNetworkSwitchingChainId(null);
-          return;
-        } finally {
-          setNetworkSwitchingChainId(null);
-        }
+        toast.loading('Switching network...', { id: toastId });
+        await switchToChain(chainId);
+        await delay(1000);
       }
       
       const updatedProvider = getProvider();
-      if (!updatedProvider) {
-        throw new Error("Provider not available after network switch");
-      }
-      
+      if (!updatedProvider) throw new Error("Wallet provider not found.");
       const updatedSigner = updatedProvider.getSigner();
       
       const contract = getContract(updatedSigner, chainId);
       
-      console.log(`Performing checkin on chain ${chainId}`);
+      toast.loading('Waiting for your confirmation...', { id: toastId });
+      const tx = await performCheckin(contract, chainId);
       
-      console.log("Before performCheckin:", { 
-        contract, 
-        chainId, 
-        checkinFee: CHECKIN_FEE
+      setSuccessChainId(chainId);
+      if (onCheckinSuccess) {
+        onCheckinSuccess(chainId, tx.hash);
+      }
+      
+      toast.loading('Transaction sent, waiting for confirmation...', { id: toastId });
+
+      await tx.wait();
+
+      toast.success('GM Sent successfully!', {
+        id: toastId, 
+        duration: 5000,
       });
       
-      const tx = await performCheckin(contract, chainId);
-      console.log("Transaction sent:", tx.hash);
-      
-      if (tx.hash) {
-        console.log("Transaction hash received:", tx.hash);
-        
-        setSuccessChainId(chainId);
-        
-        setChainStatusMap(prev => ({
-          ...prev,
-          [chainId]: {
-            ...prev[chainId],
-            canCheckin: false,
-            lastCheckin: Math.floor(Date.now() / 1000),
-            timeUntilNextCheckin: 24 * 60 * 60 
-          }
-        }));
-        
-        if (onCheckinSuccess) {
-          onCheckinSuccess(chainId, tx.hash);
+      setChainStatusMap(prev => ({
+        ...prev,
+        [chainId]: {
+          ...prev[chainId],
+          canCheckin: false,
+          lastCheckin: Math.floor(Date.now() / 1000),
+          timeUntilNextCheckin: 86400,
         }
-        
-        tx.wait()
-          .then(receipt => {
-            console.log("Transaction confirmed:", receipt);
-          })
-          .catch(error => {
-            console.warn("Error waiting for receipt, but transaction was sent:", error);
-          });
-      } else {
-        throw new Error("Failed to get transaction hash");
-      }
+      }));
+
     } catch (error: any) {
-      console.error("Error performing checkin:", error);
-      setErrorMessage(error.message || "Failed to send GM");
+      console.error("Failed to perform checkin:", error);
+
+      let friendlyMessage = "An unknown error occurred. Please try again.";
+
+      if (error.code === 'ACTION_REJECTED') {
+        friendlyMessage = "Transaction Rejected: You cancelled the request in your wallet.";
+      } else if (error.code === 'INSUFFICIENT_FUNDS') {
+        friendlyMessage = "Insufficient Funds: You don't have enough balance for the transaction fee.";
+      } else if (error.code === 'CALL_EXCEPTION') {
+        friendlyMessage = "Execution Error: The contract could not complete the transaction.";
+      }
+      
+      toast.error(friendlyMessage, {
+        id: toastId,
+        duration: 6000,
+      });
+      
     } finally {
       setProcessingChainId(null);
+      setNetworkSwitchingChainId(null);
     }
   };
 
@@ -564,31 +550,6 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
           </button>
         </motion.div>
       </div>
-
-      <AnimatePresence>
-        {errorMessage && (
-          <motion.div
-            initial={{ opacity: 0, height: 0, y: -10 }}
-            animate={{ opacity: 1, height: 'auto', y: 0 }}
-            exit={{ opacity: 0, height: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="mb-6 bg-gradient-to-r from-red-50 to-red-50/50 dark:from-red-900/20 dark:to-red-900/10 backdrop-blur-xl border border-red-200/50 dark:border-red-700/30 rounded-2xl p-4 text-red-600 dark:text-red-300 shadow-sm"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 mt-0.5">
-                <FaExclamationTriangle className="h-5 w-5" />
-              </div>
-              <div className="flex-1 text-sm">{errorMessage}</div>
-              <button 
-                onClick={() => setErrorMessage(null)}
-                className="p-1 text-red-500 hover:text-red-700 dark:hover:text-red-300 rounded-lg hover:bg-red-100 dark:hover:bg-red-800/30 transition-all duration-200"
-              >
-                <FaTimes size={14} />
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {!isConnected && (
         <motion.div 
