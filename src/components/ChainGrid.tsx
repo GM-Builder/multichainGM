@@ -137,10 +137,14 @@ const ChainGrid: React.FC<ChainGridProps> = ({
       if (onCheckinSuccess) {
         onCheckinSuccess(chainId, receipt.transactionHash);
       }
-    } catch (error: any) {
-      console.error("Error performing checkin:", error);
-      setErrorMessage(error.message || "Failed to activate beacon");
-    } finally {
+    } catch (error: unknown) {
+      console.error("Error performing checkin:", error);
+      setErrorMessage(
+        error instanceof Error 
+          ? error.message 
+          : "Failed to activate beacon (Unknown Error)"
+      );
+    } finally {
       setProcessingChainId(null);
     }
   };
