@@ -556,7 +556,7 @@ const AdminDashboard: React.FC = () => {
       } transition-transform duration-300 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/50`}>
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200/50 dark:border-gray-700/50">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
               <FaLeaf className="w-4 h-4 text-white" />
             </div>
             <span className="text-lg font-bold text-gray-800 dark:text-white">GM Admin</span>
@@ -751,7 +751,7 @@ const AdminDashboard: React.FC = () => {
         {!isConnected ? (
           <button
             onClick={() => setIsWalletModalOpen(true)}
-            className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white rounded-lg transition-all duration-200 shadow-sm"
+            className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-lg transition-all duration-200 shadow-sm"
           >
             <FaWallet className="w-4 h-4 mr-2" />
             Connect
@@ -762,7 +762,7 @@ const AdminDashboard: React.FC = () => {
               onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
               className="flex items-center px-3 py-2 bg-gray-100/50 dark:bg-gray-800/50 backdrop-blur-xl hover:bg-gray-200/50 dark:hover:bg-gray-700/50 rounded-lg transition-all duration-200 border border-gray-200/30 dark:border-gray-700/30"
             >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center mr-2">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mr-2">
                 <span className="text-xs text-white font-bold">
                   {address ? address.slice(2, 4).toUpperCase() : ''}
                 </span>
@@ -970,7 +970,7 @@ const AdminDashboard: React.FC = () => {
   }> = ({ title, value, subtitle, icon: Icon, color = 'blue', loading = false }) => {
     const colorClasses: Record<'blue' | 'green' | 'purple' | 'amber', string> = {
       blue: 'bg-blue-100/50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-      green: 'bg-emerald-100/50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
+      green: 'bg-cyan-100/50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400',
       purple: 'bg-purple-100/50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
       amber: 'bg-amber-100/50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
     };
@@ -1020,7 +1020,7 @@ const AdminDashboard: React.FC = () => {
           </p>
           <button
             onClick={() => setIsWalletModalOpen(true)}
-            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white font-medium rounded-xl transition-all duration-200 shadow-sm"
+            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium rounded-xl transition-all duration-200 shadow-sm"
           >
             <FaWallet className="w-5 h-5 mr-2" />
             Connect Wallet
@@ -1070,7 +1070,7 @@ const AdminDashboard: React.FC = () => {
         >
           <div>
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center mr-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mr-3">
                 <FaLeaf className="text-white" size={16} />
               </div>
               Protocol Overview
@@ -1087,7 +1087,7 @@ const AdminDashboard: React.FC = () => {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 shadow-sm ${
               isDataLoading 
                 ? 'bg-gray-100/50 dark:bg-gray-800/50 text-gray-400 cursor-not-allowed' 
-                : 'bg-gradient-to-r from-blue-500/10 to-emerald-500/10 backdrop-blur-xl text-gray-700 dark:text-gray-300 hover:from-blue-500/20 hover:to-emerald-500/20 border border-blue-200/50 dark:border-emerald-400/30'
+                : 'bg-gradient-to-r from-blue-500/10 to-cyan-500/10 backdrop-blur-xl text-gray-700 dark:text-gray-300 hover:from-blue-500/20 hover:to-cyan-500/20 border border-blue-200/50 dark:border-cyan-400/30'
             }`}
           >
             {isDataLoading ? (
@@ -1166,7 +1166,7 @@ const AdminDashboard: React.FC = () => {
                     <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-xl ${
                       systemMetrics?.isCircuitActive 
                         ? 'bg-red-100/50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-800/50'
-                        : 'bg-emerald-100/50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50'
+                        : 'bg-cyan-100/50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 border border-cyan-200/50 dark:border-cyan-800/50'
                     }`}>
                       {systemMetrics?.isCircuitActive ? 'Active' : 'Inactive'}
                     </span>
@@ -1176,7 +1176,7 @@ const AdminDashboard: React.FC = () => {
                     <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-xl ${
                       systemMetrics?.isEmergencyActive 
                         ? 'bg-amber-100/50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-800/50'
-                        : 'bg-emerald-100/50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50'
+                        : 'bg-cyan-100/50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 border border-cyan-200/50 dark:border-cyan-800/50'
                     }`}>
                       {systemMetrics?.isEmergencyActive ? 'Active' : 'Inactive'}
                     </span>
@@ -1271,7 +1271,7 @@ const AdminDashboard: React.FC = () => {
                   return (
                     <div key={index} className="flex-1 flex flex-col items-center group">
                       <div 
-                        className="w-full bg-gradient-to-t from-blue-500 to-emerald-500 rounded-t opacity-80 hover:opacity-100 transition-all duration-200 cursor-pointer relative"
+                        className="w-full bg-gradient-to-t from-blue-500 to-cyan-500 rounded-t opacity-80 hover:opacity-100 transition-all duration-200 cursor-pointer relative"
                         style={{ 
                           height: `${Math.max(height, 4)}px`,
                         }}
@@ -1341,7 +1341,7 @@ const AdminDashboard: React.FC = () => {
           {!isConnected && (
             <button
               onClick={() => setIsWalletModalOpen(true)}
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white font-medium rounded-xl transition-all duration-200 shadow-sm"
+              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium rounded-xl transition-all duration-200 shadow-sm"
             >
               <FaWallet className="w-5 h-5 mr-2" />
               Connect Wallet
@@ -1362,7 +1362,7 @@ const AdminDashboard: React.FC = () => {
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center mr-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mr-3">
               <FaCog className="text-white" size={16} />
             </div>
             Contract Controls
@@ -1419,7 +1419,7 @@ const AdminDashboard: React.FC = () => {
                   true
                 )}
                 disabled={!newKeeperAddress || !canPerformActions || processingAction !== null}
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-medium rounded-lg transition-all duration-200 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-medium rounded-lg transition-all duration-200 disabled:cursor-not-allowed"
               >
                 Transfer Role
               </button>
@@ -1465,7 +1465,7 @@ const AdminDashboard: React.FC = () => {
                     false
                   )}
                   disabled={!newVaultAddress || !canPerformActions || processingAction !== null}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-medium rounded-lg transition-all duration-200 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-medium rounded-lg transition-all duration-200 disabled:cursor-not-allowed"
                 >
                   Redirect Vault
                 </button>
@@ -1565,7 +1565,7 @@ const AdminDashboard: React.FC = () => {
                         false
                       )}
                       disabled={!tokenAddress || !tokenAmount || !canPerformActions || processingAction !== null}
-                      className="w-full px-3 py-2 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-medium rounded-lg text-sm transition-all duration-200 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-medium rounded-lg text-sm transition-all duration-200 disabled:cursor-not-allowed"
                     >
                       Recover Asset
                     </button>
@@ -1638,7 +1638,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark' : ''}`}>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-emerald-50/30 dark:from-gray-900 dark:via-blue-900/10 dark:to-emerald-900/10">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-cyan-50/30 dark:from-gray-900 dark:via-blue-900/10 dark:to-cyan-900/10">
         <Sidebar />
         <Header />
         

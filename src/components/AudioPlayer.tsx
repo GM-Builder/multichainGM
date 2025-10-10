@@ -325,16 +325,16 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
     >
       <div className={`${
         isDarkMode 
-          ? 'bg-gray-900/80 border-emerald-500/20' 
-          : 'bg-white/80 border-emerald-600/20'
+          ? 'bg-slate-900/80 border-cyan-500/20' 
+          : 'bg-white/80 border-cyan-600/20'
         } backdrop-blur-md rounded-full shadow-lg border p-2 flex items-center`}>
         <button
           onClick={togglePlay}
           className={`h-8 w-8 rounded-full flex items-center justify-center ${
             isPlaying 
               ? isDarkMode
-                ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' 
-                : 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200'
+                ? 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30' 
+                : 'bg-cyan-100 text-cyan-600 hover:bg-cyan-200'
               : isDarkMode
                 ? 'bg-gray-700 text-gray-400 hover:bg-gray-600'
                 : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
@@ -344,9 +344,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
         >
           {isPlaying ? (
             <div className="flex space-x-0.5">
-              <div className={`w-0.5 h-4 ${isDarkMode ? 'bg-emerald-400' : 'bg-emerald-600'} animate-music-bar1`}></div>
-              <div className={`w-0.5 h-3 ${isDarkMode ? 'bg-emerald-400' : 'bg-emerald-600'} animate-music-bar2`}></div>
-              <div className={`w-0.5 h-2 ${isDarkMode ? 'bg-emerald-400' : 'bg-emerald-600'} animate-music-bar3`}></div>
+              <div className={`w-0.5 h-4 ${isDarkMode ? 'bg-cyan-400' : 'bg-cyan-600'} animate-music-bar1`}></div>
+              <div className={`w-0.5 h-3 ${isDarkMode ? 'bg-cyan-400' : 'bg-cyan-600'} animate-music-bar2`}></div>
+              <div className={`w-0.5 h-2 ${isDarkMode ? 'bg-cyan-400' : 'bg-cyan-600'} animate-music-bar3`}></div>
             </div>
           ) : (
             <FaMusic className="h-4 w-4" />
@@ -362,8 +362,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
                   ? 'bg-gray-700 text-gray-400 hover:bg-gray-600' 
                   : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
                 : isDarkMode
-                  ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
-                  : 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200'
+                  ? 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'
+                  : 'bg-cyan-100 text-cyan-600 hover:bg-cyan-200'
             } transition-all`}
             aria-label={isMuted ? 'Unmute' : 'Mute'}
             title={isMuted ? 'Unmute' : 'Mute'}
@@ -373,7 +373,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
         )}
         
         {isPlaying && !isMuted && (
-          <div className={`text-xs ${isDarkMode ? 'text-emerald-400/70' : 'text-emerald-600/70'}`}>
+          <div className={`text-xs ${isDarkMode ? 'text-cyan-400/70' : 'text-cyan-600/70'}`}>
           </div>
         )}
       </div>

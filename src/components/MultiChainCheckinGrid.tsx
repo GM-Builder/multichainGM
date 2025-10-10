@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  FaLeaf, FaSpinner, FaCheckCircle, FaClock, FaWallet, 
+  FaSpinner, FaCheckCircle, FaClock, FaWallet, 
   FaExclamationTriangle, FaStar, FaRegStar, FaFilter, FaTimes,
-  FaExchangeAlt, FaMoon
+  FaExchangeAlt, FaMoon,
+  FaLayerGroup,
+  FaGlobe,
+  FaFlask,
+  FaAlipay,
+  FaEthereum
 } from 'react-icons/fa';
 import { 
   CHECKIN_FEE,
@@ -23,6 +28,7 @@ import {
 import { ethers } from 'ethers';
 import ChainLogo from '@/components/ChainLogo';
 import toast from 'react-hot-toast';
+import { FaLandMineOn } from 'react-icons/fa6';
 
 type NetworkType = 'all' | 'mainnet' | 'testnet';
 type FilterType = 'all' | 'available' | 'checked' | 'favorites';
@@ -424,22 +430,22 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
     switch (networkType) {
       case 'testnet':
         return {
-          icon: FaLeaf,
-          gradient: 'from-blue-500/10 to-emerald-500/10',
+          icon: FaFlask,
+          gradient: 'from-blue-500/10 to-cyan-500/10',
           textColor: 'text-blue-600 dark:text-blue-400',
           badgeColor: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
         };
       case 'mainnet':
         return {
-          icon: FaLeaf,
-          gradient: 'from-emerald-500/10 to-blue-500/10',
-          textColor: 'text-emerald-600 dark:text-emerald-400',
-          badgeColor: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
+          icon: FaGlobe,
+          gradient: 'from-cyan-500/10 to-blue-500/10',
+          textColor: 'text-cyan-600 dark:text-cyan-400',
+          badgeColor: 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400'
         };
       default:
         return {
-          icon: FaLeaf,
-          gradient: 'from-blue-500/8 to-emerald-500/8',
+          icon: FaLayerGroup,
+          gradient: 'from-blue-500/8 to-cyan-500/8',
           textColor: 'text-slate-700 dark:text-slate-300',
           badgeColor: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
         };
@@ -458,7 +464,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 flex items-center">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center mr-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mr-3">
               <NetworkIcon className="text-white" size={16} />
             </div> 
             {networkType === 'testnet' ? 'Testnet Networks' : networkType === 'mainnet' ? 'Mainnet Networks' : 'All Networks'}
@@ -530,8 +536,8 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
             disabled={isLoading || !isConnected}
             className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 shadow-sm ${
               isLoading 
-                ? 'bg-gradient-to-r from-cyan-300/10 to-emerald-300/10 backdrop-blur-xl text-slate-500 dark:text-slate-100 hover:from-blue-300/20 hover:to-emerald-300/20 border border-blue-200/50 dark:border-emerald-400/30' 
-                : 'bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 backdrop-blur-xl text-slate-700 dark:text-slate-300 hover:from-blue-500/20 hover:to-emerald-500/20 border border-blue-200/50 dark:border-emerald-400/30'
+                ? 'bg-gradient-to-r from-cyan-300/10 to-cyan-300/10 backdrop-blur-xl text-slate-500 dark:text-slate-100 hover:from-blue-300/20 hover:to-cyan-300/20 border border-blue-200/50 dark:border-cyan-400/30' 
+                : 'bg-gradient-to-r from-cyan-500/10 to-cyan-500/10 backdrop-blur-xl text-slate-700 dark:text-slate-300 hover:from-blue-500/20 hover:to-cyan-500/20 border border-blue-200/50 dark:border-cyan-400/30'
             }`}
           >
             {isLoading ? (
@@ -556,11 +562,11 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-gradient-to-r from-blue-50/50 to-emerald-50/50 dark:from-blue-900/10 dark:to-emerald-900/10 backdrop-blur-xl border border-gray-200/50 dark:border-slate-700/50 rounded-xl p-6 mb-8 shadow-sm"
+          className="bg-gradient-to-r from-blue-50/50 to-cyan-50/50 dark:from-blue-900/10 dark:to-cyan-900/10 backdrop-blur-xl border border-gray-200/50 dark:border-slate-700/50 rounded-xl p-6 mb-8 shadow-sm"
         >
           <div className="flex items-center gap-4">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                 <FaWallet className="h-5 w-5 text-white" />
               </div>
             </div>
@@ -581,7 +587,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
           transition={{ duration: 0.5 }}
           className="text-center py-12 px-6 bg-white/40 dark:bg-slate-800/20 backdrop-blur-xl rounded-xl border border-gray-200/50 dark:border-slate-700/50 shadow-sm"
         >
-          <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-gradient-to-br from-blue-500/20 to-emerald-500/20 flex items-center justify-center">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
             <FaMoon className="h-6 w-6 text-slate-400 dark:text-slate-500" />
           </div>
           <p className="text-gray-600 dark:text-gray-300 text-lg">
@@ -615,9 +621,9 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
               whileHover={{ y: -2, scale: 1.02 }}
               className={`rounded-xl overflow-hidden backdrop-blur-xl transition-all duration-300 ${
                 isCurrentChain 
-                  ? 'border border-blue-200 dark:border-blue-400/50 bg-gradient-to-br from-blue-50/60 to-emerald-50/60 dark:from-blue-900/70 dark:to-emerald-900/70 shadow-md'
-                  : 'border border-gray-200/60 dark:border-slate-700/60 bg-emerald-50/30 dark:bg-cyan-900/30 hover:shadow-md shadow-sm'
-              } ${isSuccess ? 'ring-2 ring-emerald-400/40' : ''}`}
+                  ? 'border border-blue-200 dark:border-blue-400/50 bg-gradient-to-br from-blue-50/60 to-cyan-50/60 dark:from-blue-900/70 dark:to-cyan-900/70 shadow-md'
+                  : 'border border-gray-200/60 dark:border-slate-700/60 bg-cyan-50/30 dark:bg-cyan-900/30 hover:shadow-md shadow-sm'
+              } ${isSuccess ? 'ring-2 ring-cyan-400/40' : ''}`}
             >
               <div className="p-4 flex flex-col justify-between h-full">
                 <div>
@@ -625,7 +631,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                     <div className="flex items-center gap-3">
                       <div className={`flex items-center justify-center w-9 h-9 rounded-lg ${
                         isCurrentChain 
-                          ? 'bg-gradient-to-br from-blue-100 to-emerald-100 dark:from-blue-900 dark:to-emerald-900/30' 
+                          ? 'bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900/30' 
                           : 'bg-gray-100 dark:bg-slate-700/50'
                       } transition-all duration-300`}>
                         <ChainLogo 
@@ -644,7 +650,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                               {formatTime(chainStatus.timeUntilNextCheckin)}
                             </span>
                           ) : chainStatus.canCheckin ? (
-                            <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-700/30">
+                            <span className="text-xs px-2 py-0.5 rounded-md bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-300 border border-cyan-200/50 dark:border-cyan-700/30">
                               Ready
                             </span>
                           ) : (
@@ -677,7 +683,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                   className={`w-full mt-3 py-3 px-4 text-sm font-medium flex items-center justify-center transition-all duration-300 rounded-xl shadow-md ${
                     !isConnected || !canActivateNow || processingChainId !== null || isLoading
                       ? 'bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-cyan-400/80 to-emerald-400 hover:from-blue-600 hover:to-emerald-600 text-white shadow-md hover:shadow-md'
+                      : 'bg-gradient-to-r from-cyan-400/80 to-cyan-400 hover:from-blue-600 hover:to-cyan-600 text-white shadow-md hover:shadow-md'
                   }`}
                   disabled={!isConnected || !canActivateNow || processingChainId !== null || isLoading}
                 >

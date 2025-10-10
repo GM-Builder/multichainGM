@@ -63,7 +63,7 @@ const Notification: React.FC<NotificationProps> = ({
               <div className="flex items-start justify-between mb-4">
                 <div className={`p-3 rounded-full ${
                   type === 'success'
-                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
+                    ? 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400'
                     : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
                 }`}>
                   {type === 'success' ? (
@@ -83,7 +83,7 @@ const Notification: React.FC<NotificationProps> = ({
               
               <h3 className={`text-xl font-bold mb-2 ${
                 type === 'success'
-                  ? 'text-emerald-600 dark:text-emerald-400'
+                  ? 'text-cyan-600 dark:text-cyan-400'
                   : 'text-red-600 dark:text-red-400'
               }`}>
                 {title}
@@ -108,8 +108,8 @@ const Notification: React.FC<NotificationProps> = ({
                         href={getTxExplorerUrl() || '#'} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-sm text-center py-2 px-4 rounded-lg bg-emerald-100 dark:bg-emerald-900/20 
-                                   text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800/30
+                        className="text-sm text-center py-2 px-4 rounded-lg bg-cyan-100 dark:bg-cyan-900/20 
+                                   text-cyan-700 dark:text-cyan-300 hover:bg-cyan-200 dark:hover:bg-cyan-800/30
                                    transition-colors flex items-center justify-center"
                       >
                         <span>View on Explorer</span>
@@ -125,7 +125,7 @@ const Notification: React.FC<NotificationProps> = ({
                   onClick={onClose}
                   className={`py-2 px-4 rounded-lg text-white transition-colors flex items-center ${
                     type === 'success'
-                      ? 'bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700'
+                      ? 'bg-cyan-500 hover:bg-cyan-600 dark:bg-cyan-600 dark:hover:bg-cyan-700'
                       : 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700'
                   }`}
                 >

@@ -31,7 +31,7 @@ const BlobPatternBottomLeft: React.FC = () => (
         ease: "easeInOut" 
       }}
     >
-      <path fill="#10b981" d="M44.5,-76.3C56.9,-69.1,65.8,-55.3,71.3,-41.1C76.8,-26.9,78.9,-12.1,76.5,1.4C74.1,14.9,67.1,27.2,58.1,37.8C49.1,48.4,38.2,57.2,25.8,63.5C13.5,69.8,-0.3,73.5,-14.2,71.5C-28.1,69.5,-42.1,61.8,-52.9,50.8C-63.8,39.9,-71.4,25.7,-75.6,9.7C-79.8,-6.3,-80.5,-24.1,-73.6,-38.4C-66.6,-52.6,-52,-63.4,-37.2,-69.7C-22.4,-76,-11.2,-78,2.9,-82.6C17,-87.2,32.1,-83.5,44.5,-76.3Z" transform="translate(100 100)" />
+      <path fill="#00E5FF" d="M44.5,-76.3C56.9,-69.1,65.8,-55.3,71.3,-41.1C76.8,-26.9,78.9,-12.1,76.5,1.4C74.1,14.9,67.1,27.2,58.1,37.8C49.1,48.4,38.2,57.2,25.8,63.5C13.5,69.8,-0.3,73.5,-14.2,71.5C-28.1,69.5,-42.1,61.8,-52.9,50.8C-63.8,39.9,-71.4,25.7,-75.6,9.7C-79.8,-6.3,-80.5,-24.1,-73.6,-38.4C-66.6,-52.6,-52,-63.4,-37.2,-69.7C-22.4,-76,-11.2,-78,2.9,-82.6C17,-87.2,32.1,-83.5,44.5,-76.3Z" transform="translate(100 100)" />
     </motion.svg>
   </div>
 );
@@ -82,7 +82,7 @@ const CheckinPageIntegration: React.FC = () => {
   const [showCheckinTutorial, setShowCheckinTutorial] = useState<boolean>(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState<boolean>(false);
   const [showErrorNotification, setShowErrorNotification] = useState<boolean>(false);
-  const [networkTab, setNetworkTab] = useState<NetworkTabType>('testnet');
+  const [networkTab, setNetworkTab] = useState<NetworkTabType>('all');
 
   useEffect(() => {
     const fetchTotalCheckins = async (): Promise<void> => {
@@ -127,7 +127,7 @@ const CheckinPageIntegration: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-cyan-50/70 dark:from-emerald-800 dark:via-gray-900 dark:to-black relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800 relative overflow-hidden">
       <BlobPatternBottomLeft />
       <SquigglyPatternTopRight />
       <AudioPlayer />
@@ -137,7 +137,7 @@ const CheckinPageIntegration: React.FC = () => {
         onClose={() => setShowSuccessNotification(false)}
         type="success"
         title="GM Sent Successfully!"
-        message="Your daily GM has been recorded on the blockchain. Keep coming back daily to increase your crystal balance."
+        message="Your daily GM has been recorded on the blockchain. Keep coming back daily to increase your transaction."
         txHash={lastTxHash}
         chainId={lastCheckinChainId}
       />
@@ -157,7 +157,7 @@ const CheckinPageIntegration: React.FC = () => {
               onClick={() => setNetworkTab('all')}
               className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${
                 networkTab === 'all' 
-                  ? 'bg-emerald-100/70 dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm transform scale-105' 
+                  ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' 
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-700/30'
               }`}
             >
@@ -171,7 +171,7 @@ const CheckinPageIntegration: React.FC = () => {
               onClick={() => setNetworkTab('mainnet')}
               className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${
                 networkTab === 'mainnet' 
-                  ? 'bg-emerald-100/70 dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm transform scale-105' 
+                  ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' 
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-700/30'
               }`}
             >
@@ -185,7 +185,7 @@ const CheckinPageIntegration: React.FC = () => {
               onClick={() => setNetworkTab('testnet')}
               className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${
                 networkTab === 'testnet' 
-                  ? 'bg-emerald-100/70 dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm transform scale-105' 
+                  ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' 
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-700/30'
               }`}
             >

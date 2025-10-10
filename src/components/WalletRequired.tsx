@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaWallet, FaLeaf } from 'react-icons/fa';
+import { FaWallet } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import CustomConnectModal from './CustomConnectModal';
 
@@ -26,14 +26,21 @@ const WalletRequired: React.FC<WalletRequiredProps> = ({
     <div className="min-h-[90vh] flex flex-col items-center justify-center">
       <div className="card max-w-md mx-auto p-10 text-center space-y-6">
         <div className="relative w-24 h-24 mx-auto">
-          <div className="absolute inset-0 bg-emerald-500 rounded-full blur-xl opacity-20 animate-pulse"></div>
+          <div className="absolute inset-0 bg-cyan-500 rounded-full blur-xl opacity-20 animate-pulse"></div>
+          
           <div className="relative h-full w-full flex items-center justify-center">
-            <FaLeaf className="text-5xl text-emerald-500" />
+            <motion.img
+                src="/icon.png"
+                alt="GannetX Icon"
+                initial={{ rotate: -50, scale: 0.9 }}
+                animate={{ rotate: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 100, damping: 10 }}
+            />
           </div>
         </div>
         
-        <h2 className="text-2xl font-bold text-emerald-700">Welcome to
-          <span className="bg-gradient-to-r from-cyan-700 to-emerald-300 text-transparent bg-clip-text"> MultiChainGM</span>
+        <h2 className="text-2xl font-bold text-cyan-700">Welcome to
+          <span className="bg-gradient-to-r from-cyan-700 to-cyan-300 text-transparent bg-clip-text"> GannetX</span>
         </h2>
         
         <p className="text-gray-600">
@@ -49,7 +56,7 @@ const WalletRequired: React.FC<WalletRequiredProps> = ({
             }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setIsModalOpen(true)}
-            className="w-auto px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-all duration-200 shadow-[0_0_15px_rgba(16,185,129,0.2)] flex items-center justify-center"
+            className="w-auto px-6 py-3 bg-cyan-500 text-white rounded-xl font-medium hover:bg-cyan-600 transition-all duration-200 shadow-[0_0_15px_rgba(16,185,129,0.2)] flex items-center justify-center"
           >
             <FaWallet className="inline-block mr-2" /> Connect Wallet
           </motion.button>
@@ -63,14 +70,14 @@ const WalletRequired: React.FC<WalletRequiredProps> = ({
         
         <div className="text-xs text-gray-500 flex items-center justify-center gap-2">
           <div className="h-1.5 w-1.5 bg-cyan-700 rounded-full"></div>
-          <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full"></div>
           <div className="h-1.5 w-1.5 bg-cyan-500 rounded-full"></div>
+          <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full"></div>
         </div>
       </div>
       
-      <div className="absolute -z-10 left-1/4 top-1/4 w-64 h-64 bg-emerald-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-      <div className="absolute -z-10 right-1/4 bottom-1/4 w-64 h-64 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div className="absolute -z-10 left-1/3 bottom-1/3 w-64 h-64 bg-emerald-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      <div className="absolute -z-10 left-1/4 top-1/4 w-64 h-64 bg-cyan-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+      <div className="absolute -z-10 right-1/4 bottom-1/4 w-64 h-64 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute -z-10 left-1/3 bottom-1/3 w-64 h-64 bg-cyan-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
     </div>
   );
 };

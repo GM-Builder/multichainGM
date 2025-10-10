@@ -147,7 +147,7 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
     {
       id: "phone",
       name: "Continue with Phone",
-      icon: <FaPhone className="text-emerald-500" />
+      icon: <FaPhone className="text-cyan-500" />
     },
     {
       id: "passkey",
@@ -293,9 +293,9 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
           className="relative bg-white dark:bg-gradient-to-br dark:from-slate-900/95 dark:via-gray-900/95 dark:to-slate-800/95 backdrop-blur-2xl rounded-3xl border border-gray-200 dark:border-cyan-500/20 shadow-2xl shadow-gray-500/10 dark:shadow-cyan-500/5 w-full max-w-sm max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent dark:from-cyan-500/5 dark:via-transparent dark:to-emerald-500/5"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent dark:from-cyan-500/5 dark:via-transparent dark:to-cyan-500/5"></div>
           <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-transparent to-transparent dark:from-cyan-400/10 dark:to-transparent rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-transparent to-transparent dark:from-emerald-400/10 dark:to-transparent rounded-full blur-2xl"></div>
+          <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-transparent to-transparent dark:from-cyan-400/10 dark:to-transparent rounded-full blur-2xl"></div>
           
           <div className="relative flex items-center justify-between p-6 pb-4">
             <div className="flex items-center gap-3">
@@ -312,10 +312,10 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                 </motion.button>
               )}
               <div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-cyan-300 dark:to-emerald-300 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-cyan-300 dark:to-cyan-300 bg-clip-text text-transparent">
                   {showWalletOptions ? "Select Wallet" : "Connect"}
                 </h2>
-                <div className="h-0.5 w-12 bg-gradient-to-r from-gray-400 to-gray-600 dark:from-cyan-400 dark:to-emerald-400 rounded-full mt-1"></div>
+                <div className="h-0.5 w-12 bg-gradient-to-r from-gray-400 to-gray-600 dark:from-cyan-400 dark:to-cyan-400 rounded-full mt-1"></div>
               </div>
             </div>
             
@@ -458,15 +458,15 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleConnectWalletClick}
-                    className="w-full group relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-50 to-emerald-50 dark:from-cyan-500/10 dark:via-emerald-500/10 dark:to-cyan-500/10 border border-emerald-200 dark:border-cyan-500/20 hover:border-blue-300 dark:hover:border-cyan-400/30 p-4 transition-all duration-300"
+                    className="w-full group relative overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-50 to-cyan-50 dark:from-cyan-500/10 dark:via-cyan-500/10 dark:to-cyan-500/10 border border-cyan-200 dark:border-cyan-500/20 hover:border-blue-300 dark:hover:border-cyan-400/30 p-4 transition-all duration-300"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 dark:from-cyan-500/0 dark:via-cyan-500/5 dark:to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div className="relative flex items-center gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-100 to-blue-100 dark:from-cyan-500/20 dark:to-emerald-500/20 border border-blue-200 dark:border-cyan-500/30">
-                        <FaWallet className="w-5 h-5 text-emerald-600 dark:text-emerald-300" />
+                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-100 to-blue-100 dark:from-cyan-500/20 dark:to-cyan-500/20 border border-blue-200 dark:border-cyan-500/30">
+                        <FaWallet className="w-5 h-5 text-cyan-600 dark:text-cyan-300" />
                       </div>
                       <div className="flex-1 text-left">
-                        <div className="font-semibold text-emerald-800 dark:text-emerald-300 text-sm">Connect a Wallet</div>
+                        <div className="font-semibold text-cyan-800 dark:text-cyan-300 text-sm">Connect a Wallet</div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">Use your crypto wallet</div>
                       </div>
                       <svg className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-cyan-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -486,7 +486,7 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
             >
               <div className="flex items-center justify-center gap-1 mb-2">
                 <div className="w-1 h-1 rounded-full bg-blue-400 dark:bg-cyan-400"></div>
-                <div className="w-1 h-1 rounded-full bg-purple-400 dark:bg-emerald-400"></div>
+                <div className="w-1 h-1 rounded-full bg-purple-400 dark:bg-cyan-400"></div>
                 <div className="w-1 h-1 rounded-full bg-blue-400 dark:bg-cyan-400"></div>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 text-center leading-relaxed">

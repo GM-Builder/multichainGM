@@ -138,13 +138,13 @@ const ChainGrid: React.FC<ChainGridProps> = ({
         onCheckinSuccess(chainId, receipt.transactionHash);
       }
     } catch (error: unknown) {
-      console.error("Error performing checkin:", error);
-      setErrorMessage(
-        error instanceof Error 
-          ? error.message 
-          : "Failed to activate beacon (Unknown Error)"
-      );
-    } finally {
+      console.error("Error performing checkin:", error);
+      setErrorMessage(
+        error instanceof Error 
+          ? error.message 
+          : "Failed to activate beacon (Unknown Error)"
+      );
+    } finally {
       setProcessingChainId(null);
     }
   };
@@ -174,12 +174,12 @@ const ChainGrid: React.FC<ChainGridProps> = ({
 
   return (
     <div className="w-full">
-      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
+      <div className="flex border-b border-cyan-500/20 dark:border-cyan-500/30 mb-6">
         <button
           className={`py-2 px-4 text-sm font-medium ${
             activeTab === 'all' 
-              ? 'text-emerald-600 border-b-2 border-emerald-500 dark:text-emerald-400 dark:border-emerald-400'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+              ? 'text-cyan-600 border-b-2 border-cyan-500 dark:text-cyan-400 dark:border-cyan-400'
+              : 'text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-300'
           }`}
           onClick={() => setActiveTab('all')}
         >
@@ -188,8 +188,8 @@ const ChainGrid: React.FC<ChainGridProps> = ({
         <button
           className={`py-2 px-4 text-sm font-medium ${
             activeTab === 'favorites' 
-              ? 'text-emerald-600 border-b-2 border-emerald-500 dark:text-emerald-400 dark:border-emerald-400'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+              ? 'text-cyan-600 border-b-2 border-cyan-500 dark:text-cyan-400 dark:border-cyan-400'
+              : 'text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-300'
           }`}
           onClick={() => setActiveTab('favorites')}
         >
@@ -216,19 +216,19 @@ const ChainGrid: React.FC<ChainGridProps> = ({
       </AnimatePresence>
 
       {isCountdownActive && (
-        <div className="mb-6 bg-emerald-50 dark:bg-emerald-900/10 rounded-lg p-4 border border-emerald-100 dark:border-emerald-800/30">
+        <div className="mb-6 bg-cyan-50 dark:bg-cyan-900/10 rounded-lg p-4 border border-cyan-100 dark:border-cyan-800/30">
           <div className="flex items-center justify-center">
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
-                <FaHourglassHalf className="w-5 h-5 text-emerald-500 mr-2" />
-                <h4 className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                <FaHourglassHalf className="w-5 h-5 text-cyan-500 mr-2" />
+                <h4 className="text-sm font-semibold text-cyan-700 dark:text-cyan-300">
                   Next Beacon Activation
                 </h4>
               </div>
-              <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">
+              <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400 mb-1">
                 {formatTime(secondsRemaining)}
               </div>
-              <p className="text-xs text-gray-600 dark:text-emerald-300/70">
+              <p className="text-xs text-gray-600 dark:text-cyan-300/70">
                 Time remaining until next activation
               </p>
             </div>
@@ -237,8 +237,8 @@ const ChainGrid: React.FC<ChainGridProps> = ({
       )}
 
       {activeTab === 'favorites' && favoriteChains.length === 0 && (
-        <div className="text-center py-10 px-4 bg-gray-50 dark:bg-gray-800/20 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-gray-600 dark:text-gray-300">No favorite networks yet. Add some from the "All Networks" tab.</p>
+        <div className="text-center py-10 px-4 bg-slate-800/20 rounded-lg border border-cyan-500/20">
+          <p className="text-gray-300">No favorite networks yet. Add some from the "All Networks" tab.</p>
         </div>
       )}
 
@@ -254,13 +254,13 @@ const ChainGrid: React.FC<ChainGridProps> = ({
               key={chain.id}
               className={`rounded-xl p-4 border transition-all duration-300 ${
                 isCurrentChain 
-                  ? 'border-emerald-200 dark:border-emerald-700/50 bg-emerald-50 dark:bg-emerald-900/20'
-                  : 'border-gray-200 dark:border-gray-700/30 bg-white dark:bg-gray-800/20'
-              } ${isSuccess ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} hover:shadow-md`}
+                  ? 'border-cyan-200 dark:border-cyan-700/50 bg-cyan-50 dark:bg-cyan-900/20'
+                  : 'border-gray-200 dark:border-cyan-500/20 bg-white dark:bg-slate-800/20'
+              } ${isSuccess ? 'ring-2 ring-cyan-500 ring-opacity-50' : ''} hover:shadow-md`}
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mr-3">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-100 dark:bg-cyan-900/30 mr-3">
                     <ChainLogo 
                       logoUrl={chain.logoUrl}
                       altText={chain.chainName}
@@ -283,10 +283,10 @@ const ChainGrid: React.FC<ChainGridProps> = ({
                 </button>
               </div>
               
-              <div className="bg-white dark:bg-gray-700/20 rounded-lg p-3 mb-3 border border-gray-100 dark:border-gray-700/20">
+              <div className="bg-white dark:bg-slate-700/20 rounded-lg p-3 mb-3 border border-gray-100 dark:border-cyan-500/20">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-xs text-gray-500 dark:text-gray-400">Fee:</span>
-                  <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                  <span className="text-xs font-medium text-cyan-600 dark:text-cyan-400">
                     {CHECKIN_FEE} {chain.nativeCurrency.symbol}
                   </span>
                 </div>
@@ -294,7 +294,7 @@ const ChainGrid: React.FC<ChainGridProps> = ({
                   <span className="text-xs text-gray-500 dark:text-gray-400">Status:</span>
                   <span className={`text-xs px-2 py-0.5 rounded-full ${
                     isChainSupported(chain.id) 
-                      ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' 
+                      ? 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300' 
                       : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
                   }`}>
                     {isChainSupported(chain.id) ? 'Ready!' : 'Not Supported'}
@@ -315,7 +315,7 @@ const ChainGrid: React.FC<ChainGridProps> = ({
                 className={`w-full py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center transition-all duration-300 ${
                   !canCheckin || !isConnected || isCountdownActive || chain.status !== 'Ready!' || processingChainId !== null || isLoading
                     ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                    : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:shadow'
+                    : 'bg-gradient-to-r from-cyan-400 to-cyan-600 hover:from-cyan-500 hover:to-cyan-700 text-white shadow-sm hover:shadow'
                 }`}
               >
                 {isProcessing ? (

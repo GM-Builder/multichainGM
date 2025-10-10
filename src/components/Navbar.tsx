@@ -5,7 +5,6 @@ import { useState, useRef, useEffect } from "react"
 import { formatAddress } from "@/utils/web3"
 import ThemeToggle from "./ThemeToggle"
 import {
-  FaLeaf,
   FaSignOutAlt,
   FaChevronDown,
   FaBars,
@@ -14,6 +13,8 @@ import {
 } from "react-icons/fa"
 import ConnectWalletButton from "./ConnectWalletButton"
 import ChainLogo from "@/components/ChainLogo"
+
+const LOGO_PATH = "/logo.png"
 
 interface NetworkInfo {
   name: string;
@@ -113,20 +114,37 @@ const Navbar: React.FC<NavbarProps> = ({
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-20 transition-all duration-500 ${
-          scrolled ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-md" : "bg-transparent"
+          scrolled 
+            ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-md shadow-cyan-500/30" 
+            : "bg-transparent"
         }`}
       >
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-20">
-          <div className="flex justify-between items-center h-16 md:h-20">
+          {/* PERUBAHAN 1: Membuat tinggi Navbar dinamis berdasarkan scroll */}
+          <div 
+            className={`flex justify-between items-center transition-all duration-500
+              ${scrolled ? 'h-16 md:h-20' : 'h-20 md:h-28'}` /* Navbar menyusut dari h-28 ke h-20 di desktop */
+            }
+          >
             <div className="flex items-center">
               <div className="flex items-center gap-2 cursor-pointer">
-                <div className="relative">
-                  <FaLeaf className="h-6 w-6 md:h-8 md:w-8 text-emerald-500" />
-                  <div className="absolute inset-0 bg-emerald-500 rounded-full blur-md opacity-30 animate-pulse"></div>
+                {/* PERUBAHAN 2: Menyesuaikan ukuran logo agar memanjang ke samping (Horizontal).
+                  Kami menggunakan tinggi yang dikontrol (h-16/h-20) dan lebar yang jauh lebih besar (w-48/w-64).
+                */}
+                <div 
+                  className={`flex-shrink-0 relative transition-all duration-500 ${
+                    scrolled 
+                      ? "h-14 md:h-16 w-32 md:w-40" // Ukuran kecil (scrolled): Tinggi h-12, Lebar w-40
+                      : "h-16 md:h-24 w-48 md:w-64" // Ukuran BESAR (normal): Tinggi h-20, Lebar w-64
+                  }`}
+                >
+                  <img 
+                    src={LOGO_PATH}
+                    alt="GannetX Logo"
+                    // object-contain penting agar logo horizontal tidak terpotong
+                    className="h-full w-full object-contain" 
+                  />
                 </div>
-                <span className="ml-2 text-lg md:text-xl font-bold bg-gradient-to-r from-cyan-700 to-emerald-300 text-transparent bg-clip-text dark:text-emerald-300 tracking-tight">
-                  MultiChainGM
-                </span>
               </div>
             </div>
 
@@ -157,7 +175,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <button className="flex items-center gap-2 bg-white dark:bg-black/60 backdrop-blur-md px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-emerald-900/10 transition-colors border border-gray-200 dark:border-emerald-500/20 shadow-sm">
+                  <button className="flex items-center gap-2 bg-white dark:bg-black/60 backdrop-blur-md px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-cyan-900/10 transition-colors border border-gray-200 dark:border-cyan-500/20 shadow-sm">
                     <div className="h-5 w-5 rounded-full overflow-hidden flex-shrink-0">
                       {address && (
                         <img 
@@ -167,17 +185,17 @@ const Navbar: React.FC<NavbarProps> = ({
                         />
                       )}
                     </div>
-                    <span className="text-sm font-medium text-gray-800 dark:text-emerald-300">
+                    <span className="text-sm font-medium text-gray-800 dark:text-cyan-300">
                       {formatAddress(address)}
                     </span>
                     <FaChevronDown
-                      className={`h-3 w-3 text-emerald-500 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
+                      className={`h-3 w-3 text-cyan-500 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
                     />
                   </button>
 
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-xl bg-white dark:bg-black/80 backdrop-blur-md border border-gray-200 dark:border-emerald-500/20 z-50 overflow-hidden">
-                      <div className="px-4 py-3 border-b border-gray-200 dark:border-emerald-500/20 bg-gray-50 dark:bg-emerald-900/10">
+                    <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-xl bg-white dark:bg-black/80 backdrop-blur-md border border-gray-200 dark:border-cyan-500/20 z-50 overflow-hidden">
+                      <div className="px-4 py-3 border-b border-gray-200 dark:border-cyan-500/20 bg-gray-50 dark:bg-cyan-900/10">
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full overflow-hidden">
                             {address && (
@@ -193,7 +211,7 @@ const Navbar: React.FC<NavbarProps> = ({
                               {formatAddress(address)}
                               <button
                                 onClick={copyAddressToClipboard}
-                                className="ml-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400"
+                                className="ml-1 text-gray-500 hover:text-cyan-600 dark:hover:text-cyan-400"
                               >
                                 <FaCopy size={10} />
                               </button>
@@ -205,7 +223,7 @@ const Navbar: React.FC<NavbarProps> = ({
                       <div className="py-1">
                         <button
                           onClick={disconnectWallet}
-                          className="px-4 py-3 w-full flex items-center gap-2 hover:bg-red-50 dark:hover:bg-emerald-900/10 transition-colors text-left"
+                          className="px-4 py-3 w-full flex items-center gap-2 hover:bg-red-50 dark:hover:bg-cyan-900/10 transition-colors text-left"
                         >
                           <FaSignOutAlt className="text-red-500" size={14} />
                           <span className="text-sm text-red-500 hover:text-red-800">Disconnect</span>
@@ -237,7 +255,7 @@ const Navbar: React.FC<NavbarProps> = ({
               <ThemeToggle />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
+                className="p-2 rounded-md text-cyan-600 dark:text-cyan-400 hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors"
                 aria-expanded={mobileMenuOpen}
               >
                 <span className="sr-only">Open main menu</span>
@@ -254,7 +272,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
       <div
         ref={mobileMenuRef}
-        className={`fixed inset-0 top-16 bg-white dark:bg-gray-900 z-40 transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed inset-0 top-20 bg-white dark:bg-gray-900 z-40 transform transition-transform duration-300 ease-in-out md:hidden ${
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -266,7 +284,7 @@ const Navbar: React.FC<NavbarProps> = ({
               </div>
             ) : (
               <div className="px-2 py-2 flex flex-col space-y-4">
-                <div className="flex items-center justify-between bg-emerald-50 dark:bg-emerald-900/30 px-4 py-3 rounded-lg">
+                <div className="flex items-center justify-between bg-cyan-50 dark:bg-cyan-900/30 px-4 py-3 rounded-lg">
                   <div className="flex items-center gap-2">
                     <div className="h-6 w-6 rounded-full overflow-hidden">
                       {address && (
@@ -277,7 +295,7 @@ const Navbar: React.FC<NavbarProps> = ({
                         />
                       )}
                     </div>
-                    <span className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+                    <span className="text-sm font-medium text-cyan-800 dark:text-cyan-300">
                       {formatAddress(address)}
                     </span>
                   </div>
@@ -296,7 +314,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
       {showCopyToast && (
         <div className="fixed bottom-4 right-4 z-50 animate-fade-in-up">
-          <div className="flex items-center gap-2 bg-gradient-to-r from-emerald-500/90 to-teal-600/90 backdrop-blur-md px-4 py-3 rounded-lg shadow-lg border border-emerald-400/30">
+          <div className="flex items-center gap-2 bg-gradient-to-r from-cyan-500/90 to-teal-600/90 backdrop-blur-md px-4 py-3 rounded-lg shadow-lg border border-cyan-400/30">
             <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

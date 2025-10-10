@@ -121,10 +121,10 @@ const Footer: React.FC<FooterProps> = ({
                       document.querySelector('[data-section="badge-mint"]');
     }
     if (!badgeSection) {
-      badgeSection = document.querySelector('div.mb-8.mt-8:has(.text-emerald-500)');
+      badgeSection = document.querySelector('div.mb-8.mt-8:has(.text-cyan-500)');
     }
     if (!badgeSection) {
-      badgeSection = document.querySelector('div:has(h2):has(.text-emerald-500)');
+      badgeSection = document.querySelector('div:has(h2):has(.text-cyan-500)');
     }
 
     if (badgeSection) {
@@ -211,17 +211,17 @@ const Footer: React.FC<FooterProps> = ({
   ];
 
   return (
-    <footer className="relative bg-gradient-to-b from-emerald-900/90 to-black overflow-hidden py-16">
+    <footer className="relative bg-gradient-to-b from-cyan-900/90 to-black overflow-hidden py-16">
       {/* Background elements */}
       <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-repeat opacity-5 pointer-events-none"></div>
       
       {/* Glowing elements */}
-      <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-emerald-500/20 blur-xl animate-pulse pointer-events-none"></div>
-      <div className="absolute bottom-40 left-20 w-80 h-80 rounded-full bg-emerald-600/10 blur-xl animate-pulse pointer-events-none"></div>
+      <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-cyan-500/20 blur-xl animate-pulse pointer-events-none"></div>
+      <div className="absolute bottom-40 left-20 w-80 h-80 rounded-full bg-cyan-600/10 blur-xl animate-pulse pointer-events-none"></div>
       
       {/* Footer top border */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent"></div>
-      <div className="absolute top-1 left-0 w-full h-px bg-emerald-400/20"></div>
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
+      <div className="absolute top-1 left-0 w-full h-px bg-cyan-400/20"></div>
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-white/90">
@@ -229,11 +229,11 @@ const Footer: React.FC<FooterProps> = ({
           <div className="space-y-6">
             <div className="flex items-center gap-2">
               <div className="relative">
-                <FaLeaf className="h-8 w-8 text-emerald-500" />
-                <div className="absolute inset-0 bg-emerald-500 rounded-full blur-md opacity-30 animate-pulse"></div>
+                <FaLeaf className="h-8 w-8 text-cyan-500" />
+                <div className="absolute inset-0 bg-cyan-500 rounded-full blur-md opacity-30 animate-pulse"></div>
               </div>
-              <span className="ml-2 text-xl font-bold text-emerald-300 tracking-tight">
-                GM <span className="text-emerald-500">TEA</span>
+              <span className="ml-2 text-xl font-bold text-cyan-300 tracking-tight">
+                GM <span className="text-cyan-500">TEA</span>
               </span>
             </div>
             
@@ -242,37 +242,37 @@ const Footer: React.FC<FooterProps> = ({
             </p>
             
             <div className="pt-2">
-              <h4 className="text-emerald-400 font-medium mb-3">Why GMTea?</h4>
+              <h4 className="text-cyan-400 font-medium mb-3">Why GMTea?</h4>
               <ul className="space-y-2 text-sm">
                 <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
+                  <div className="w-1 h-1 rounded-full bg-cyan-500"></div>
                   <span>OnChain & Optimized</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
+                  <div className="w-1 h-1 rounded-full bg-cyan-500"></div>
                   <span>Scalable Architecture</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
+                  <div className="w-1 h-1 rounded-full bg-cyan-500"></div>
                   <span>Growing Community</span>
                 </li>
               </ul>
             </div>
             
             <div className="flex space-x-4 pt-2">
-              <div className="group bg-emerald-900/40 hover:bg-emerald-800/50 text-emerald-400 hover:text-emerald-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-emerald-700/30 cursor-pointer">
+              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
                 <FaTwitter className="transform group-hover:-translate-y-1 transition-transform duration-300" />
               </div>
-              <div className="group bg-emerald-900/40 hover:bg-emerald-800/50 text-emerald-400 hover:text-emerald-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-emerald-700/30 cursor-pointer">
+              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
                 <FaDiscord className="transform group-hover:-translate-y-1 transition-transform duration-300" />
               </div>
-              <div className="group bg-emerald-900/40 hover:bg-emerald-800/50 text-emerald-400 hover:text-emerald-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-emerald-700/30 cursor-pointer">
+              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
                 <FaGlobe className="transform group-hover:-translate-y-1 transition-transform duration-300" />
               </div>
-              <div className="group bg-emerald-900/40 hover:bg-emerald-800/50 text-emerald-400 hover:text-emerald-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-emerald-700/30 cursor-pointer">
+              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
                 <FaGithub className="transform group-hover:-translate-y-1 transition-transform duration-300" />
               </div>
-              <div className="group bg-emerald-900/40 hover:bg-emerald-800/50 text-emerald-400 hover:text-emerald-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-emerald-700/30 cursor-pointer">
+              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
                 <FaEnvelope className="transform group-hover:-translate-y-1 transition-transform duration-300" />
               </div>
             </div>
@@ -280,43 +280,43 @@ const Footer: React.FC<FooterProps> = ({
           
           {/* Resources - Column 2 */}
           <div className="lg:ml-auto">
-            <h4 className="text-emerald-400 font-semibold mb-6 relative inline-block">
+            <h4 className="text-cyan-400 font-semibold mb-6 relative inline-block">
               Resources
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-500/50"></span>
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-500/50"></span>
             </h4>
             <ul className="space-y-3">
               <li>
-                <div className="text-gray-300 hover:text-emerald-300 transition-colors group flex items-center cursor-pointer">
-                  <span className="group-hover:text-emerald-300 transition-all duration-300">Documentation</span>
-                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-emerald-500 transition-all duration-300"></div>
+                <div className="text-gray-300 hover:text-cyan-300 transition-colors group flex items-center cursor-pointer">
+                  <span className="group-hover:text-cyan-300 transition-all duration-300">Documentation</span>
+                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-cyan-500 transition-all duration-300"></div>
                   <FaArrowRight className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs" />
                 </div>
               </li>
               <li>
-                <div className="text-gray-300 hover:text-emerald-300 transition-colors group flex items-center cursor-pointer">
-                  <span className="group-hover:text-emerald-300 transition-all duration-300">Whitepaper</span>
-                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-emerald-500 transition-all duration-300"></div>
+                <div className="text-gray-300 hover:text-cyan-300 transition-colors group flex items-center cursor-pointer">
+                  <span className="group-hover:text-cyan-300 transition-all duration-300">Whitepaper</span>
+                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-cyan-500 transition-all duration-300"></div>
                   <FaArrowRight className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs" />
                 </div>
               </li>
               <li>
-                <div className="text-gray-300 hover:text-emerald-300 transition-colors group flex items-center cursor-pointer">
-                  <span className="group-hover:text-emerald-300 transition-all duration-300">Blog</span>
-                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-emerald-500 transition-all duration-300"></div>
+                <div className="text-gray-300 hover:text-cyan-300 transition-colors group flex items-center cursor-pointer">
+                  <span className="group-hover:text-cyan-300 transition-all duration-300">Blog</span>
+                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-cyan-500 transition-all duration-300"></div>
                   <FaArrowRight className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs" />
                 </div>
               </li>
               <li>
-                <div className="text-gray-300 hover:text-emerald-300 transition-colors group flex items-center cursor-pointer">
-                  <span className="group-hover:text-emerald-300 transition-all duration-300">FAQ</span>
-                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-emerald-500 transition-all duration-300"></div>
+                <div className="text-gray-300 hover:text-cyan-300 transition-colors group flex items-center cursor-pointer">
+                  <span className="group-hover:text-cyan-300 transition-all duration-300">FAQ</span>
+                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-cyan-500 transition-all duration-300"></div>
                   <FaArrowRight className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs" />
                 </div>
               </li>
               <li>
-                <div className="text-gray-300 hover:text-emerald-300 transition-colors group flex items-center cursor-pointer">
-                  <span className="group-hover:text-emerald-300 transition-all duration-300">Events</span>
-                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-emerald-500 transition-all duration-300"></div>
+                <div className="text-gray-300 hover:text-cyan-300 transition-colors group flex items-center cursor-pointer">
+                  <span className="group-hover:text-cyan-300 transition-all duration-300">Events</span>
+                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-cyan-500 transition-all duration-300"></div>
                   <FaArrowRight className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs" />
                 </div>
               </li>
@@ -325,36 +325,36 @@ const Footer: React.FC<FooterProps> = ({
           
           {/* Tea Protocol Contracts - Column 3 */}
           <div>
-            <h4 className="text-emerald-400 font-semibold mb-6 relative inline-block">
+            <h4 className="text-cyan-400 font-semibold mb-6 relative inline-block">
               Tea Protocol Contracts
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-500/50"></span>
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-500/50"></span>
             </h4>
             <div className="space-y-4">
               {expandedSection === 'contracts' ? (
-                <div className="bg-emerald-900/40 rounded-lg border border-emerald-700/30 backdrop-blur-sm shadow-lg p-4">
+                <div className="bg-cyan-900/40 rounded-lg border border-cyan-700/30 backdrop-blur-sm shadow-lg p-4">
                   <div 
                     className="flex items-center justify-between cursor-pointer"
                     onClick={() => toggleSection('contracts')}
                   >
                     <div className="flex items-center gap-2">
-                      <FaLeaf className="text-emerald-400" />
+                      <FaLeaf className="text-cyan-400" />
                       <div>
-                        <span className="text-emerald-300 font-medium">Tea Protocol</span>
-                        <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">Testnet</span>
+                        <span className="text-cyan-300 font-medium">Tea Protocol</span>
+                        <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">Testnet</span>
                       </div>
                     </div>
-                    <FaChevronUp className="text-emerald-400" />
+                    <FaChevronUp className="text-cyan-400" />
                   </div>
                   
                   <div className="mt-4 grid grid-cols-1 gap-3">
                     {contracts.map((contract) => (
-                      <div key={contract.id} className="bg-emerald-900/40 p-3 rounded border border-emerald-700/20 flex items-center justify-between">
+                      <div key={contract.id} className="bg-cyan-900/40 p-3 rounded border border-cyan-700/20 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="text-emerald-400">{contract.icon}</div>
+                          <div className="text-cyan-400">{contract.icon}</div>
                           <span className="text-sm text-gray-300">{contract.name}</span>
                         </div>
                         <div 
-                          className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer"
+                          className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
                             navigator.clipboard.writeText(contract.address);
@@ -369,28 +369,28 @@ const Footer: React.FC<FooterProps> = ({
                 </div>
               ) : (
                 <div 
-                  className="bg-emerald-900/40 rounded-lg border border-emerald-700/30 backdrop-blur-sm shadow-lg p-4 cursor-pointer hover:bg-emerald-800/30 transition-colors"
+                  className="bg-cyan-900/40 rounded-lg border border-cyan-700/30 backdrop-blur-sm shadow-lg p-4 cursor-pointer hover:bg-cyan-800/30 transition-colors"
                   onClick={() => toggleSection('contracts')}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <FaLeaf className="text-emerald-400" />
+                      <FaLeaf className="text-cyan-400" />
                       <div>
-                        <span className="text-emerald-300 font-medium">Tea Protocol</span>
-                        <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">Testnet</span>
+                        <span className="text-cyan-300 font-medium">Tea Protocol</span>
+                        <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">Testnet</span>
                       </div>
                     </div>
-                    <FaChevronDown className="text-emerald-400" />
+                    <FaChevronDown className="text-cyan-400" />
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {contracts.slice(0, 3).map((contract) => (
-                      <div key={contract.id} className="bg-emerald-900/60 px-2 py-1 rounded border border-emerald-700/20 text-xs text-gray-300 flex items-center gap-1">
-                        <div className="text-emerald-400">{contract.icon}</div>
+                      <div key={contract.id} className="bg-cyan-900/60 px-2 py-1 rounded border border-cyan-700/20 text-xs text-gray-300 flex items-center gap-1">
+                        <div className="text-cyan-400">{contract.icon}</div>
                         {contract.name}
                       </div>
                     ))}
                     {contracts.length > 3 && (
-                      <div className="bg-emerald-900/60 px-2 py-1 rounded border border-emerald-700/20 text-xs text-gray-300">
+                      <div className="bg-cyan-900/60 px-2 py-1 rounded border border-cyan-700/20 text-xs text-gray-300">
                         +{contracts.length - 3} more
                       </div>
                     )}
@@ -402,27 +402,27 @@ const Footer: React.FC<FooterProps> = ({
           
           {/* Community Stats - Column 4 (moved from being nested) */}
           <div>
-            <h4 className="text-emerald-400 font-semibold mb-6 relative inline-block">
+            <h4 className="text-cyan-400 font-semibold mb-6 relative inline-block">
               Community Stats
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-500/50"></span>
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-500/50"></span>
             </h4>
-            <div className="bg-emerald-900/40 rounded-lg border border-emerald-700/30 backdrop-blur-sm shadow-lg p-4">
+            <div className="bg-cyan-900/40 rounded-lg border border-cyan-700/30 backdrop-blur-sm shadow-lg p-4">
                 <div className="flex items-center gap-2">
-                  <TfiStatsUp className="text-emerald-400" />
-                  <span className="text-emerald-300 font-medium">Platform Statistics</span>
+                  <TfiStatsUp className="text-cyan-400" />
+                  <span className="text-cyan-300 font-medium">Platform Statistics</span>
                 </div>
              
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <div className="bg-emerald-900/60 px-2 py-1 rounded border border-emerald-700/20 text-xs text-gray-300 flex items-center gap-1">
-                    <div className="text-emerald-400"><FaUsers className="h-3 w-3" /></div>
+                  <div className="bg-cyan-900/60 px-2 py-1 rounded border border-cyan-700/20 text-xs text-gray-300 flex items-center gap-1">
+                    <div className="text-cyan-400"><FaUsers className="h-3 w-3" /></div>
                     1,850+ Users
                   </div>
-                  <div className="bg-emerald-900/60 px-2 py-1 rounded border border-emerald-700/20 text-xs text-gray-300 flex items-center gap-1">
-                    <div className="text-emerald-400"><FaRocket className="h-3 w-3" /></div>
+                  <div className="bg-cyan-900/60 px-2 py-1 rounded border border-cyan-700/20 text-xs text-gray-300 flex items-center gap-1">
+                    <div className="text-cyan-400"><FaRocket className="h-3 w-3" /></div>
                     400+ Daily Active
                   </div>
-                  <div className="bg-emerald-900/60 px-2 py-1 rounded border border-emerald-700/20 text-xs text-gray-300 flex items-center gap-1">
-                    <div className="text-emerald-400"><IoIosStats className="h-3 w-3" /></div>
+                  <div className="bg-cyan-900/60 px-2 py-1 rounded border border-cyan-700/20 text-xs text-gray-300 flex items-center gap-1">
+                    <div className="text-cyan-400"><IoIosStats className="h-3 w-3" /></div>
                     15K+ Transactions
                   </div>
                 </div>
@@ -435,14 +435,14 @@ const Footer: React.FC<FooterProps> = ({
           {/* Futuristic glowing separator with moving light effect */}
           <div className="flex-1 relative h-px w-full mb-8">
             {/* Base gradient line */}
-            <div className="h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-70"></div>
+            <div className="h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-70"></div>
             
             {/* Moving light effect - persis seperti contoh */}
             <div 
               className="absolute top-0 h-px w-20 animate-gradient-x" 
               style={{
-                boxShadow: '0 0 8px 1px rgba(16, 185, 129, 0.6)',
-                background: 'linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.8), transparent)'
+                boxShadow: '0 0 8px 1px rgba(0, 229, 255, 0.6)',
+                background: 'linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.8), transparent)'
               }}
             >
             </div>
@@ -454,11 +454,11 @@ const Footer: React.FC<FooterProps> = ({
             <div className="flex flex-col items-center md:items-start space-y-3">
               <div className="flex items-center space-x-2">
                 <div className="relative">
-                  <FaLeaf className="h-8 w-8 text-emerald-500 mr-2" />
-                  <div className="absolute inset-0 bg-emerald-500 rounded-full blur-md opacity-30 animate-pulse"></div>
+                  <FaLeaf className="h-8 w-8 text-cyan-500 mr-2" />
+                  <div className="absolute inset-0 bg-cyan-500 rounded-full blur-md opacity-30 animate-pulse"></div>
                 </div>
-                <span className="text-emerald-400 font-semibold tracking-wide text-2xl">
-                  GM <span className="text-emerald-500">TEA</span>
+                <span className="text-cyan-400 font-semibold tracking-wide text-2xl">
+                  GM <span className="text-cyan-500">TEA</span>
                 </span>
               </div>
             </div>
@@ -467,28 +467,28 @@ const Footer: React.FC<FooterProps> = ({
             <div className="flex flex-col items-center">
               <div className="relative">
                 <div className="text-gray-400 text-sm">© 2025 GM TEA. All rights reserved.</div>
-                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-px bg-emerald-400 animate-pulse-width"></div>
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-px bg-cyan-400 animate-pulse-width"></div>
               </div>
               
               {/* Testnet badge */}
-              <div className="mt-2 px-2 py-0.5 rounded-full bg-emerald-900/30 border border-emerald-700/20 text-emerald-400 text-xs font-medium">
+              <div className="mt-2 px-2 py-0.5 rounded-full bg-cyan-900/30 border border-cyan-700/20 text-cyan-400 text-xs font-medium">
                 Tea Protocol Testnet
               </div>
             </div>
             
             {/* Right - links with hover effects */}
             <div className="flex justify-center md:justify-end gap-6">
-              <div className="text-gray-400 hover:text-emerald-300 text-sm transition-colors cursor-pointer relative group">
+              <div className="text-gray-400 hover:text-cyan-300 text-sm transition-colors cursor-pointer relative group">
                 Terms
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-emerald-400 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
               </div>
-              <div className="text-gray-400 hover:text-emerald-300 text-sm transition-colors cursor-pointer relative group">
+              <div className="text-gray-400 hover:text-cyan-300 text-sm transition-colors cursor-pointer relative group">
                 Privacy
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-emerald-400 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
               </div>
-              <div className="text-gray-400 hover:text-emerald-300 text-sm transition-colors cursor-pointer relative group">
+              <div className="text-gray-400 hover:text-cyan-300 text-sm transition-colors cursor-pointer relative group">
                 Support
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-emerald-400 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
               </div>
             </div>
           </div>
