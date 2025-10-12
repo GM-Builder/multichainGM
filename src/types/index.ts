@@ -202,3 +202,23 @@ export interface UserCheckin {
   txHash: string;
   chain: string;
 }
+
+// Interface untuk GET_USER_RANKING response
+export interface RawUserRankingResponse {
+  navigator: {
+    id: string;
+    address: string;
+    totalCheckins: string;
+  } | null;
+  leaderboardEntries: Array<{
+    navigator: {
+      id: string;
+      address: string;
+      totalCheckins: string;
+    };
+  }>;
+  globalStats: {
+    totalNavigators: string;
+  } | null;
+}
+

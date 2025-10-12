@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaSpinner, FaCheckCircle, FaClock, FaWallet, 
@@ -82,6 +82,25 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState<boolean>(false);
   const [networkSwitchingChainId, setNetworkSwitchingChainId] = useState<number | null>(null);
   
+  const filterMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterMenuRef.current && !filterMenuRef.current.contains(event.target as Node)) {
+        setIsFilterMenuOpen(false);
+      }
+    };
+
+    if (isFilterMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isFilterMenuOpen]);
+
+
   useEffect(() => {
     try {
       const savedFavorites = localStorage.getItem('favoriteChains');
@@ -476,41 +495,67 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="flex flex-wrap gap-3"
+            className="flex flex-wrap gap-2.5"
           >
-            <div className="relative">
+            {/* Filter Dropdown */}
+            <div className="relative" ref={filterMenuRef}>
               <button
                 onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-gray-200/50 dark:border-slate-700/50 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-700/60 transition-all duration-200 shadow-sm"
+                className="group flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-white/90 to-white/70 dark:from-slate-800/90 dark:to-slate-800/70 backdrop-blur-xl border border-gray-200/60 dark:border-slate-700/60 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:shadow-lg hover:scale-[1.02] hover:border-cyan-300/50 dark:hover:border-cyan-500/50 transition-all duration-300 shadow-sm"
               >
-                <FaFilter className="text-slate-500" size={14} />
-                <span>Filter: {filter.charAt(0).toUpperCase() + filter.slice(1)}</span>
+                <div className="p-1 rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30 group-hover:from-cyan-100 group-hover:to-blue-100 dark:group-hover:from-cyan-900/50 dark:group-hover:to-blue-900/50 transition-colors">
+                  <FaFilter className="text-cyan-600 dark:text-cyan-400" size={12} />
+                </div>
+                <span className="bg-gradient-to-r from-gray-700 to-gray-900 dark:from-gray-200 dark:to-white bg-clip-text text-transparent">
+                  Filter: {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                </span>
+                <svg 
+                  className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform duration-300 ${isFilterMenuOpen ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
               
               <AnimatePresence>
                 {isFilterMenuOpen && (
                   <motion.div 
-                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    initial={{ opacity: 0, scale: 0.92, y: -15 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-2 w-44 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-slate-700/50 rounded-xl shadow-lg z-20"
+                    exit={{ opacity: 0, scale: 0.92, y: -15 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className="absolute right-0 mt-2 w-48 bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl border border-gray-200/60 dark:border-slate-700/60 rounded-2xl shadow-2xl z-20 overflow-hidden"
                   >
-                    <div className="py-2">
-                      {['all', 'available', 'checked', 'favorites'].map((option) => (
+                    <div className="py-1.5">
+                      {['all', 'available', 'checked', 'favorites'].map((option, idx) => (
                         <button
                           key={option}
                           onClick={() => {
                             setFilter(option as FilterType);
                             setIsFilterMenuOpen(false);
                           }}
-                          className={`block w-full text-left px-4 py-2.5 text-sm transition-all duration-200 ${
+                          className={`group relative block w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
                             filter === option 
-                              ? `${networkConfig.badgeColor} font-medium` 
-                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50'
+                              ? 'bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/40 dark:to-blue-900/40 text-cyan-700 dark:text-cyan-300 font-semibold' 
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100/50 dark:hover:from-slate-700/50 dark:hover:to-slate-700/30'
                           }`}
                         >
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
+                          {filter === option && (
+                            <motion.div 
+                              layoutId="activeFilter"
+                              className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-r-full"
+                              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            />
+                          )}
+                          <span className="relative z-10 flex items-center gap-2">
+                            {option === 'all' && '📋'}
+                            {option === 'available' && '✅'}
+                            {option === 'checked' && '✔️'}
+                            {option === 'favorites' && '⭐'}
+                            {option.charAt(0).toUpperCase() + option.slice(1)}
+                          </span>
                         </button>
                       ))}
                     </div>
@@ -519,37 +564,66 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
               </AnimatePresence>
             </div>
             
-            <select
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value as SortOptionType)}
-              className="px-4 py-2.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-gray-200/50 dark:border-slate-700/50 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-700/60 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 shadow-sm"
-            >
-              <option value="name">Sort by Name</option>
-              <option value="status">Sort by Status</option>
-            </select>
+            {/* Sort Select */}
+            <div className="relative">
+              <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value as SortOptionType)}
+                className="appearance-none pl-4 pr-10 py-2.5 bg-gradient-to-br from-white/90 to-white/70 dark:from-slate-800/90 dark:to-slate-800/70 backdrop-blur-xl border border-gray-200/60 dark:border-slate-700/60 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:shadow-lg hover:scale-[1.02] hover:border-purple-300/50 dark:hover:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-400 dark:focus:border-purple-500 transition-all duration-300 shadow-sm cursor-pointer"
+              >
+                <option value="name">🔤 Sort by Name</option>
+                <option value="status">📊 Sort by Status</option>
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
             
+            {/* Refresh Button */}
             <button 
               onClick={checkAllChainsStatus}
               disabled={isLoading || !isConnected}
-              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 shadow-sm ${
+              className={`group relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 shadow-sm overflow-hidden ${
                 isLoading 
-                  ? 'bg-gradient-to-r from-cyan-300/10 to-cyan-300/10 backdrop-blur-xl text-slate-500 dark:text-slate-100 hover:from-blue-300/20 hover:to-cyan-300/20 border border-blue-200/50 dark:border-cyan-400/30' 
-                  : 'bg-gradient-to-r from-cyan-500/10 to-cyan-500/10 backdrop-blur-xl text-slate-700 dark:text-slate-300 hover:from-blue-500/20 hover:to-cyan-500/20 border border-blue-200/50 dark:border-cyan-400/30'
+                  ? 'bg-gradient-to-r from-cyan-100/60 to-blue-100/60 dark:from-cyan-900/30 dark:to-blue-900/30 text-cyan-600 dark:text-cyan-400 border border-cyan-200/60 dark:border-cyan-700/50 cursor-wait' 
+                  : !isConnected
+                    ? 'bg-gray-100/60 dark:bg-slate-800/50 text-gray-400 dark:text-gray-500 border border-gray-200/50 dark:border-slate-700/50 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-cyan-500/15 to-blue-500/15 dark:from-cyan-500/20 dark:to-blue-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-300/50 dark:border-cyan-600/50 hover:shadow-lg hover:scale-[1.02] hover:from-cyan-500/25 hover:to-blue-500/25 dark:hover:from-cyan-500/30 dark:hover:to-blue-500/30 active:scale-95'
               }`}
             >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <FaSpinner className="animate-spin" size={14} />
-                  Refreshing...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Refresh
-                </span>
+              {/* Animated background on hover */}
+              {!isLoading && isConnected && (
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/20 to-cyan-400/0 dark:from-cyan-500/0 dark:via-cyan-500/30 dark:to-cyan-500/0"
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                />
               )}
+              
+              <div className="relative z-10 flex items-center gap-2">
+                {isLoading ? (
+                  <>
+                    <FaSpinner className="animate-spin" size={14} />
+                    <span>Refreshing...</span>
+                  </>
+                ) : (
+                  <>
+                    <motion.div
+                      animate={isConnected ? { rotate: 360 } : {}}
+                      transition={{ duration: 0.6, ease: "easeInOut" }}
+                      whileHover={{ rotate: 360 }}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                    </motion.div>
+                    <span>Refresh</span>
+                  </>
+                )}
+              </div>
             </button>
           </motion.div>
         </div>

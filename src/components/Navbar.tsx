@@ -50,6 +50,8 @@ const Navbar: React.FC<NavbarProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const [scrolled, setScrolled] = useState(false)
+  // ✅ TAMBAHAN: State untuk tooltip leaderboard
+  const [showLeaderboardTooltip, setShowLeaderboardTooltip] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -130,14 +132,13 @@ const Navbar: React.FC<NavbarProps> = ({
                 <div 
                   className={`flex-shrink-0 relative transition-all duration-500 ${
                     scrolled 
-                      ? "h-14 md:h-16 w-32 md:w-40" // Ukuran kecil (scrolled): Tinggi h-12, Lebar w-40
-                      : "h-16 md:h-24 w-48 md:w-64" // Ukuran BESAR (normal): Tinggi h-20, Lebar w-64
+                      ? "h-14 md:h-16 w-32 md:w-40"
+                      : "h-16 md:h-24 w-48 md:w-64"
                   }`}
                 >
                   <img 
                     src={LOGO_PATH}
                     alt="GannetX Logo"
-                    // object-contain penting agar logo horizontal tidak terpotong
                     className="h-full w-full object-contain" 
                   />
                 </div>
@@ -145,16 +146,36 @@ const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             <div className="hidden md:flex items-center gap-4">
-              {/* Leaderboard Button */}
+              {/* ✅ PERBAIKAN: Leaderboard Button dengan Tooltip */}
               {scrollToLeaderboard && (
-                <button
-                  onClick={scrollToLeaderboard}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 hover:from-yellow-100 hover:to-orange-100 dark:hover:from-yellow-900/30 dark:hover:to-orange-900/30 border border-yellow-200/50 dark:border-yellow-700/30 rounded-lg transition-all duration-200 shadow-sm"
-                >
-                  <FaTrophy className="text-yellow-600 dark:text-yellow-400 w-4 h-4" />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Leaderboard</span>
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={scrollToLeaderboard}
+                    onMouseEnter={() => setShowLeaderboardTooltip(true)}
+                    onMouseLeave={() => setShowLeaderboardTooltip(false)}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 hover:from-yellow-100 hover:to-orange-100 dark:hover:from-yellow-900/30 dark:hover:to-orange-900/30 border border-yellow-200/50 dark:border-yellow-700/30 rounded-lg transition-all duration-200 shadow-sm"
+                  >
+                    <FaTrophy className="text-yellow-600 dark:text-yellow-400 w-4 h-4" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Leaderboard</span>
+                  </button>
+                  
+                  {/* ✅ TOOLTIP: Under Construction */}
+                  {showLeaderboardTooltip && (
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50 animate-fade-in">
+                      <div className="relative">
+                        {/* Arrow pointing up */}
+                        <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 dark:bg-gray-700 rotate-45"></div>
+                        
+                        {/* Tooltip content */}
+                        <div className="bg-gray-800 dark:bg-gray-700 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
+                          🚧 Under Construction
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
+              
               <ThemeToggle />
               {networkInfo && (
                 <div className="flex items-center px-3 py-1.5 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-sm text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-700/50 shadow-inner backdrop-blur-sm">

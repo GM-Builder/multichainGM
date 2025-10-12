@@ -18,6 +18,7 @@ import {
   RawNavigatorEntry,
   RawCheckin,
   RawUserCheckinsResponse,
+  RawUserRankingResponse,
 } from '@/types';
 
 // Tipe hasil yang di-parse dari getUserStatsOnChain
@@ -394,20 +395,27 @@ export async function getUserRanking(chainName: ChainName, address: string): Pro
 } | null> {
   try {
     const client = createSubgraphClient(chainName);
-    const { data } = await client.query({
+    // ✅ PERBAIKAN 1: Tambahkan <RawUserRankingResponse>
+    const { data } = await client.query<RawUserRankingResponse>({
       query: GET_USER_RANKING,
       variables: { address: address.toLowerCase() },
       fetchPolicy: 'network-only',
     });
 
-    if (!data || !data.navigator) {
-      return { rank: 0, totalUsers: parseInt(data?.globalStats?.totalNavigators || '0') };
+    // ✅ PERBAIKAN 2: Handle data undefined dengan benar
+    if (!data) {
+      return { rank: 0, totalUsers: 0 };
     }
 
-    const userCheckins = parseInt(data.navigator.totalCheckins);
+    // ✅ PERBAIKAN 3: Handle navigator null
+    if (!data.navigator) {
+      const totalUsers = parseInt(data.globalStats?.totalNavigators || '0');
+      return { rank: 0, totalUsers };
+    }
+
+    const userCheckins = parseInt(data.navigator.totalCheckins || '0');
     const leaderboard = data.leaderboardEntries || [];
     
-    // Find user position in leaderboard
     let rank = 0;
     for (let i = 0; i < leaderboard.length; i++) {
       if (leaderboard[i].navigator.address.toLowerCase() === address.toLowerCase()) {
@@ -416,11 +424,10 @@ export async function getUserRanking(chainName: ChainName, address: string): Pro
       }
     }
     
-    // If not found in top 1000, calculate approximate rank
     if (rank === 0 && userCheckins > 0) {
-      // Count how many users have more checkins
+      // ✅ PERBAIKAN 4: Hapus type 'any', gunakan type inference
       const usersAbove = leaderboard.filter(
-        (entry: any) => parseInt(entry.navigator.totalCheckins) > userCheckins
+        (entry: { navigator: { totalCheckins: any; }; }) => parseInt(entry.navigator.totalCheckins || '0') > userCheckins
       ).length;
       rank = usersAbove + 1;
     }
@@ -434,7 +441,6 @@ export async function getUserRanking(chainName: ChainName, address: string): Pro
   }
 }
 
-// Get aggregated ranking across all chains
 export async function getUserRankingAllChains(address: string): Promise<{
   rank: number;
   totalUsers: number;
@@ -444,16 +450,18 @@ export async function getUserRankingAllChains(address: string): Promise<{
       SUPPORTED_CHAINS.map((chain) => getUserRanking(chain, address))
     );
 
-    // Use the best rank from all chains
-    const validResults = results.filter((r) => r !== null && r.rank > 0);
+    // ✅ PERBAIKAN: Gunakan type predicate untuk filter yang lebih aman
+    const validResults = results.filter(
+      (r): r is NonNullable<typeof r> => r !== null && r.rank > 0
+    );
     
     if (validResults.length === 0) {
       return { rank: 0, totalUsers: 0 };
     }
 
-    // Get best (lowest) rank
-    const bestRank = Math.min(...validResults.map(r => r!.rank));
-    const maxTotalUsers = Math.max(...validResults.map(r => r!.totalUsers));
+    // ✅ Sekarang TypeScript tahu r tidak null, tidak perlu r!
+    const bestRank = Math.min(...validResults.map(r => r.rank));
+    const maxTotalUsers = Math.max(...validResults.map(r => r.totalUsers));
 
     return {
       rank: bestRank,
