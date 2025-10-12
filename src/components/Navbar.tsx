@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa"
 import ConnectWalletButton from "./ConnectWalletButton"
 import ChainLogo from "@/components/ChainLogo"
+import { FaTrophy } from 'react-icons/fa';
 
 const LOGO_PATH = "/logo.png"
 
@@ -120,17 +121,12 @@ const Navbar: React.FC<NavbarProps> = ({
         }`}
       >
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-20">
-          {/* PERUBAHAN 1: Membuat tinggi Navbar dinamis berdasarkan scroll */}
-          <div 
-            className={`flex justify-between items-center transition-all duration-500
-              ${scrolled ? 'h-16 md:h-20' : 'h-20 md:h-28'}` /* Navbar menyusut dari h-28 ke h-20 di desktop */
+          <div className={`flex justify-between items-center transition-all duration-500
+              ${scrolled ? 'h-16 md:h-20' : 'h-20 md:h-28'}` 
             }
           >
             <div className="flex items-center">
               <div className="flex items-center gap-2 cursor-pointer">
-                {/* PERUBAHAN 2: Menyesuaikan ukuran logo agar memanjang ke samping (Horizontal).
-                  Kami menggunakan tinggi yang dikontrol (h-16/h-20) dan lebar yang jauh lebih besar (w-48/w-64).
-                */}
                 <div 
                   className={`flex-shrink-0 relative transition-all duration-500 ${
                     scrolled 
@@ -149,6 +145,16 @@ const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             <div className="hidden md:flex items-center gap-4">
+              {/* Leaderboard Button */}
+              {scrollToLeaderboard && (
+                <button
+                  onClick={scrollToLeaderboard}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 hover:from-yellow-100 hover:to-orange-100 dark:hover:from-yellow-900/30 dark:hover:to-orange-900/30 border border-yellow-200/50 dark:border-yellow-700/30 rounded-lg transition-all duration-200 shadow-sm"
+                >
+                  <FaTrophy className="text-yellow-600 dark:text-yellow-400 w-4 h-4" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Leaderboard</span>
+                </button>
+              )}
               <ThemeToggle />
               {networkInfo && (
                 <div className="flex items-center px-3 py-1.5 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-sm text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-700/50 shadow-inner backdrop-blur-sm">

@@ -342,3 +342,9 @@ export const getChainAbi = (chainId: number): any => {
   const chain = getChainConfig(chainId);
   return chain?.abi || GMTestnetABI;
 };
+
+export const SUBGRAPH_ENDPOINTS = {
+  base: 'https://api.studio.thegraph.com/query/106565/gannet-x-base/version/latest',
+  ink: 'https://api.studio.thegraph.com/query/106565/gannetx-ink/version/latest',
+  soneium: 'https://api.studio.thegraph.com/query/106565/gannet-x-soneium/version/latest',
+} as const;

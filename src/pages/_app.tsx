@@ -5,6 +5,7 @@ import Script from "next/script"
 import "@/styles/globals.css"
 import { ThirdwebProvider } from "thirdweb/react"
 import { useRouter } from "next/router"
+import { useRef, useCallback } from 'react'
 import Footer from "@/components/Footer"
 import WalletRequired from "@/components/WalletRequired"
 import { useWalletState } from "@/hooks/useWalletState"
@@ -16,6 +17,15 @@ function GMApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const { web3State, connectWallet, disconnectWallet, switchNetwork } = useWalletState()
   const { address, isConnected, isLoading: isWalletConnecting, chainId } = web3State
+  
+  const leaderboardRef = useRef<HTMLDivElement>(null)
+  
+  const scrollToLeaderboard = useCallback(() => {
+    leaderboardRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    })
+  }, [])
   
   const adaptedConnectWallet = async (): Promise<void> => {
     await connectWallet()
@@ -67,13 +77,11 @@ function GMApp({ Component, pageProps }: AppProps) {
           reverseOrder={false}
           toastOptions={{
             className: 'custom-toast',
-            
             style: {
               background: 'rgba(255, 255, 255, 0.9)',
               color: '#1f2937',
               backdropFilter: 'blur(8px)',
             },
-            
             duration: 5000,
           }}
         />
@@ -83,23 +91,25 @@ function GMApp({ Component, pageProps }: AppProps) {
           disconnectWallet={disconnectWallet}
           isConnecting={isWalletConnecting}
           networkInfo={networkInfo}
+          scrollToLeaderboard={scrollToLeaderboard}
         />
         
         <main>
           <WalletRequired
-              isConnected={isConnected}
-              connectWallet={adaptedConnectWallet}
-              isConnecting={isWalletConnecting}
-            >
-          {shouldRequireWallet ? (
-              <Component {...pageProps} />
-            
-          ) : (
-            <Component {...pageProps} />
-          )}
+            isConnected={isConnected}
+            connectWallet={adaptedConnectWallet}
+            isConnecting={isWalletConnecting}
+          >
+            {shouldRequireWallet ? (
+              <Component {...pageProps} leaderboardRef={leaderboardRef} />
+            ) : (
+              <Component {...pageProps} leaderboardRef={leaderboardRef} />
+            )}
+            <Footer />
           </WalletRequired>
         </main>
       </ThirdwebProvider>
+      
     </>
   )
 }

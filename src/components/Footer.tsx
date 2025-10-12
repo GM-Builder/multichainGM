@@ -13,7 +13,8 @@ import {
   FaFlask,
   FaGithub,
   FaRocket,
-  FaUsers
+  FaUsers,
+  FaTelegram
 } from 'react-icons/fa';
 import { IoIosStats } from "react-icons/io";
 import { TfiStatsUp } from "react-icons/tfi";
@@ -27,6 +28,8 @@ interface FooterProps {
   scrollToMintSection?: () => void;
   activeMenu?: string;
 }
+
+const LOGO_PATH = "/logo.png"
 
 const Footer: React.FC<FooterProps> = ({ 
   scrollToLeaderboard, 
@@ -229,204 +232,11 @@ const Footer: React.FC<FooterProps> = ({
           <div className="space-y-6">
             <div className="flex items-center gap-2">
               <div className="relative">
-                <FaLeaf className="h-8 w-8 text-cyan-500" />
-                <div className="absolute inset-0 bg-cyan-500 rounded-full blur-md opacity-30 animate-pulse"></div>
               </div>
-              <span className="ml-2 text-xl font-bold text-cyan-300 tracking-tight">
-                GM <span className="text-cyan-500">TEA</span>
-              </span>
             </div>
-            
             <p className="text-gray-300 text-sm leading-relaxed">
-              GMTea is an advanced on-chain platform that transforms blockchain interactions through innovative daily engagement protocols ensuring secure and seamless user experiences.
+              <span className='text-cyan-400 font-semibold relative'>GannetX</span> is an on-chain ecosystem navigator that transforms daily blockchain interactions, ensuring secure and seamless multi-chain user experiences.
             </p>
-            
-            <div className="pt-2">
-              <h4 className="text-cyan-400 font-medium mb-3">Why GMTea?</h4>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 rounded-full bg-cyan-500"></div>
-                  <span>OnChain & Optimized</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 rounded-full bg-cyan-500"></div>
-                  <span>Scalable Architecture</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1 h-1 rounded-full bg-cyan-500"></div>
-                  <span>Growing Community</span>
-                </li>
-              </ul>
-            </div>
-            
-            <div className="flex space-x-4 pt-2">
-              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
-                <FaTwitter className="transform group-hover:-translate-y-1 transition-transform duration-300" />
-              </div>
-              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
-                <FaDiscord className="transform group-hover:-translate-y-1 transition-transform duration-300" />
-              </div>
-              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
-                <FaGlobe className="transform group-hover:-translate-y-1 transition-transform duration-300" />
-              </div>
-              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
-                <FaGithub className="transform group-hover:-translate-y-1 transition-transform duration-300" />
-              </div>
-              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
-                <FaEnvelope className="transform group-hover:-translate-y-1 transition-transform duration-300" />
-              </div>
-            </div>
-          </div>
-          
-          {/* Resources - Column 2 */}
-          <div className="lg:ml-auto">
-            <h4 className="text-cyan-400 font-semibold mb-6 relative inline-block">
-              Resources
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-500/50"></span>
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <div className="text-gray-300 hover:text-cyan-300 transition-colors group flex items-center cursor-pointer">
-                  <span className="group-hover:text-cyan-300 transition-all duration-300">Documentation</span>
-                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-cyan-500 transition-all duration-300"></div>
-                  <FaArrowRight className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs" />
-                </div>
-              </li>
-              <li>
-                <div className="text-gray-300 hover:text-cyan-300 transition-colors group flex items-center cursor-pointer">
-                  <span className="group-hover:text-cyan-300 transition-all duration-300">Whitepaper</span>
-                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-cyan-500 transition-all duration-300"></div>
-                  <FaArrowRight className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs" />
-                </div>
-              </li>
-              <li>
-                <div className="text-gray-300 hover:text-cyan-300 transition-colors group flex items-center cursor-pointer">
-                  <span className="group-hover:text-cyan-300 transition-all duration-300">Blog</span>
-                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-cyan-500 transition-all duration-300"></div>
-                  <FaArrowRight className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs" />
-                </div>
-              </li>
-              <li>
-                <div className="text-gray-300 hover:text-cyan-300 transition-colors group flex items-center cursor-pointer">
-                  <span className="group-hover:text-cyan-300 transition-all duration-300">FAQ</span>
-                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-cyan-500 transition-all duration-300"></div>
-                  <FaArrowRight className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs" />
-                </div>
-              </li>
-              <li>
-                <div className="text-gray-300 hover:text-cyan-300 transition-colors group flex items-center cursor-pointer">
-                  <span className="group-hover:text-cyan-300 transition-all duration-300">Events</span>
-                  <div className="ml-2 w-0 group-hover:w-5 h-px bg-cyan-500 transition-all duration-300"></div>
-                  <FaArrowRight className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs" />
-                </div>
-              </li>
-            </ul>
-          </div>
-          
-          {/* Tea Protocol Contracts - Column 3 */}
-          <div>
-            <h4 className="text-cyan-400 font-semibold mb-6 relative inline-block">
-              Tea Protocol Contracts
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-500/50"></span>
-            </h4>
-            <div className="space-y-4">
-              {expandedSection === 'contracts' ? (
-                <div className="bg-cyan-900/40 rounded-lg border border-cyan-700/30 backdrop-blur-sm shadow-lg p-4">
-                  <div 
-                    className="flex items-center justify-between cursor-pointer"
-                    onClick={() => toggleSection('contracts')}
-                  >
-                    <div className="flex items-center gap-2">
-                      <FaLeaf className="text-cyan-400" />
-                      <div>
-                        <span className="text-cyan-300 font-medium">Tea Protocol</span>
-                        <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">Testnet</span>
-                      </div>
-                    </div>
-                    <FaChevronUp className="text-cyan-400" />
-                  </div>
-                  
-                  <div className="mt-4 grid grid-cols-1 gap-3">
-                    {contracts.map((contract) => (
-                      <div key={contract.id} className="bg-cyan-900/40 p-3 rounded border border-cyan-700/20 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="text-cyan-400">{contract.icon}</div>
-                          <span className="text-sm text-gray-300">{contract.name}</span>
-                        </div>
-                        <div 
-                          className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigator.clipboard.writeText(contract.address);
-                            alert("Contract address copied to clipboard!");
-                          }}
-                        >
-                          {contract.address.substring(0, 6)}...{contract.address.substring(contract.address.length - 4)}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div 
-                  className="bg-cyan-900/40 rounded-lg border border-cyan-700/30 backdrop-blur-sm shadow-lg p-4 cursor-pointer hover:bg-cyan-800/30 transition-colors"
-                  onClick={() => toggleSection('contracts')}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FaLeaf className="text-cyan-400" />
-                      <div>
-                        <span className="text-cyan-300 font-medium">Tea Protocol</span>
-                        <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">Testnet</span>
-                      </div>
-                    </div>
-                    <FaChevronDown className="text-cyan-400" />
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {contracts.slice(0, 3).map((contract) => (
-                      <div key={contract.id} className="bg-cyan-900/60 px-2 py-1 rounded border border-cyan-700/20 text-xs text-gray-300 flex items-center gap-1">
-                        <div className="text-cyan-400">{contract.icon}</div>
-                        {contract.name}
-                      </div>
-                    ))}
-                    {contracts.length > 3 && (
-                      <div className="bg-cyan-900/60 px-2 py-1 rounded border border-cyan-700/20 text-xs text-gray-300">
-                        +{contracts.length - 3} more
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Community Stats - Column 4 (moved from being nested) */}
-          <div>
-            <h4 className="text-cyan-400 font-semibold mb-6 relative inline-block">
-              Community Stats
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-500/50"></span>
-            </h4>
-            <div className="bg-cyan-900/40 rounded-lg border border-cyan-700/30 backdrop-blur-sm shadow-lg p-4">
-                <div className="flex items-center gap-2">
-                  <TfiStatsUp className="text-cyan-400" />
-                  <span className="text-cyan-300 font-medium">Platform Statistics</span>
-                </div>
-             
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <div className="bg-cyan-900/60 px-2 py-1 rounded border border-cyan-700/20 text-xs text-gray-300 flex items-center gap-1">
-                    <div className="text-cyan-400"><FaUsers className="h-3 w-3" /></div>
-                    1,850+ Users
-                  </div>
-                  <div className="bg-cyan-900/60 px-2 py-1 rounded border border-cyan-700/20 text-xs text-gray-300 flex items-center gap-1">
-                    <div className="text-cyan-400"><FaRocket className="h-3 w-3" /></div>
-                    400+ Daily Active
-                  </div>
-                  <div className="bg-cyan-900/60 px-2 py-1 rounded border border-cyan-700/20 text-xs text-gray-300 flex items-center gap-1">
-                    <div className="text-cyan-400"><IoIosStats className="h-3 w-3" /></div>
-                    15K+ Transactions
-                  </div>
-                </div>
-            </div>
           </div>
         </div>
         
@@ -454,41 +264,71 @@ const Footer: React.FC<FooterProps> = ({
             <div className="flex flex-col items-center md:items-start space-y-3">
               <div className="flex items-center space-x-2">
                 <div className="relative">
-                  <FaLeaf className="h-8 w-8 text-cyan-500 mr-2" />
-                  <div className="absolute inset-0 bg-cyan-500 rounded-full blur-md opacity-30 animate-pulse"></div>
+                  <img 
+                    src={LOGO_PATH}
+                    alt="GannetX Logo"
+                    className="h-18 w-36 object-contain" 
+                  />
                 </div>
-                <span className="text-cyan-400 font-semibold tracking-wide text-2xl">
-                  GM <span className="text-cyan-500">TEA</span>
-                </span>
               </div>
             </div>
             
             {/* Middle - Copyright with animated accent */}
             <div className="flex flex-col items-center">
               <div className="relative">
-                <div className="text-gray-400 text-sm">© 2025 GM TEA. All rights reserved.</div>
+                <div className="text-gray-400 text-sm">© 2025 GannetX. All rights reserved.</div>
                 <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-px bg-cyan-400 animate-pulse-width"></div>
               </div>
               
               {/* Testnet badge */}
               <div className="mt-2 px-2 py-0.5 rounded-full bg-cyan-900/30 border border-cyan-700/20 text-cyan-400 text-xs font-medium">
-                Tea Protocol Testnet
+                GannetX
               </div>
             </div>
             
             {/* Right - links with hover effects */}
-            <div className="flex justify-center md:justify-end gap-6">
-              <div className="text-gray-400 hover:text-cyan-300 text-sm transition-colors cursor-pointer relative group">
-                Terms
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+            <div className="flex flex-col items-center md:items-end gap-4"> 
+            
+            {/* 1. Social Media Icons Container */}
+            <div className="flex space-x-4 pt-2">
+              {/* Note: In a real app, replace the `div` with `a` tags pointing to the links */}
+              
+             <a 
+                href="https://x.com/gannetx" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer"
+                title="GannetX on X (Twitter)" // Menambahkan title untuk aksesibilitas
+              >
+                <FaTwitter className="transform group-hover:-translate-y-1 transition-transform duration-300" />
+              </a>
+              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
+                <FaTelegram className="transform group-hover:-translate-y-1 transition-transform duration-300" />
               </div>
-              <div className="text-gray-400 hover:text-cyan-300 text-sm transition-colors cursor-pointer relative group">
-                Privacy
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
+                <FaDiscord className="transform group-hover:-translate-y-1 transition-transform duration-300" />
               </div>
-              <div className="text-gray-400 hover:text-cyan-300 text-sm transition-colors cursor-pointer relative group">
-                Support
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
+                <FaEnvelope className="transform group-hover:-translate-y-1 transition-transform duration-300" />
+              </div>
+
+            </div>
+
+            {/* 2. Legal Links Container (Horizontal) */}
+            <div className="flex justify-center md:justify-end gap-6 text-sm">
+                
+                <div className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer relative group">
+                    Terms
+                    <span className="absolute -bottom-1 left-0 w-0 h-px bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+                </div>
+                <div className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer relative group">
+                    Privacy
+                    <span className="absolute -bottom-1 left-0 w-0 h-px bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+                </div>
+                <div className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer relative group">
+                    Support
+                    <span className="absolute -bottom-1 left-0 w-0 h-px bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+                </div>
               </div>
             </div>
           </div>

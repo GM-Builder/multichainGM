@@ -2,21 +2,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaSpinner, FaCheckCircle, FaClock, FaWallet, 
-  FaExclamationTriangle, FaStar, FaRegStar, FaFilter, FaTimes,
-  FaExchangeAlt, FaMoon,
+  FaStar, FaRegStar, FaFilter,
+  FaMoon,
   FaLayerGroup,
   FaGlobe,
   FaFlask,
-  FaAlipay,
-  FaEthereum
 } from 'react-icons/fa';
 import { 
-  CHECKIN_FEE,
   SUPPORTED_CHAINS, 
   getSupportedChainIds,
   getContractAddress,
   getChainAbi,
-  isChainSupported 
+  BASE_CHAIN_ID,
 } from '@/utils/constants';
 import { 
   performCheckin, 
@@ -28,7 +25,6 @@ import {
 import { ethers } from 'ethers';
 import ChainLogo from '@/components/ChainLogo';
 import toast from 'react-hot-toast';
-import { FaLandMineOn } from 'react-icons/fa6';
 
 type NetworkType = 'all' | 'mainnet' | 'testnet';
 type FilterType = 'all' | 'available' | 'checked' | 'favorites';
@@ -456,106 +452,107 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
   const NetworkIcon = networkConfig.icon;
 
   return (
-    <div className="w-full pt-10">
+    <div className="w-full pt-10 pb-20">
+      {/* Title & Filter Row */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 flex items-center">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mr-3">
-              <NetworkIcon className="text-white" size={16} />
-            </div> 
-            {networkType === 'testnet' ? 'Testnet Networks' : networkType === 'mainnet' ? 'Mainnet Networks' : 'All Networks'}
-            <div className={`ml-3 ${networkConfig.badgeColor} text-sm font-medium px-3 py-1 rounded-full backdrop-blur-sm border border-current/20`}>
-              {availableChainCount} Available
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 flex items-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mr-3">
+                <NetworkIcon className="text-white" size={16} />
+              </div> 
+              {networkType === 'testnet' ? 'Testnet Networks' : networkType === 'mainnet' ? 'Mainnet Networks' : 'All Networks'}
+              <div className={`ml-3 ${networkConfig.badgeColor} text-sm font-medium px-3 py-1 rounded-full backdrop-blur-sm border border-current/20`}>
+                {availableChainCount} Available
+              </div>
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Say GM across multiple blockchain networks daily</p>
+          </motion.div>
+          
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="flex flex-wrap gap-3"
+          >
+            <div className="relative">
+              <button
+                onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-gray-200/50 dark:border-slate-700/50 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-700/60 transition-all duration-200 shadow-sm"
+              >
+                <FaFilter className="text-slate-500" size={14} />
+                <span>Filter: {filter.charAt(0).toUpperCase() + filter.slice(1)}</span>
+              </button>
+              
+              <AnimatePresence>
+                {isFilterMenuOpen && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-44 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-slate-700/50 rounded-xl shadow-lg z-20"
+                  >
+                    <div className="py-2">
+                      {['all', 'available', 'checked', 'favorites'].map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => {
+                            setFilter(option as FilterType);
+                            setIsFilterMenuOpen(false);
+                          }}
+                          className={`block w-full text-left px-4 py-2.5 text-sm transition-all duration-200 ${
+                            filter === option 
+                              ? `${networkConfig.badgeColor} font-medium` 
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50'
+                          }`}
+                        >
+                          {option.charAt(0).toUpperCase() + option.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Say GM across multiple blockchain networks daily</p>
-        </motion.div>
-        
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex flex-wrap gap-3"
-        >
-          <div className="relative">
-            <button
-              onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-gray-200/50 dark:border-slate-700/50 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-700/60 transition-all duration-200 shadow-sm"
-            >
-              <FaFilter className="text-slate-500" size={14} />
-              <span>Filter: {filter.charAt(0).toUpperCase() + filter.slice(1)}</span>
-            </button>
             
-            <AnimatePresence>
-              {isFilterMenuOpen && (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute right-0 mt-2 w-44 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-slate-700/50 rounded-xl shadow-lg z-20"
-                >
-                  <div className="py-2">
-                    {['all', 'available', 'checked', 'favorites'].map((option) => (
-                      <button
-                        key={option}
-                        onClick={() => {
-                          setFilter(option as FilterType);
-                          setIsFilterMenuOpen(false);
-                        }}
-                        className={`block w-full text-left px-4 py-2.5 text-sm transition-all duration-200 ${
-                          filter === option 
-                            ? `${networkConfig.badgeColor} font-medium` 
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50'
-                        }`}
-                      >
-                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as SortOptionType)}
+              className="px-4 py-2.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-gray-200/50 dark:border-slate-700/50 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-700/60 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 shadow-sm"
+            >
+              <option value="name">Sort by Name</option>
+              <option value="status">Sort by Status</option>
+            </select>
+            
+            <button 
+              onClick={checkAllChainsStatus}
+              disabled={isLoading || !isConnected}
+              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 shadow-sm ${
+                isLoading 
+                  ? 'bg-gradient-to-r from-cyan-300/10 to-cyan-300/10 backdrop-blur-xl text-slate-500 dark:text-slate-100 hover:from-blue-300/20 hover:to-cyan-300/20 border border-blue-200/50 dark:border-cyan-400/30' 
+                  : 'bg-gradient-to-r from-cyan-500/10 to-cyan-500/10 backdrop-blur-xl text-slate-700 dark:text-slate-300 hover:from-blue-500/20 hover:to-cyan-500/20 border border-blue-200/50 dark:border-cyan-400/30'
+              }`}
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <FaSpinner className="animate-spin" size={14} />
+                  Refreshing...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Refresh
+                </span>
               )}
-            </AnimatePresence>
-          </div>
-          
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value as SortOptionType)}
-            className="px-4 py-2.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-gray-200/50 dark:border-slate-700/50 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-700/60 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 shadow-sm"
-          >
-            <option value="name">Sort by Name</option>
-            <option value="status">Sort by Status</option>
-          </select>
-          
-          <button 
-            onClick={checkAllChainsStatus}
-            disabled={isLoading || !isConnected}
-            className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 shadow-sm ${
-              isLoading 
-                ? 'bg-gradient-to-r from-cyan-300/10 to-cyan-300/10 backdrop-blur-xl text-slate-500 dark:text-slate-100 hover:from-blue-300/20 hover:to-cyan-300/20 border border-blue-200/50 dark:border-cyan-400/30' 
-                : 'bg-gradient-to-r from-cyan-500/10 to-cyan-500/10 backdrop-blur-xl text-slate-700 dark:text-slate-300 hover:from-blue-500/20 hover:to-cyan-500/20 border border-blue-200/50 dark:border-cyan-400/30'
-            }`}
-          >
-            {isLoading ? (
-              <span className="flex items-center gap-2">
-                <FaSpinner className="animate-spin" size={14} />
-                Refreshing...
-              </span>
-            ) : (
-              <span className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Refresh
-              </span>
-            )}
-          </button>
-        </motion.div>
-      </div>
+            </button>
+          </motion.div>
+        </div>
 
       {!isConnected && (
         <motion.div 

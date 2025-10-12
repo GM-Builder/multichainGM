@@ -1,17 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useWalletState } from '@/hooks/useWalletState';
 import FixedMultiChainCheckinGrid from '@/components/MultiChainCheckinGrid';
 import Notification from '@/components/Notification';
+import HeroStatsSection from '@/components/HeroStatsSection';
 import { 
-  FaInfoCircle, 
   FaGlobe,
   FaFlask,
   FaLayerGroup
 } from 'react-icons/fa';
 import { getTotalCheckins } from '@/utils/web3';
-import { LOADING_STATES, getChainConfig } from '@/utils/constants';
+import { LOADING_STATES } from '@/utils/constants';
 import { motion } from 'framer-motion';
 import AudioPlayer from '@/components/AudioPlayer';
+import { useUserStats } from '@/hooks/useSubgraph';
+import { useUserChainStats } from '@/hooks/useUserChainStats';
+import { useUserRanking } from '@/hooks/useUserRangking';
+import { SUPPORTED_CHAINS } from '@/utils/constants';
 
 type NetworkTabType = 'all' | 'mainnet' | 'testnet';
 
@@ -59,7 +63,14 @@ const SquigglyPatternTopRight: React.FC = () => (
   </div>
 );
 
-const CheckinPageIntegration: React.FC = () => {
+interface CheckinPageProps {
+  leaderboardRef?: React.RefObject<HTMLDivElement>;
+}
+
+const CheckinPageIntegration: React.FC<CheckinPageProps> = ({ leaderboardRef: propRef }) => {
+  const localRef = useRef<HTMLDivElement>(null);
+  const currentleaderboardRef = propRef || localRef;
+  
   const { 
     web3State, 
     connectWallet: rawConnectWallet, 
@@ -79,10 +90,22 @@ const CheckinPageIntegration: React.FC = () => {
   const [lastTxHash, setLastTxHash] = useState<string | null>(null);
   const [lastCheckinChainId, setLastCheckinChainId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [showCheckinTutorial, setShowCheckinTutorial] = useState<boolean>(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState<boolean>(false);
   const [showErrorNotification, setShowErrorNotification] = useState<boolean>(false);
   const [networkTab, setNetworkTab] = useState<NetworkTabType>('all');
+  
+  // Subgraph integration
+  const { data: userStats, loading: userStatsLoading } = useUserStats(web3State.address || undefined);
+  const { data: currentChainStats, loading: chainStatsLoading } = useUserChainStats(
+    web3State.chainId || null, 
+    web3State.address || null
+  );
+  const { data: userRanking, loading: rankingLoading } = useUserRanking(web3State.address || null);
+  
+  // Get current chain name
+  const currentChainName = web3State.chainId 
+    ? (SUPPORTED_CHAINS[web3State.chainId]?.chainName || 'Unknown') 
+    : 'No Chain';
 
   useEffect(() => {
     const fetchTotalCheckins = async (): Promise<void> => {
@@ -151,6 +174,24 @@ const CheckinPageIntegration: React.FC = () => {
       />
       
       <div className="pt-32 max-w-7xl mx-auto px-4 py-6 relative z-10">
+        
+        {/* Hero Stats Section */}
+        {web3State.isConnected && web3State.address && (
+          <HeroStatsSection
+            currentChainId={web3State.chainId || null}
+            currentChainName={currentChainName}
+            currentChainCheckins={currentChainStats?.totalCheckins || 0}
+            currentChainStreak={currentChainStats?.currentStreak || 0}
+            totalCheckins={userStats?.totalCheckins || 0}
+            totalChains={userStats?.chains.length || 0}
+            maxStreak={userStats?.maxStreak || 0}
+            userRank={userRanking?.rank || 0}
+            totalUsers={userRanking?.totalUsers || 0}
+            loading={chainStatsLoading || userStatsLoading || rankingLoading}
+          />
+        )}
+        
+        {/* Network Tabs */}
         <div className="flex justify-center mb-8">
           <div className="flex bg-white dark:bg-gray-800/80 px-2 py-1 rounded-full backdrop-blur-sm shadow-md">
             <button
@@ -197,6 +238,7 @@ const CheckinPageIntegration: React.FC = () => {
           </div>
         </div>
         
+        {/* Multi Chain Checkin Grid */}
         <FixedMultiChainCheckinGrid
           isConnected={web3State.isConnected}
           currentChainId={web3State.chainId}
