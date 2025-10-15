@@ -10,10 +10,13 @@ import {
   FaBars,
   FaTimes,
   FaCopy,
+  FaExchangeAlt,
 } from "react-icons/fa"
 import ConnectWalletButton from "./ConnectWalletButton"
 import ChainLogo from "@/components/ChainLogo"
-import { FaTrophy } from 'react-icons/fa';
+import { FaTrophy } from 'react-icons/fa'
+import { getMainnetChainIds, SUPPORTED_CHAINS } from '@/utils/constants'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const LOGO_PATH = "/logo.png"
 
@@ -30,6 +33,8 @@ interface NavbarProps {
   scrollToLeaderboard?: () => void
   scrollToMintSection?: () => void
   networkInfo?: NetworkInfo | null
+  currentChainId?: number | null
+  onSwitchChain?: (chainId: number) => Promise<void>
 }
 
 const getAvatarUrl = (address: string): string => `https://api.dicebear.com/6.x/identicon/svg?seed=${address}`
@@ -41,16 +46,20 @@ const Navbar: React.FC<NavbarProps> = ({
   isConnecting,
   scrollToLeaderboard,
   scrollToMintSection,
-  networkInfo = null
+  networkInfo = null,
+  currentChainId,
+  onSwitchChain,
 }) => {
   const [showCopyToast, setShowCopyToast] = useState(false)
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false)
+  const [isSwitchingChain, setIsSwitchingChain] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
+  const chainDropdownRef = useRef<HTMLDivElement>(null)
   const [scrolled, setScrolled] = useState(false)
-  // ✅ TAMBAHAN: State untuk tooltip leaderboard
   const [showLeaderboardTooltip, setShowLeaderboardTooltip] = useState(false)
 
   useEffect(() => {
@@ -70,6 +79,10 @@ const Navbar: React.FC<NavbarProps> = ({
 
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
         setMobileMenuOpen(false)
+      }
+
+      if (chainDropdownRef.current && !chainDropdownRef.current.contains(event.target as Node)) {
+        setIsChainDropdownOpen(false)
       }
     }
 
@@ -113,6 +126,42 @@ const Navbar: React.FC<NavbarProps> = ({
     }
   }
 
+  const handleChainSwitch = async (chainId: number) => {
+    if (isSwitchingChain || currentChainId === chainId) return
+    
+    setIsSwitchingChain(true)
+    setIsChainDropdownOpen(false)
+    
+    try {
+      // Import switchToChain directly from web3 utils
+      const { switchToChain } = await import('@/utils/web3')
+      await switchToChain(chainId)
+      
+      // Delay to let the network switch complete
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Call the callback if provided
+      if (onSwitchChain) {
+        await onSwitchChain(chainId)
+      }
+    } catch (error: any) {
+      console.error('Failed to switch chain:', error)
+      
+      // Show error toast (you can customize this)
+      const errorMessage = error.message || 'Failed to switch network'
+      console.error(errorMessage)
+    } finally {
+      setIsSwitchingChain(false)
+    }
+  }
+
+  // Get mainnet chains for dropdown
+  const mainnetChainIds = getMainnetChainIds()
+  const mainnetChains = mainnetChainIds.map(id => ({
+    id,
+    ...SUPPORTED_CHAINS[id]
+  }))
+
   return (
     <>
       <nav
@@ -145,51 +194,113 @@ const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
 
-            <div className="hidden md:flex items-center gap-4">
-              {/* ✅ PERBAIKAN: Leaderboard Button dengan Tooltip */}
-              {scrollToLeaderboard && (
-                <div className="relative">
-                  <button
-                    onClick={scrollToLeaderboard}
-                    onMouseEnter={() => setShowLeaderboardTooltip(true)}
-                    onMouseLeave={() => setShowLeaderboardTooltip(false)}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 hover:from-yellow-100 hover:to-orange-100 dark:hover:from-yellow-900/30 dark:hover:to-orange-900/30 border border-yellow-200/50 dark:border-yellow-700/30 rounded-lg transition-all duration-200 shadow-sm"
-                  >
-                    <FaTrophy className="text-yellow-600 dark:text-yellow-400 w-4 h-4" />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Leaderboard</span>
-                  </button>
-                  
-                  {/* ✅ TOOLTIP: Under Construction */}
-                  {showLeaderboardTooltip && (
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50 animate-fade-in">
-                      <div className="relative">
-                        {/* Arrow pointing up */}
-                        <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 dark:bg-gray-700 rotate-45"></div>
-                        
-                        {/* Tooltip content */}
-                        <div className="bg-gray-800 dark:bg-gray-700 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
-                          🚧 Under Construction
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-              
+            <div className="hidden md:flex items-center gap-4">       
               <ThemeToggle />
-              {networkInfo && (
-                <div className="flex items-center px-3 py-1.5 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-sm text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-700/50 shadow-inner backdrop-blur-sm">
-                  <div className="mr-2 text-lg">
-                    {networkInfo && (
+              
+              {/* Chain Switcher Dropdown */}
+              {networkInfo && address && (
+                <div className="relative" ref={chainDropdownRef}>
+                  <button
+                    onClick={() => setIsChainDropdownOpen(!isChainDropdownOpen)}
+                    disabled={isSwitchingChain}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-sm text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-700/50 shadow-inner backdrop-blur-sm hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-all duration-200 ${
+                      isSwitchingChain ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                    }`}
+                  >
+                    <div className="text-lg">
                       <ChainLogo 
                         logoUrl={networkInfo.logoUrl}
                         altText={networkInfo.name}
                         size="md"
                         fallbackIcon="🔗"
                       />
+                    </div>
+                    <span className="max-w-[120px] truncate">{networkInfo.name}</span>
+                    {isSwitchingChain ? (
+                      <FaExchangeAlt className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <FaChevronDown className={`w-3 h-3 transition-transform duration-200 ${isChainDropdownOpen ? 'rotate-180' : ''}`} />
                     )}
+                  </button>
+
+                  <AnimatePresence>
+                    {isChainDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute right-0 mt-2 w-64 rounded-xl shadow-xl bg-white dark:bg-gray-900 backdrop-blur-md border border-gray-200 dark:border-cyan-500/20 z-50 overflow-hidden max-h-[400px] overflow-y-auto"
+                      >
+                        <div className="px-4 py-3 border-b border-gray-200 dark:border-cyan-500/20 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20">
+                          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                            Switch Network
+                          </h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Select mainnet chain
+                          </p>
+                        </div>
+                        
+                        <div className="py-2">
+                          {mainnetChains.map((chain) => {
+                            const isCurrentChain = currentChainId === chain.id
+                            
+                            return (
+                              <button
+                                key={chain.id}
+                                onClick={() => handleChainSwitch(chain.id)}
+                                disabled={isCurrentChain || isSwitchingChain}
+                                className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 ${
+                                  isCurrentChain
+                                    ? 'bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30 cursor-default'
+                                    : 'hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer'
+                                } ${isSwitchingChain ? 'opacity-50' : ''}`}
+                              >
+                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700/50">
+                                  <ChainLogo 
+                                    logoUrl={chain.logoUrl}
+                                    altText={chain.chainName}
+                                    size="md"
+                                    fallbackIcon="🔗"
+                                  />
+                                </div>
+                                
+                                <div className="flex-1 text-left">
+                                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {chain.chainName}
+                                  </div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                                    {chain.nativeCurrency.symbol}
+                                  </div>
+                                </div>
+                                
+                                {isCurrentChain && (
+                                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500/20">
+                                    <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
+                                  </div>
+                                )}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+
+              {/* Show simple network info when not connected */}
+              {networkInfo && !address && (
+                <div className="flex items-center px-3 py-1.5 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-sm text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-700/50 shadow-inner backdrop-blur-sm">
+                  <div className="mr-2 text-lg">
+                    <ChainLogo 
+                      logoUrl={networkInfo.logoUrl}
+                      altText={networkInfo.name}
+                      size="md"
+                      fallbackIcon="🔗"
+                    />
                   </div>
-                  <span>{networkInfo?.name || 'Unknown Network'}</span>
+                  <span>{networkInfo.name}</span>
                 </div>
               )}
 
@@ -262,20 +373,19 @@ const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
 
+            {/* Mobile Menu Button */}
             <div className="flex md:hidden items-center space-x-3">
               {networkInfo && (
                 <div className="flex items-center px-2 py-1 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-xs text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-700/50 shadow-inner backdrop-blur-sm">
                   <div className="mr-1 text-sm">
-                    {networkInfo && (
-                      <ChainLogo 
-                        logoUrl={networkInfo.logoUrl}
-                        altText={networkInfo.name}
-                        size="md" 
-                        fallbackIcon="🔗"
-                      />
-                    )}
+                    <ChainLogo 
+                      logoUrl={networkInfo.logoUrl}
+                      altText={networkInfo.name}
+                      size="md" 
+                      fallbackIcon="🔗"
+                    />
                   </div>
-                  <span>{networkInfo?.name}</span>
+                  <span className="max-w-[60px] truncate">{networkInfo.name}</span>
                 </div>
               )}
               
@@ -297,6 +407,7 @@ const Navbar: React.FC<NavbarProps> = ({
         </div>
       </nav>
 
+      {/* Mobile Menu */}
       <div
         ref={mobileMenuRef}
         className={`fixed inset-0 top-20 bg-white dark:bg-gray-900 z-40 transform transition-transform duration-300 ease-in-out md:hidden ${
@@ -304,6 +415,60 @@ const Navbar: React.FC<NavbarProps> = ({
         }`}
       >
         <div className="px-4 pt-4 pb-6 space-y-6">
+          {/* Mobile Chain Switcher */}
+          {address && networkInfo && (
+            <div className="px-2 py-2">
+              <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">
+                Switch Network
+              </h3>
+              <div className="space-y-2">
+                {mainnetChains.map((chain) => {
+                  const isCurrentChain = currentChainId === chain.id
+                  
+                  return (
+                    <button
+                      key={chain.id}
+                      onClick={() => {
+                        handleChainSwitch(chain.id)
+                        setMobileMenuOpen(false)
+                      }}
+                      disabled={isCurrentChain || isSwitchingChain}
+                      className={`w-full px-4 py-3 flex items-center gap-3 rounded-lg transition-all duration-200 ${
+                        isCurrentChain
+                          ? 'bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30 cursor-default'
+                          : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer'
+                      } ${isSwitchingChain ? 'opacity-50' : ''}`}
+                    >
+                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700/50">
+                        <ChainLogo 
+                          logoUrl={chain.logoUrl}
+                          altText={chain.chainName}
+                          size="md"
+                          fallbackIcon="🔗"
+                        />
+                      </div>
+                      
+                      <div className="flex-1 text-left">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          {chain.chainName}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {chain.nativeCurrency.symbol}
+                        </div>
+                      </div>
+                      
+                      {isCurrentChain && (
+                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500/20">
+                          <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col space-y-4">
             {!address ? (
               <div className="px-2 py-2">
@@ -339,6 +504,7 @@ const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
+      {/* Copy Toast */}
       {showCopyToast && (
         <div className="fixed bottom-4 right-4 z-50 animate-fade-in-up">
           <div className="flex items-center gap-2 bg-gradient-to-r from-cyan-500/90 to-teal-600/90 backdrop-blur-md px-4 py-3 rounded-lg shadow-lg border border-cyan-400/30">

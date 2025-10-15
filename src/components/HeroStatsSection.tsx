@@ -74,225 +74,153 @@ const HeroStatsSection: React.FC<HeroStatsSectionProps> = ({
   
   // Determine rank tier for styling
   const getRankTier = () => {
-    if (userRank === 0) return { color: 'gray', label: 'Unranked', gradient: 'from-gray-400 to-gray-500' };
-    if (userRank <= 10) return { color: 'gold', label: 'Top 10', gradient: 'from-yellow-400 to-yellow-600' };
-    if (userRank <= 50) return { color: 'silver', label: 'Top 50', gradient: 'from-gray-300 to-gray-400' };
-    if (userRank <= 100) return { color: 'bronze', label: 'Top 100', gradient: 'from-orange-400 to-orange-600' };
-    return { color: 'default', label: `Top ${rankPercentage}%`, gradient: 'from-purple-400 to-purple-600' };
+    if (userRank === 0) return { color: 'gray', label: 'Unranked', gradient: 'from-gray-400 to-gray-500', emoji: '🏅' };
+    if (userRank <= 10) return { color: 'gold', label: 'Top 10', gradient: 'from-yellow-400 to-yellow-600', emoji: '🏆' };
+    if (userRank <= 50) return { color: 'silver', label: 'Top 50', gradient: 'from-gray-300 to-gray-400', emoji: '🥈' };
+    if (userRank <= 100) return { color: 'bronze', label: 'Top 100', gradient: 'from-orange-400 to-orange-600', emoji: '🥉' };
+    return { color: 'default', label: `Top ${rankPercentage}%`, gradient: 'from-purple-400 to-purple-600', emoji: '🏅' };
   };
   
   const rankTier = getRankTier();
 
   return (
-    <div className="relative overflow-hidden rounded-2xl mb-16">
-      {/* Animated Gradient Background - More subtle */}
-      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5" />
+    <div className="space-y-3">
       
-      {/* Decorative Blobs - Smaller */}
-      <div className="absolute top-0 left-0 w-48 h-48 bg-cyan-400/10 rounded-full blur-3xl -translate-x-1/3 -translate-y-1/3" />
-      <div className="absolute bottom-0 right-0 w-48 h-48 bg-blue-400/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
-      
-      {/* Content - More compact */}
-      <div className="relative grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 p-4 md:p-5">
-        
-        {/* Card 1: Current Chain Stats - More compact */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          whileHover={{ scale: 1.02, y: -2 }}
-          className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-xl p-4 border border-cyan-500/20 shadow-lg hover:shadow-xl transition-all duration-300"
-        >
-          <div className="flex items-center gap-2 mb-3">
+      {/* Current Chain - Compact Horizontal */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-xl border border-gray-200 dark:border-gray-800 shadow-md p-3"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
             {chainConfig && (
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900 flex items-center justify-center flex-shrink-0">
                 <ChainLogo
                   logoUrl={chainConfig.logoUrl}
                   altText={chainConfig.chainName}
-                  size="md"
+                  size="sm"
                   fallbackIcon="🔗"
                 />
               </div>
             )}
-            <div className="min-w-0">
-              <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Current Chain</p>
-              <h3 className="text-base font-bold text-cyan-600 dark:text-cyan-400 truncate">
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                Current Chain
+              </p>
+              <h3 className="text-xs font-bold text-cyan-600 dark:text-cyan-400 truncate">
                 {currentChainName || 'No Chain'}
               </h3>
             </div>
           </div>
           
-          <div className="space-y-3">
-            {/* Check-ins */}
-            <div>
-              {loading ? (
-                <div className="h-12 w-20 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"></div>
-              ) : (
-                <div className="flex items-baseline gap-2">
-                  <motion.span
-                    key={currentChainCheckins}
-                    initial={{ scale: 1.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white"
-                  >
-                    <CountUpNumber value={currentChainCheckins} />
-                  </motion.span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">check-ins</span>
-                </div>
-              )}
+          {loading ? (
+            <div className="h-8 w-12 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
+          ) : (
+            <div className="text-right">
+              <div className="text-xl font-black text-gray-900 dark:text-white">
+                <CountUpNumber value={currentChainCheckins} />
+              </div>
+              <div className="flex items-center gap-1 text-[10px] text-orange-600 dark:text-orange-400 font-bold">
+                <FaFire className="text-[10px]" />
+                {currentChainStreak}
+              </div>
             </div>
-            
-            {/* Current Streak */}
-            <div className="flex items-center gap-2 px-3 py-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200/50 dark:border-orange-700/30 w-fit">
-              <FaFire className="text-orange-500 dark:text-orange-400" />
-              {loading ? (
-                <div className="h-4 w-8 bg-orange-200 dark:bg-orange-800 animate-pulse rounded"></div>
-              ) : (
-                <span className="text-sm font-bold text-orange-600 dark:text-orange-300">
-                  {currentChainStreak} day streak
-                </span>
-              )}
-            </div>
-          </div>
-        </motion.div>
+          )}
+        </div>
+      </motion.div>
 
-        {/* Card 2: All Chains (HERO) - With Best Streak Badge */}
+      {/* Stats Grid - 2 Cards Side by Side */}
+      <div className="grid grid-cols-2 gap-3">
+        
+        {/* All Chains Card - Compact */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          whileHover={{ scale: 1.02, y: -2 }}
-          className="bg-gradient-to-br from-cyan-500 to-blue-600 dark:from-cyan-600 dark:to-blue-700 rounded-xl p-4 text-white shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden"
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="bg-gradient-to-br from-cyan-500 to-blue-600 dark:from-cyan-600 dark:to-blue-700 rounded-xl p-3 text-white shadow-md relative overflow-hidden"
         >
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute top-0 right-0 w-12 h-12 bg-white/10 rounded-full blur-xl translate-x-1/2 -translate-y-1/2" />
           
           <div className="relative">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <FaGlobe className="text-lg text-white" />
-                </div>
-                <p className="text-cyan-100 text-sm font-medium">All Chains</p>
-              </div>
-              
-              {/* Best Streak Badge - NEW POSITION */}
-              {maxStreak > 0 && (
-                <motion.div
-                  initial={{ scale: 0, rotate: -45 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
-                  className="flex items-center gap-1 px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full border border-white/30"
-                >
-                  <FaFire className="text-yellow-300 text-xs" />
-                  <span className="text-[12px] font-bold">{maxStreak} Best Streak</span>
-                </motion.div>
-              )}
+            <div className="flex items-center gap-1 mb-2">
+              <FaGlobe className="text-xs text-white/80" />
+              <p className="text-[10px] text-cyan-100 font-medium">All Chains</p>
             </div>
             
             {loading ? (
-              <div className="h-12 w-24 bg-white/20 animate-pulse rounded-lg mb-2"></div>
+              <div className="h-8 w-12 bg-white/20 animate-pulse rounded mb-1"></div>
             ) : (
-              <motion.h2
+              <motion.div
                 key={totalCheckins}
-                initial={{ scale: 1.3, opacity: 0 }}
+                initial={{ scale: 1.2, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="text-5xl md:text-6xl font-black mb-1 drop-shadow-lg"
+                transition={{ duration: 0.3 }}
+                className="text-2xl font-black mb-1 drop-shadow-lg"
               >
-                <CountUpNumber value={totalCheckins} duration={1200} />
-              </motion.h2>
+                <CountUpNumber value={totalCheckins} duration={800} />
+              </motion.div>
             )}
             
-            <p className="text-cyan-100 text-sm font-medium mb-2">Total Check-ins</p>
+            <p className="text-[10px] text-cyan-100 font-medium mb-2">Total GMs</p>
             
-            <div className="flex items-center gap-2 pt-2 border-t border-white/20">
-              <div className="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <span className="text-md">🌐</span>
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] font-semibold">
+                {totalChains} {totalChains === 1 ? 'chain' : 'chains'}
               </div>
-              {loading ? (
-                <div className="h-3 w-12 bg-white/20 animate-pulse rounded"></div>
-              ) : (
-                <span className="text-xs font-semibold">
-                  {totalChains} {totalChains === 1 ? 'chain' : 'chains'}
-                </span>
+              {maxStreak > 0 && (
+                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white/20 backdrop-blur-sm rounded-full">
+                  <FaFire className="text-yellow-300 text-[10px]" />
+                  <span className="text-[10px] font-bold">{maxStreak}</span>
+                </div>
               )}
             </div>
           </div>
         </motion.div>
 
-        {/* Card 3: User Ranking - NEW */}
+        {/* Ranking Card - Compact */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          whileHover={{ scale: 1.02, y: -2 }}
-          className={`bg-gradient-to-br ${rankTier.gradient} rounded-xl p-4 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden`}
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className={`bg-gradient-to-br ${rankTier.gradient} rounded-xl p-3 text-white shadow-md relative overflow-hidden`}
         >
-          {/* Decorative Pattern */}
-          <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-xl translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute top-0 right-0 w-12 h-12 bg-white/10 rounded-full blur-xl translate-x-1/2 -translate-y-1/2" />
           
           <div className="relative">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <FaTrophy className="text-lg text-yellow-300" />
-              </div>
-              <p className="text-white/90 text-sm font-medium">Your Rank</p>
+            <div className="flex items-center gap-1 mb-2">
+              <FaTrophy className="text-xs text-yellow-300" />
+              <p className="text-[10px] text-white/90 font-medium">Your Rank</p>
             </div>
             
             {loading ? (
-              <div className="h-12 w-16 bg-white/20 animate-pulse rounded-lg mb-2"></div>
+              <div className="h-8 w-10 bg-white/20 animate-pulse rounded mb-1"></div>
             ) : userRank === 0 ? (
-              <div className="text-center py-2">
-                <FaMedal className="text-4xl text-white/40 mx-auto mb-1" />
-                <p className="text-xs text-white/70">Start checking in!</p>
+              <div className="text-center py-1">
+                <FaMedal className="text-xl text-white/40 mx-auto mb-1" />
+                <p className="text-[9px] text-white/70">Not ranked</p>
               </div>
             ) : (
               <>
-                <div className="flex items-baseline gap-1 mb-1">
-                  <motion.span
-                    key={userRank}
-                    initial={{ scale: 1.3, opacity: 0, y: 10 }}
-                    animate={{ scale: 1, opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="text-5xl font-black drop-shadow-lg"
-                  >
-                    #{<CountUpNumber value={userRank} duration={1000} />}
-                  </motion.span>
-                </div>
-                
-                <p className="text-white/90 text-sm font-medium mb-2">out of {totalUsers.toLocaleString()}</p>
-                
-                {/* Rank Badge */}
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.5, type: 'spring' }}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-full border border-white/30"
+                  key={userRank}
+                  initial={{ scale: 1.2, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-2xl font-black drop-shadow-lg mb-1"
                 >
-                  {userRank <= 10 ? (
-                    <>
-                      <span className="text-base">🏆</span>
-                      <span className="text-xs font-bold">{rankTier.label}</span>
-                    </>
-                  ) : userRank <= 50 ? (
-                    <>
-                      <span className="text-base">🥈</span>
-                      <span className="text-xs font-bold">{rankTier.label}</span>
-                    </>
-                  ) : userRank <= 100 ? (
-                    <>
-                      <span className="text-base">🥉</span>
-                      <span className="text-xs font-bold">{rankTier.label}</span>
-                    </>
-                  ) : (
-                    <>
-                      <FaMedal className="text-xs" />
-                      <span className="text-xs font-bold">{rankTier.label}</span>
-                    </>
-                  )}
+                  #{<CountUpNumber value={userRank} duration={800} />}
                 </motion.div>
+                
+                <p className="text-[10px] text-white/90 font-medium mb-2">
+                  of {totalUsers.toLocaleString()}
+                </p>
+                
+                <div className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-white/20 backdrop-blur-sm rounded-full">
+                  <span className="text-xs">{rankTier.emoji}</span>
+                  <span className="text-[9px] font-bold">{rankTier.label}</span>
+                </div>
               </>
             )}
           </div>

@@ -1,5 +1,6 @@
 import GMTestnetABI from "../abis/GMTestnetABI.json";
 import GMMainnetABI from "../abis/GMMainnetABI.json"; 
+import ReferralABI from "../abis/ReferralABI.json";
 
 export const TEA_SEPOLIA_CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_TEA_SEPOLIA_CHAIN_ID || "10218", 10);
 export const BASE_SEPOLIA_CHAIN_ID = 84532;
@@ -348,3 +349,28 @@ export const SUBGRAPH_ENDPOINTS = {
   ink: 'https://api.studio.thegraph.com/query/106565/gannetx-ink/version/latest',
   soneium: 'https://api.studio.thegraph.com/query/106565/gannet-x-soneium/version/latest',
 } as const;
+
+export const REFERRAL_CONTRACT_CONFIG = {
+  // Base mainnet (only chain with referral contract)
+  [BASE_CHAIN_ID]: {
+    address: process.env.REFERRAL_CONTRACT_ADDRESS || "0x577990A6b1D9403Db0477985787F0d687E77dfB4",
+    abi: ReferralABI,
+  }
+};
+
+export const REFERRAL_SUBGRAPH_ENDPOINT = 
+  process.env.NEXT_PUBLIC_REFERRAL_SUBGRAPH_URL || 
+  'https://api.studio.thegraph.com/query/XXXXX/gannetx-referral/version/latest';
+
+// Helper functions for referral
+export const getReferralContractAddress = (): string => {
+  return REFERRAL_CONTRACT_CONFIG[BASE_CHAIN_ID].address;
+};
+
+export const getReferralContractAbi = (): any => {
+  return REFERRAL_CONTRACT_CONFIG[BASE_CHAIN_ID].abi;
+};
+
+export const isReferralSupported = (chainId: number): boolean => {
+  return chainId === BASE_CHAIN_ID;
+};

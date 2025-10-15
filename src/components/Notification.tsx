@@ -12,6 +12,7 @@ import { getChainConfig } from '@/utils/constants';
 interface NotificationProps {
   isOpen: boolean;
   onClose: () => void;
+  onAwesomeClick?: () => void; // ✅ NEW: Callback for Awesome button
   type: 'success' | 'error';
   title: string;
   message: string;
@@ -22,6 +23,7 @@ interface NotificationProps {
 const Notification: React.FC<NotificationProps> = ({ 
   isOpen, 
   onClose, 
+  onAwesomeClick, // ✅ NEW
   type, 
   title, 
   message, 
@@ -37,6 +39,15 @@ const Notification: React.FC<NotificationProps> = ({
     }
     
     return `${chainConfig.blockExplorerUrls[0]}/tx/${txHash}`;
+  };
+
+  const handleAwesomeClick = () => {
+    // ✅ Trigger animation callback if provided
+    if (onAwesomeClick) {
+      onAwesomeClick();
+    }
+    // Then close notification
+    onClose();
   };
 
   return (
@@ -122,7 +133,7 @@ const Notification: React.FC<NotificationProps> = ({
               
               <div className="mt-6 flex justify-end">
                 <button
-                  onClick={onClose}
+                  onClick={handleAwesomeClick} // ✅ Updated to trigger animation
                   className={`py-2 px-4 rounded-lg text-white transition-colors flex items-center ${
                     type === 'success'
                       ? 'bg-cyan-500 hover:bg-cyan-600 dark:bg-cyan-600 dark:hover:bg-cyan-700'

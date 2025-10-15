@@ -25,6 +25,9 @@ import {
 import { ethers } from 'ethers';
 import ChainLogo from '@/components/ChainLogo';
 import toast from 'react-hot-toast';
+import SuccessAnimation from '@/components/SuccessAnimation';
+import { useSuccessAnimation } from '@/components/SuccessAnimationContext';
+import { useUserStats } from '@/hooks/useSubgraph';
 
 type NetworkType = 'all' | 'mainnet' | 'testnet';
 type FilterType = 'all' | 'available' | 'checked' | 'favorites';
@@ -61,6 +64,8 @@ interface MultiChainCheckinGridProps {
   provider?: ethers.providers.Web3Provider | null;
   onCheckinSuccess?: (chainId: number, txHash: string) => void;
   networkType?: NetworkType;
+  triggerAnimation?: { chainId: number; chainName: string } | null;
+  onAnimationComplete?: () => void;
 }
 
 const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
@@ -70,7 +75,9 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
   signer,
   provider,
   onCheckinSuccess,
-  networkType = 'all' 
+  networkType = 'all',
+  triggerAnimation,
+  onAnimationComplete,
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [processingChainId, setProcessingChainId] = useState<number | null>(null);
@@ -81,7 +88,18 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
   const [sortOption, setSortOption] = useState<SortOptionType>('name');
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState<boolean>(false);
   const [networkSwitchingChainId, setNetworkSwitchingChainId] = useState<number | null>(null);
+  const [successAnimationData, setSuccessAnimationData] = useState<{
+  visible: boolean;
+  chainId: number | null;
+  chainName: string;
+}>({
+  visible: false,
+  chainId: null,
+  chainName: '',
+});
   
+  const { soundEnabled } = useSuccessAnimation();
+  const { data: userStats } = useUserStats(address || undefined);
   const filterMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -99,6 +117,16 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isFilterMenuOpen]);
+
+  useEffect(() => {
+    if (triggerAnimation) {
+      setSuccessAnimationData({
+        visible: true,
+        chainId: triggerAnimation.chainId,
+        chainName: triggerAnimation.chainName,
+      });
+    }
+  }, [triggerAnimation]);
 
 
   useEffect(() => {
@@ -300,6 +328,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
       const tx = await performCheckin(contract, chainId);
       
       setSuccessChainId(chainId);
+
       if (onCheckinSuccess) {
         onCheckinSuccess(chainId, tx.hash);
       }
@@ -483,12 +512,12 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mr-3">
                 <NetworkIcon className="text-white" size={16} />
               </div> 
-              {networkType === 'testnet' ? 'Testnet Networks' : networkType === 'mainnet' ? 'Mainnet Networks' : 'All Networks'}
+              {networkType === 'testnet' ? 'Testnet' : networkType === 'mainnet' ? 'Mainnet' : 'All Networks'}
               <div className={`ml-3 ${networkConfig.badgeColor} text-sm font-medium px-3 py-1 rounded-full backdrop-blur-sm border border-current/20`}>
                 {availableChainCount} Available
               </div>
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">Say GM across multiple blockchain networks daily</p>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Say GM across multiple blockchain daily</p>
           </motion.div>
           
           <motion.div 
@@ -550,10 +579,10 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                             />
                           )}
                           <span className="relative z-10 flex items-center gap-2">
-                            {option === 'all' && '📋'}
-                            {option === 'available' && '✅'}
-                            {option === 'checked' && '✔️'}
-                            {option === 'favorites' && '⭐'}
+                            {option === 'all'}
+                            {option === 'available'}
+                            {option === 'checked'}
+                            {option === 'favorites'}
                             {option.charAt(0).toUpperCase() + option.slice(1)}
                           </span>
                         </button>
@@ -571,8 +600,8 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                 onChange={(e) => setSortOption(e.target.value as SortOptionType)}
                 className="appearance-none pl-4 pr-10 py-2.5 bg-gradient-to-br from-white/90 to-white/70 dark:from-slate-800/90 dark:to-slate-800/70 backdrop-blur-xl border border-gray-200/60 dark:border-slate-700/60 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:shadow-lg hover:scale-[1.02] hover:border-purple-300/50 dark:hover:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-400 dark:focus:border-purple-500 transition-all duration-300 shadow-sm cursor-pointer"
               >
-                <option value="name">🔤 Sort by Name</option>
-                <option value="status">📊 Sort by Status</option>
+                <option value="name">Sort by Name</option>
+                <option value="status">Sort by Status</option>
               </select>
               <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                 <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -673,7 +702,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
         </motion.div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {filteredChains.map((chain, index) => {
           const chainStatus = chain.status;
           const isCurrentChain = currentChainId === chain.id;
@@ -682,7 +711,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
           const isFavorite = favoriteChains.includes(chain.id);
           const canActivateNow = chainStatus.canCheckin && chainStatus.timeUntilNextCheckin === 0;
           const isSwitchingToThisChain = networkSwitchingChainId === chain.id;
-          
+
           return (
             <motion.div 
               key={chain.id}
@@ -690,13 +719,21 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
               whileHover={{ y: -2, scale: 1.02 }}
-              className={`rounded-xl overflow-hidden backdrop-blur-xl transition-all duration-300 ${
-                isCurrentChain 
+              className={`
+                rounded-xl overflow-hidden backdrop-blur-xl transition-all duration-300
+                relative
+                ${isCurrentChain 
                   ? 'border border-blue-200 dark:border-blue-400/50 bg-gradient-to-br from-blue-50/60 to-cyan-50/60 dark:from-blue-900/70 dark:to-cyan-900/70 shadow-md'
                   : 'border border-gray-200/60 dark:border-slate-700/60 bg-cyan-50/30 dark:bg-cyan-900/30 hover:shadow-md shadow-sm'
-              } ${isSuccess ? 'ring-2 ring-cyan-400/40' : ''}`}
+                } 
+                ${isSuccess ? 'ring-2 ring-cyan-400/40' : ''}
+              `}
+              style={{ 
+                isolation: 'isolate', 
+                minHeight: '200px'
+              }}
             >
-              <div className="p-4 flex flex-col justify-between h-full">
+              <div className="p-4 flex flex-col justify-between h-full relative z-10">
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -790,6 +827,29 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                   )}
                 </button>
               </div>
+              {successAnimationData.visible && 
+              successAnimationData.chainId === chain.id && (
+                <div className="absolute inset-0 z-50 pointer-events-none">
+                  <SuccessAnimation
+                    isVisible={true}
+                    checkinCount={1}
+                    streak={userStats?.currentStreak || 0}
+                    chainName={successAnimationData.chainName}
+                    position="card"
+                    soundEnabled={true}
+                    onComplete={() => {
+                      setSuccessAnimationData({ 
+                        visible: false, 
+                        chainId: null, 
+                        chainName: '' 
+                      });
+                      if (onAnimationComplete) {
+                        onAnimationComplete();
+                      }
+                    }}
+                  />
+                </div>
+              )}
             </motion.div>
           );
         })}

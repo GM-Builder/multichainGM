@@ -4,7 +4,13 @@ import {
   getContract, 
   getCurrentChainId,
   isChainSupported,
-  getChainConfig
+  getChainConfig,
+  getReferralContract,
+  isOnReferralChain,
+  extractReferralCode,
+  validateReferralCode,
+  getReferrer,
+  hasReferrer as checkHasReferrer
 } from "@/utils/web3";
 import { useEthereumEvents } from "./useEthereumEvents";
 
@@ -17,6 +23,10 @@ export interface Web3State {
   isLoading: boolean;
   error: string | null;
   chainId: number | null;
+  referralContract: ethers.Contract | null;
+  isOnReferralChain: boolean;
+  hasReferrer: boolean;
+  referredBy: string | null;
 }
 
 export function useWalletState() {
@@ -29,7 +39,49 @@ export function useWalletState() {
     isLoading: false,
     error: null,
     chainId: null,
+    referralContract: null,
+    isOnReferralChain: false,
+    hasReferrer: false,
+    referredBy: null,
   });
+
+  useEffect(() => {
+    const checkReferralStatus = async () => {
+      if (!web3State.isConnected || !web3State.address || !web3State.provider) return;
+
+      try {
+        const onReferralChain = await isOnReferralChain();
+        
+        if (onReferralChain) {
+          const referralContract = getReferralContract(web3State.provider);
+          const userHasReferrer = await checkHasReferrer(web3State.provider, web3State.address);
+          const referrer = userHasReferrer 
+            ? await getReferrer(web3State.provider, web3State.address)
+            : null;
+
+          setWeb3State(prev => ({
+            ...prev,
+            referralContract,
+            isOnReferralChain: true,
+            hasReferrer: userHasReferrer,
+            referredBy: referrer,
+          }));
+        } else {
+          setWeb3State(prev => ({
+            ...prev,
+            referralContract: null,
+            isOnReferralChain: false,
+            hasReferrer: false,
+            referredBy: null,
+          }));
+        }
+      } catch (error) {
+        console.error('Error checking referral status:', error);
+      }
+    };
+
+    checkReferralStatus();
+  }, [web3State.isConnected, web3State.address, web3State.chainId]);
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -114,6 +166,23 @@ export function useWalletState() {
       
       const contract = getContract(signer, chainId);
 
+      const onReferralChain = await isOnReferralChain();
+      let referralContract = null;
+      let userHasReferrer = false;
+      let referrer = null;
+
+      if (onReferralChain) {
+        try {
+          referralContract = getReferralContract(provider);
+          userHasReferrer = await checkHasReferrer(provider, address);
+          if (userHasReferrer) {
+            referrer = await getReferrer(provider, address);
+          }
+        } catch (error) {
+          console.error('Error fetching referral data:', error);
+        }
+      }
+
       setWeb3State({
         isConnected: true,
         address,
@@ -123,6 +192,10 @@ export function useWalletState() {
         isLoading: false,
         error: null,
         chainId,
+        referralContract,
+        isOnReferralChain: onReferralChain,
+        hasReferrer: userHasReferrer,
+        referredBy: referrer,
       });
 
       localStorage.setItem("walletConnected", "true");
@@ -138,6 +211,10 @@ export function useWalletState() {
         isConnected: false,
         isLoading: false,
         error: error.message || "Failed to connect wallet",
+        referralContract: null,
+        isOnReferralChain: false,
+        hasReferrer: false,
+        referredBy: null,
       }));
 
       localStorage.removeItem("walletConnected");
@@ -145,6 +222,30 @@ export function useWalletState() {
       return false;
     }
   }, [web3State.isLoading]);
+
+  const refreshReferralStatus = useCallback(async () => {
+    if (!web3State.isConnected || !web3State.address || !web3State.provider) return;
+
+    try {
+      const onReferralChain = await isOnReferralChain();
+      
+      if (onReferralChain) {
+        const userHasReferrer = await checkHasReferrer(web3State.provider, web3State.address);
+        const referrer = userHasReferrer 
+          ? await getReferrer(web3State.provider, web3State.address)
+          : null;
+
+        setWeb3State(prev => ({
+          ...prev,
+          hasReferrer: userHasReferrer,
+          referredBy: referrer,
+        }));
+      }
+    } catch (error) {
+      console.error('Error refreshing referral status:', error);
+    }
+  }, [web3State.isConnected, web3State.address, web3State.provider]);
+
 
   const handleDisconnectWallet = useCallback(() => {
     setWeb3State({
@@ -156,6 +257,10 @@ export function useWalletState() {
       isLoading: false,
       error: null,
       chainId: null,
+      referralContract: null,
+      isOnReferralChain: false,
+      hasReferrer: false,
+      referredBy: null,
     });
 
     localStorage.removeItem("walletConnected");
@@ -234,6 +339,7 @@ export function useWalletState() {
     disconnectWallet: handleDisconnectWallet,
     switchNetwork: handleSwitchNetwork,
     isOnSupportedNetwork,
-    getCurrentChainInfo
+    getCurrentChainInfo,
+    refreshReferralStatus,
   };
 }

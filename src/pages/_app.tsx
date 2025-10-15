@@ -12,6 +12,7 @@ import { useWalletState } from "@/hooks/useWalletState"
 import Navbar from "@/components/Navbar"
 import { getChainConfig } from "@/utils/constants" 
 import { Toaster } from 'react-hot-toast';
+import { SuccessAnimationProvider } from "@/components/SuccessAnimationContext"
 
 function GMApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -95,16 +96,19 @@ function GMApp({ Component, pageProps }: AppProps) {
         />
         
         <main>
+
           <WalletRequired
             isConnected={isConnected}
             connectWallet={adaptedConnectWallet}
             isConnecting={isWalletConnecting}
           >
+            <SuccessAnimationProvider>
             {shouldRequireWallet ? (
               <Component {...pageProps} leaderboardRef={leaderboardRef} />
             ) : (
               <Component {...pageProps} leaderboardRef={leaderboardRef} />
             )}
+            </SuccessAnimationProvider>
             <Footer />
           </WalletRequired>
         </main>

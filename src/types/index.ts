@@ -79,14 +79,7 @@ export interface NavigatorMetrics {
   totalDaysActive: ethers.BigNumber;
 }
 
-// ========================================
-// SUBGRAPH TYPES (Baru Ditambahkan)
-// ========================================
 
-// Tipe Chain Name diambil dari utils/subgraph.ts, jadi kita definisikan ulang di sini jika perlu
-// atau impor langsung jika memungkinkan (Asumsikan sudah diimpor: import { ChainName } from '@/utils/subgraph')
-
-// Digunakan untuk Checkin di Navigator
 export interface RawCheckin {
     id: string;
     sequence: string;
@@ -98,9 +91,6 @@ export interface RawCheckin {
     blockNumber: string;
 }
 
-// 1. RAW RESPONSE TYPES (Tipe Data Mentah dari Subgraph)
-
-// Digunakan untuk GET_GLOBAL_STATS response
 export interface RawGlobalStatsResponse {
     globalStats: {
         totalNavigators: string; // Subgraph mengembalikan angka sebagai string
@@ -109,20 +99,16 @@ export interface RawGlobalStatsResponse {
     } | null;
 }
 
-// Digunakan untuk Leaderboard & Navigator response
 export interface RawNavigatorEntry {
     address: string;
     totalCheckins: string;
     currentStreak: string;
     maxStreak: string;
-    totalTaxPaid: string; // Eth value sebagai string
-    // Properti lain yang ada di query Anda:
+    totalTaxPaid: string; 
     firstBeaconTimestamp?: string;
     lastBeaconTimestamp?: string;
 }
 
-// Digunakan untuk query GET_NAVIGATOR_DETAILS (yang Anda gunakan di service)
-// **PERBAIKAN UTAMA ADA DI SINI**
 export interface RawNavigatorWithCheckins extends RawNavigatorEntry {
     id: string; // ID navigator adalah address
     checkins: RawCheckin[];
@@ -222,3 +208,178 @@ export interface RawUserRankingResponse {
   } | null;
 }
 
+export type QuestType = 'speed-runner' | 'multi-chain' | 'social' | 'ultimate' | null;
+
+export type WhitelistTier = 'FREE' | 'TIER_1' | 'TIER_2' | 'TIER_3' | 'NOT_QUALIFIED';
+
+export interface UserQuestProgress {
+  address: string;
+  activeQuest: QuestType;
+  progress: {
+    current: number;
+    total: number;
+    percentage: number;
+  };
+  completedAt: Date | null;
+  whitelistPosition: number;
+  tier: WhitelistTier;
+  chainProgress?: {
+    [chainName: string]: number;
+  };
+  referralCount?: number;
+  currentStreak?: number;
+}
+
+export interface QuestStats {
+  totalCompleted: number;
+  freeSpotsRemaining: number;
+  activeRacers: number;
+  mintDate: Date;
+}
+
+// ============================================
+// Add to src/types/index.ts
+// ============================================
+
+// ========================================
+// RAW REFERRAL RESPONSE TYPES (from Subgraph)
+// ========================================
+
+export interface RawReferral {
+  id: string;
+  referred: string;
+  timestamp: string;
+  transactionHash: string;
+  blockNumber: string;
+}
+
+export interface RawReferrerData {
+  id: string;
+  totalReferrals: string;
+  firstReferralTimestamp: string | null;
+  lastReferralTimestamp: string | null;
+  referrals: RawReferral[];
+}
+
+export interface RawUserReferralData {
+  id: string;
+  referredBy: {
+    id: string;
+    totalReferrals: string;
+  } | null;
+  referredTimestamp: string | null;
+  referralTransactionHash: string | null;
+}
+
+export interface RawReferralStats {
+  id: string;
+  totalReferrals: string;
+  totalReferrers: string;
+  totalReferred: string;
+  lastUpdatedTimestamp: string;
+}
+
+// ========================================
+// QUERY RESPONSE TYPES
+// ========================================
+
+export interface RawReferrerInfoResponse {
+  referrer: RawReferrerData | null;
+}
+
+export interface RawUserReferrerResponse {
+  user: RawUserReferralData | null;
+}
+
+export interface RawTopReferrersResponse {
+  referrers: Array<{
+    id: string;
+    totalReferrals: string;
+    firstReferralTimestamp: string | null;
+    lastReferralTimestamp: string | null;
+  }>;
+}
+
+export interface RawReferralStatsResponse {
+  referralStats: RawReferralStats | null;
+}
+
+export interface RawAllReferralsResponse {
+  referrals: Array<{
+    id: string;
+    referrer: {
+      id: string;
+      totalReferrals: string;
+    };
+    referred: string;
+    timestamp: string;
+    transactionHash: string;
+    blockNumber: string;
+  }>;
+}
+
+export interface RawRecentReferralsResponse {
+  referrals: Array<{
+    id: string;
+    referrer: {
+      id: string;
+    };
+    referred: string;
+    timestamp: string;
+    transactionHash: string;
+  }>;
+}
+
+// ========================================
+// PROCESSED REFERRAL TYPES (for Frontend)
+// ========================================
+
+export interface Referral {
+  id: string;
+  referred: string;
+  timestamp: number;
+  transactionHash: string;
+  blockNumber: number;
+}
+
+export interface ReferrerData {
+  id: string;
+  totalReferrals: number;
+  firstReferralTimestamp: number | null;
+  lastReferralTimestamp: number | null;
+  referrals: Referral[];
+}
+
+export interface UserReferralData {
+  id: string;
+  referredBy: {
+    id: string;
+    totalReferrals: number;
+  } | null;
+  referredTimestamp: number | null;
+  referralTransactionHash: string | null;
+}
+
+export interface TopReferrer {
+  id: string;
+  totalReferrals: number;
+  firstReferralTimestamp: number | null;
+  lastReferralTimestamp: number | null;
+}
+
+export interface ReferralStats {
+  totalReferrals: number;
+  totalReferrers: number;
+  totalReferred: number;
+  lastUpdatedTimestamp: number;
+}
+
+export interface RecentReferral {
+  id: string;
+  referrer: {
+    id: string;
+  };
+  referred: string;
+  timestamp: number;
+  transactionHash: string;
+}

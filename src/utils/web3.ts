@@ -7,7 +7,11 @@ import {
   isChainSupported,
   TEA_SEPOLIA_CHAIN_ID,
   DEPLOY_BLOCK,
-  CHECKIN_FEE
+  CHECKIN_FEE,
+  getReferralContractAddress,
+  getReferralContractAbi,
+  isReferralSupported,
+  BASE_CHAIN_ID
 } from "./constants";
 
 const isBrowser = typeof window !== "undefined";
@@ -321,3 +325,211 @@ export const performCheckin = async (
 };
 
 export { isChainSupported, getChainConfig };
+
+
+/**
+ * Get referral contract instance
+ */
+export const getReferralContract = (
+  signerOrProvider: ethers.Signer | ethers.providers.Provider
+) => {
+  const contractAddress = getReferralContractAddress();
+  const contractAbi = getReferralContractAbi();
+
+  return new ethers.Contract(contractAddress, contractAbi, signerOrProvider);
+};
+
+/**
+ * Check if current chain supports referral
+ */
+export const isOnReferralChain = async (): Promise<boolean> => {
+  const chainId = await getCurrentChainId();
+  return chainId === BASE_CHAIN_ID;
+};
+
+/**
+ * Get who referred a specific address
+ */
+export const getReferrer = async (
+  provider: ethers.providers.Provider,
+  userAddress: string
+): Promise<string> => {
+  try {
+    const contract = getReferralContract(provider);
+    const referrer = await contract.getReferrer(userAddress);
+    return referrer;
+  } catch (error) {
+    console.error('Error getting referrer:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get total referral count for a referrer
+ */
+export const getReferralCount = async (
+  provider: ethers.providers.Provider,
+  referrerAddress: string
+): Promise<number> => {
+  try {
+    const contract = getReferralContract(provider);
+    const count = await contract.getReferralCount(referrerAddress);
+    return count.toNumber();
+  } catch (error) {
+    console.error('Error getting referral count:', error);
+    throw error;
+  }
+};
+
+/**
+ * Check if user has a referrer
+ */
+export const hasReferrer = async (
+  provider: ethers.providers.Provider,
+  userAddress: string
+): Promise<boolean> => {
+  try {
+    const referrer = await getReferrer(provider, userAddress);
+    return referrer !== ethers.constants.AddressZero;
+  } catch (error) {
+    console.error('Error checking referrer:', error);
+    return false;
+  }
+};
+
+/**
+ * Register a referral (write transaction)
+ */
+export const registerReferral = async (
+  signer: ethers.Signer,
+  referrerAddress: string
+): Promise<ethers.ContractTransaction> => {
+  try {
+    // Validate current chain
+    const provider = signer.provider;
+    if (!provider) throw new Error('Provider not found');
+    
+    const network = await provider.getNetwork();
+    if (network.chainId !== BASE_CHAIN_ID) {
+      throw new Error('Referral only available on Base network');
+    }
+
+    const contract = getReferralContract(signer);
+    
+    // Validate referrer address
+    if (!ethers.utils.isAddress(referrerAddress)) {
+      throw new Error('Invalid referrer address');
+    }
+
+    // Get user's address
+    const userAddress = await signer.getAddress();
+    
+    // Check if trying to refer themselves
+    if (referrerAddress.toLowerCase() === userAddress.toLowerCase()) {
+      throw new Error('Cannot refer yourself');
+    }
+
+    // Check if already has a referrer
+    const existingReferrer = await contract.getReferrer(userAddress);
+    if (existingReferrer !== ethers.constants.AddressZero) {
+      throw new Error('Already has a referrer');
+    }
+
+    // Execute transaction
+    const tx = await contract.registerReferral(referrerAddress);
+    
+    return tx;
+  } catch (error: any) {
+    console.error('Error registering referral:', error);
+    
+    // Handle specific error messages
+    if (error.message.includes('Already referred')) {
+      throw new Error('You already have a referrer');
+    } else if (error.message.includes('Cannot refer yourself')) {
+      throw new Error('You cannot refer yourself');
+    } else if (error.code === 4001) {
+      throw new Error('Transaction cancelled by user');
+    } else if (error.code === 'INSUFFICIENT_FUNDS') {
+      throw new Error('Insufficient funds for gas');
+    }
+    
+    throw error;
+  }
+};
+
+/**
+ * Register referral with wait for confirmation
+ */
+export const registerReferralAndWait = async (
+  signer: ethers.Signer,
+  referrerAddress: string,
+  onProgress?: (status: string) => void
+): Promise<ethers.ContractReceipt> => {
+  try {
+    onProgress?.('Preparing transaction...');
+    
+    const tx = await registerReferral(signer, referrerAddress);
+    
+    onProgress?.('Waiting for confirmation...');
+    
+    const receipt = await tx.wait();
+    
+    onProgress?.('Confirmed!');
+    
+    return receipt;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Generate referral link
+ */
+export const generateReferralLink = (
+  address: string,
+  baseUrl: string = typeof window !== 'undefined' ? window.location.origin : ''
+): string => {
+  if (!ethers.utils.isAddress(address)) {
+    throw new Error('Invalid address');
+  }
+  
+  return `${baseUrl}?ref=${address}`;
+};
+
+/**
+ * Extract referral code from URL
+ */
+export const extractReferralCode = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('ref');
+};
+
+/**
+ * Validate referral code
+ */
+export const validateReferralCode = (code: string | null): {
+  valid: boolean;
+  address?: string;
+  error?: string;
+} => {
+  if (!code) {
+    return { valid: false, error: 'No referral code provided' };
+  }
+
+  if (!ethers.utils.isAddress(code)) {
+    return { valid: false, error: 'Invalid Ethereum address' };
+  }
+
+  return { valid: true, address: code };
+};
+
+/**
+ * Clear referral code from URL
+ */
+export const clearReferralCodeFromURL = () => {
+  if (typeof window === 'undefined') return;
+  
+  window.history.replaceState({}, document.title, window.location.pathname);
+};
