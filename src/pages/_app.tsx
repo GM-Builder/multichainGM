@@ -43,8 +43,8 @@ function GMApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>GannetX - Blockchain Interactions</title>
-        <meta name="description" content="Daily GM check-ins on the Tea Sepolia Testnet" />
+        <title>GannetX: Your Multi-Chain GM Hub</title>
+        <meta name="description" content="The ultimate multi-chain GM hub. Track your daily Web3 check-ins, build streaks, visualize on personalized heatmaps, and climb the leaderboard. Qualify for exclusive Early Adopter NFTs & future rewards. Secure your spot now!" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
