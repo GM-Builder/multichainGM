@@ -348,7 +348,7 @@ const NFTMinting = () => {
                 Official Collection
               </p>
               <a 
-                href="https://opensea.io/collection/gannetx-early-adopter"
+                href="https://opensea.io/collection/gannetx-early-adopter/overview"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#00FFFF] hover:underline text-sm"
@@ -363,7 +363,7 @@ const NFTMinting = () => {
               </p>
               <div className="flex justify-center gap-4">
                 <a 
-                  href="https://x.com/gannetx_io"
+                  href="https://x.com/gannetx"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#0A1929] hover:text-[#00FFFF] transition-colors"
@@ -371,7 +371,7 @@ const NFTMinting = () => {
                   X
                 </a>
                 <a 
-                  href="https://t.me/gannetx_io"
+                  href="https://t.me/gannetx"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#0A1929] hover:text-[#00FFFF] transition-colors"
