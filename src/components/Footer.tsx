@@ -291,20 +291,25 @@ const Footer: React.FC<FooterProps> = ({
             
             {/* 1. Social Media Icons Container */}
             <div className="flex space-x-4 pt-2">
-              {/* Note: In a real app, replace the `div` with `a` tags pointing to the links */}
               
              <a 
                 href="https://x.com/gannetx" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer"
-                title="GannetX on X (Twitter)" // Menambahkan title untuk aksesibilitas
+                title="GannetX on X (Twitter)" 
               >
                 <FaTwitter className="transform group-hover:-translate-y-1 transition-transform duration-300" />
               </a>
-              <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
+              <a 
+                href="https://t.me/gannetx" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer"
+                title="GannetX on Telegram" 
+              >
                 <FaTelegram className="transform group-hover:-translate-y-1 transition-transform duration-300" />
-              </div>
+              </a>
               <div className="group bg-cyan-900/40 hover:bg-cyan-800/50 text-cyan-400 hover:text-cyan-300 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border border-cyan-700/30 cursor-pointer">
                 <FaDiscord className="transform group-hover:-translate-y-1 transition-transform duration-300" />
               </div>

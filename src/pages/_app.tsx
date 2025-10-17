@@ -14,11 +14,16 @@ import { getChainConfig } from "@/utils/constants"
 import { Toaster } from 'react-hot-toast';
 import { SuccessAnimationProvider } from "@/components/SuccessAnimationContext"
 
+const NO_LAYOUT_PATHS = [
+  '/mint'
+
+];
+
 function GMApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const { web3State, connectWallet, disconnectWallet, switchNetwork } = useWalletState()
   const { address, isConnected, isLoading: isWalletConnecting, chainId } = web3State
-  
+  const showLayout = !NO_LAYOUT_PATHS.includes(router.pathname);
   const leaderboardRef = useRef<HTMLDivElement>(null)
   
   const scrollToLeaderboard = useCallback(() => {
@@ -86,14 +91,14 @@ function GMApp({ Component, pageProps }: AppProps) {
             duration: 5000,
           }}
         />
-        <Navbar 
+        {showLayout && <Navbar 
           address={address}
           connectWallet={adaptedConnectWallet}
           disconnectWallet={disconnectWallet}
           isConnecting={isWalletConnecting}
           networkInfo={networkInfo}
           scrollToLeaderboard={scrollToLeaderboard}
-        />
+        /> }
         
         <main>
 
@@ -109,7 +114,7 @@ function GMApp({ Component, pageProps }: AppProps) {
               <Component {...pageProps} leaderboardRef={leaderboardRef} />
             )}
             </SuccessAnimationProvider>
-            <Footer />
+            {showLayout && <Footer /> }
           </WalletRequired>
         </main>
       </ThirdwebProvider>

@@ -11,12 +11,13 @@ import {
   FaTimes,
   FaCopy,
   FaExchangeAlt,
+  FaGem,
 } from "react-icons/fa"
 import ConnectWalletButton from "./ConnectWalletButton"
 import ChainLogo from "@/components/ChainLogo"
-import { FaTrophy } from 'react-icons/fa'
 import { getMainnetChainIds, SUPPORTED_CHAINS } from '@/utils/constants'
 import { motion, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
 
 const LOGO_PATH = "/logo.png"
 
@@ -60,7 +61,6 @@ const Navbar: React.FC<NavbarProps> = ({
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const chainDropdownRef = useRef<HTMLDivElement>(null)
   const [scrolled, setScrolled] = useState(false)
-  const [showLeaderboardTooltip, setShowLeaderboardTooltip] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -133,21 +133,17 @@ const Navbar: React.FC<NavbarProps> = ({
     setIsChainDropdownOpen(false)
     
     try {
-      // Import switchToChain directly from web3 utils
       const { switchToChain } = await import('@/utils/web3')
       await switchToChain(chainId)
       
-      // Delay to let the network switch complete
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // Call the callback if provided
       if (onSwitchChain) {
         await onSwitchChain(chainId)
       }
     } catch (error: any) {
       console.error('Failed to switch chain:', error)
       
-      // Show error toast (you can customize this)
       const errorMessage = error.message || 'Failed to switch network'
       console.error(errorMessage)
     } finally {
@@ -155,7 +151,6 @@ const Navbar: React.FC<NavbarProps> = ({
     }
   }
 
-  // Get mainnet chains for dropdown
   const mainnetChainIds = getMainnetChainIds()
   const mainnetChains = mainnetChainIds.map(id => ({
     id,
@@ -176,7 +171,8 @@ const Navbar: React.FC<NavbarProps> = ({
               ${scrolled ? 'h-16 md:h-20' : 'h-20 md:h-28'}` 
             }
           >
-            <div className="flex items-center">
+            {/* Logo */}
+            <Link href="/" className="flex items-center">
               <div className="flex items-center gap-2 cursor-pointer">
                 <div 
                   className={`flex-shrink-0 relative transition-all duration-500 ${
@@ -192,9 +188,21 @@ const Navbar: React.FC<NavbarProps> = ({
                   />
                 </div>
               </div>
-            </div>
+            </Link>
 
-            <div className="hidden md:flex items-center gap-4">       
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center gap-4">
+              {/* Mint NFT Button */}
+              <Link href="/mint">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00FFFF] to-cyan-400 text-[#0A1929] rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
+                >
+                  <span>Mint NFT</span>
+                </motion.button>
+              </Link>
+
               <ThemeToggle />
               
               {/* Chain Switcher Dropdown */}
@@ -415,6 +423,17 @@ const Navbar: React.FC<NavbarProps> = ({
         }`}
       >
         <div className="px-4 pt-4 pb-6 space-y-6">
+          {/* Mint NFT Button - Mobile */}
+          <Link href="/mint" onClick={() => setMobileMenuOpen(false)}>
+            <motion.div
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#00FFFF] to-cyan-400 text-[#0A1929] rounded-lg font-semibold shadow-lg"
+            >
+              <FaGem className="text-base" />
+              <span>Mint NFT</span>
+            </motion.div>
+          </Link>
+
           {/* Mobile Chain Switcher */}
           {address && networkInfo && (
             <div className="px-2 py-2">

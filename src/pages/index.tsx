@@ -35,6 +35,7 @@ import toast from 'react-hot-toast';
 import { SidebarReferralCard} from '@/components/SidebarReferralCard';
 import SidebarLeaderboardCard from '@/components/SidebarLeaderboard';
 import LeaderboardModal from '@/components/LeaderboardModal';
+import Footer from '@/components/Footer';
 
 type NetworkTabType = 'all' | 'mainnet' | 'testnet';
 
