@@ -43,7 +43,7 @@ function GMApp({ Component, pageProps }: AppProps) {
     logoUrl: currentNetwork.logoUrl
   } : null
   
-  const shouldRequireWallet = !router.pathname.includes("/auth") && !router.pathname.includes("/landing")
+  const shouldRequireWallet = !router.pathname.includes("/auth") && !router.pathname.includes("/landing") && !router.pathname.includes("/mint")
   
   return (
     <>
@@ -102,20 +102,22 @@ function GMApp({ Component, pageProps }: AppProps) {
         
         <main>
 
-         {showLayout && <WalletRequired
+         {shouldRequireWallet ? ( <WalletRequired
             isConnected={isConnected}
             connectWallet={adaptedConnectWallet}
             isConnecting={isWalletConnecting}
           >
             <SuccessAnimationProvider>
-            {shouldRequireWallet ? (
               <Component {...pageProps} leaderboardRef={leaderboardRef} />
-            ) : (
-              <Component {...pageProps} leaderboardRef={leaderboardRef} />
-            )}
             </SuccessAnimationProvider>
+          </WalletRequired>  
+            ) : (
+              <SuccessAnimationProvider>
+              <Component {...pageProps} leaderboardRef={leaderboardRef} />
+            </SuccessAnimationProvider>
+            )}
             {showLayout && <Footer /> }
-          </WalletRequired> }
+          
         </main>
       </ThirdwebProvider>
       
