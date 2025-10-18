@@ -102,7 +102,7 @@ function GMApp({ Component, pageProps }: AppProps) {
         
         <main>
 
-          <WalletRequired
+         {showLayout && <WalletRequired
             isConnected={isConnected}
             connectWallet={adaptedConnectWallet}
             isConnecting={isWalletConnecting}
@@ -115,7 +115,7 @@ function GMApp({ Component, pageProps }: AppProps) {
             )}
             </SuccessAnimationProvider>
             {showLayout && <Footer /> }
-          </WalletRequired>
+          </WalletRequired> }
         </main>
       </ThirdwebProvider>
       
