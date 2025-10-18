@@ -589,10 +589,10 @@ const CheckinPageIntegration: React.FC = () => {
                   )}
 
                   {/* Top Leaderboard Card */}
-                  <SidebarLeaderboardCard
+                  {/* <SidebarLeaderboardCard
                     address={web3State.address}
                     onCardClick={() => setIsLeaderboardModalOpen(true)}
-                  />
+                  /> */}
 
                   {/* Referral Card */}
                   <SidebarReferralCard
@@ -603,7 +603,7 @@ const CheckinPageIntegration: React.FC = () => {
                     onCardClick={() => setIsReferralModalOpen(true)}
                     onSwitchToBase={handleSwitchToBase}
                     formatAddress={formatAddress}
-                  />
+                  /> 
                 </div>
               </motion.aside>
             )}
