@@ -12,6 +12,7 @@ import {
   FaCopy,
   FaExchangeAlt,
   FaGem,
+  FaRocket,
 } from "react-icons/fa"
 import ConnectWalletButton from "./ConnectWalletButton"
 import ChainLogo from "@/components/ChainLogo"
@@ -57,9 +58,11 @@ const Navbar: React.FC<NavbarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false)
   const [isSwitchingChain, setIsSwitchingChain] = useState(false)
+  const [showDeployTooltip, setShowDeployTooltip] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const chainDropdownRef = useRef<HTMLDivElement>(null)
+  const deployButtonRef = useRef<HTMLDivElement>(null)
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -83,6 +86,10 @@ const Navbar: React.FC<NavbarProps> = ({
 
       if (chainDropdownRef.current && !chainDropdownRef.current.contains(event.target as Node)) {
         setIsChainDropdownOpen(false)
+      }
+
+      if (deployButtonRef.current && !deployButtonRef.current.contains(event.target as Node)) {
+        setShowDeployTooltip(false)
       }
     }
 
@@ -192,6 +199,43 @@ const Navbar: React.FC<NavbarProps> = ({
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-4">
+              {/* Deploy Button with Tooltip */}
+              <div 
+                ref={deployButtonRef}
+                className="relative"
+                onMouseEnter={() => setShowDeployTooltip(true)}
+                onMouseLeave={() => setShowDeployTooltip(false)}
+              >
+                <button
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 cursor-not-allowed opacity-75"
+                  disabled
+                >
+                  <FaRocket className="text-sm" />
+                  <span>Deploy</span>
+                </button>
+
+                {/* Tooltip */}
+                <AnimatePresence>
+                  {showDeployTooltip && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none"
+                    >
+                      <div className="relative bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-lg shadow-xl border border-purple-400/30 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold">Soon</span>
+                        </div>
+                        {/* Arrow */}
+                        <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-purple-600 rotate-45 border-t border-l border-purple-400/30"></div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               {/* Mint NFT Button */}
               <Link href="/mint">
                 <motion.button
@@ -199,6 +243,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   whileTap={{ scale: 0.95 }}
                   className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00FFFF] to-cyan-400 text-[#0A1929] rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
                 >
+                  <FaGem className="text-sm" />
                   <span>Mint NFT</span>
                 </motion.button>
               </Link>
@@ -422,7 +467,16 @@ const Navbar: React.FC<NavbarProps> = ({
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="px-4 pt-4 pb-6 space-y-6">
+        <div className="px-4 pt-4 pb-6 space-y-4">
+          {/* Deploy Button - Mobile */}
+          <div className="flex items-center justify-between mb-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-semibold shadow-lg opacity-75">
+            <div className="flex items-center gap-2">
+              <FaRocket className="text-base" />
+              <span>Deploy</span>
+            </div>
+            <span className="text-xs bg-white/20 px-2 py-1 rounded-full">Coming Soon</span>
+          </div>
+
           {/* Mint NFT Button - Mobile */}
           <Link href="/mint" onClick={() => setMobileMenuOpen(false)}>
             <motion.div
