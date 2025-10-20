@@ -11,14 +11,7 @@ class MyDocument extends Document {
 
     return (
       <Html lang="en">
-        <Head>
-              {/* Farcaster Frame Meta Tags */}
-          <meta property="fc:frame" content="vNext" />
-          <meta property="fc:frame:image" content={`${APP_URL}/api/og`} />
-          <meta property="fc:frame:button:1" content="Check In" />
-          <meta property="fc:frame:button:1:action" content="link" />
-          <meta property="fc:frame:button:1:target" content={`${APP_URL}/farcaster`} />
-        </Head>
+        <Head />
         <body>
           <Main />
           <NextScript />
