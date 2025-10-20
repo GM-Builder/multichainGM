@@ -9,11 +9,6 @@ import { RiFingerprintFill } from "react-icons/ri";
 import { FcGoogle } from "react-icons/fc";
 import { SiFarcaster } from "react-icons/si";
 
-declare global {
-  interface Window {
-    ethereum?: any;
-  }
-}
 
 interface ThemeToggleProps {
   className?: string;
@@ -247,9 +242,10 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
             params: [{ eth_accounts: {} }],
           });
           
-          const accounts = await window.ethereum.request({ 
+          const accountsResult = await window.ethereum.request({ 
             method: 'eth_requestAccounts' 
           });
+          const accounts = accountsResult as string[];
           
           if (accounts && accounts.length > 0) {
             console.log("Connected account:", accounts[0]);

@@ -136,92 +136,101 @@ export function useWalletState() {
   };
 
   const handleConnectWallet = useCallback(async () => {
-    if (web3State.isLoading) return false;
+  if (web3State.isLoading) return false;
 
-    try {
-      console.log("Connecting wallet...");
-      setWeb3State((prev) => ({ ...prev, isLoading: true, error: null }));
+  try {
+    console.log("Connecting wallet...");
+    setWeb3State((prev) => ({ ...prev, isLoading: true, error: null }));
 
-      if (typeof window === 'undefined' || !window.ethereum) {
-        throw new Error("No Ethereum provider found. Please connect your wallet first.");
-      }
-
-      const ethereum = window.ethereum;
-      
-      const accounts = await ethereum.request({ method: 'eth_accounts' });
-      
-      if (!accounts || accounts.length === 0) {
-        const requestedAccounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if (!requestedAccounts || requestedAccounts.length === 0) {
-          throw new Error("No accounts returned from wallet");
-        }
-      }
-
-      const provider = new ethers.providers.Web3Provider(ethereum, "any");
-      const signer = provider.getSigner();
-      const address = accounts[0] || await signer.getAddress();
-      
-      const network = await provider.getNetwork();
-      const chainId = network.chainId;
-      
-      const contract = getContract(signer, chainId);
-
-      const onReferralChain = await isOnReferralChain();
-      let referralContract = null;
-      let userHasReferrer = false;
-      let referrer = null;
-
-      if (onReferralChain) {
-        try {
-          referralContract = getReferralContract(provider);
-          userHasReferrer = await checkHasReferrer(provider, address);
-          if (userHasReferrer) {
-            referrer = await getReferrer(provider, address);
-          }
-        } catch (error) {
-          console.error('Error fetching referral data:', error);
-        }
-      }
-
-      setWeb3State({
-        isConnected: true,
-        address,
-        provider,
-        signer,
-        contract,
-        isLoading: false,
-        error: null,
-        chainId,
-        referralContract,
-        isOnReferralChain: onReferralChain,
-        hasReferrer: userHasReferrer,
-        referredBy: referrer,
-      });
-
-      localStorage.setItem("walletConnected", "true");
-      localStorage.setItem("walletAddress", address);
-
-      console.log("Wallet connected successfully:", address, "Chain:", chainId);
-      return true;
-    } catch (error: any) {
-      console.error("Error connecting wallet:", error);
-
-      setWeb3State((prev) => ({
-        ...prev,
-        isConnected: false,
-        isLoading: false,
-        error: error.message || "Failed to connect wallet",
-        referralContract: null,
-        isOnReferralChain: false,
-        hasReferrer: false,
-        referredBy: null,
-      }));
-
-      localStorage.removeItem("walletConnected");
-      localStorage.removeItem("walletAddress");
-      return false;
+    if (typeof window === 'undefined' || !window.ethereum) {
+      throw new Error("No Ethereum provider found. Please connect your wallet first.");
     }
-  }, [web3State.isLoading]);
+
+    const ethereum = window.ethereum;
+    
+    // Type assertion untuk accounts
+    const accountsResult = await ethereum.request({ method: 'eth_accounts' });
+    const accounts = accountsResult as string[];
+    
+    if (!accounts || accounts.length === 0) {
+      const requestedAccountsResult = await ethereum.request({ method: 'eth_requestAccounts' });
+      const requestedAccounts = requestedAccountsResult as string[];
+      
+      if (!requestedAccounts || requestedAccounts.length === 0) {
+        throw new Error("No accounts returned from wallet");
+      }
+    }
+
+    // Type assertion untuk provider
+    const provider = new ethers.providers.Web3Provider(ethereum as any, "any");
+    const signer = provider.getSigner();
+    
+    // Safe access untuk accounts
+    const address = (accounts && accounts.length > 0) 
+      ? accounts[0] 
+      : await signer.getAddress();
+    
+    const network = await provider.getNetwork();
+    const chainId = network.chainId;
+    
+    const contract = getContract(signer, chainId);
+
+    const onReferralChain = await isOnReferralChain();
+    let referralContract = null;
+    let userHasReferrer = false;
+    let referrer = null;
+
+    if (onReferralChain) {
+      try {
+        referralContract = getReferralContract(provider);
+        userHasReferrer = await checkHasReferrer(provider, address);
+        if (userHasReferrer) {
+          referrer = await getReferrer(provider, address);
+        }
+      } catch (error) {
+        console.error('Error fetching referral data:', error);
+      }
+    }
+
+    setWeb3State({
+      isConnected: true,
+      address,
+      provider,
+      signer,
+      contract,
+      isLoading: false,
+      error: null,
+      chainId,
+      referralContract,
+      isOnReferralChain: onReferralChain,
+      hasReferrer: userHasReferrer,
+      referredBy: referrer,
+    });
+
+    localStorage.setItem("walletConnected", "true");
+    localStorage.setItem("walletAddress", address);
+
+    console.log("Wallet connected successfully:", address, "Chain:", chainId);
+    return true;
+  } catch (error: any) {
+    console.error("Error connecting wallet:", error);
+
+    setWeb3State((prev) => ({
+      ...prev,
+      isConnected: false,
+      isLoading: false,
+      error: error.message || "Failed to connect wallet",
+      referralContract: null,
+      isOnReferralChain: false,
+      hasReferrer: false,
+      referredBy: null,
+    }));
+
+    localStorage.removeItem("walletConnected");
+    localStorage.removeItem("walletAddress");
+    return false;
+  }
+}, [web3State.isLoading]);
 
   const refreshReferralStatus = useCallback(async () => {
     if (!web3State.isConnected || !web3State.address || !web3State.provider) return;

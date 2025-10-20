@@ -5,19 +5,18 @@ import Script from "next/script"
 import "@/styles/globals.css"
 import { ThirdwebProvider } from "thirdweb/react"
 import { useRouter } from "next/router"
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useEffect, useState } from 'react'
 import Footer from "@/components/Footer"
 import WalletRequired from "@/components/WalletRequired"
 import { useWalletState } from "@/hooks/useWalletState"
 import Navbar from "@/components/Navbar"
 import { getChainConfig } from "@/utils/constants" 
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast'
 import { SuccessAnimationProvider } from "@/components/SuccessAnimationContext"
+import FarcasterProvider from "@/components/providers/FarcasterProvider"
+import OnchainProviders from "@/components/providers/OnchainProviders"
 
-const NO_LAYOUT_PATHS = [
-  '/mint'
-
-];
+const NO_LAYOUT_PATHS = ['/mint'];
 
 function GMApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -25,6 +24,12 @@ function GMApp({ Component, pageProps }: AppProps) {
   const { address, isConnected, isLoading: isWalletConnecting, chainId } = web3State
   const showLayout = !NO_LAYOUT_PATHS.includes(router.pathname);
   const leaderboardRef = useRef<HTMLDivElement>(null)
+  const [mounted, setMounted] = useState(false)
+  
+  // Fix hydration dengan useEffect
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   
   const scrollToLeaderboard = useCallback(() => {
     leaderboardRef.current?.scrollIntoView({ 
@@ -43,7 +48,9 @@ function GMApp({ Component, pageProps }: AppProps) {
     logoUrl: currentNetwork.logoUrl
   } : null
   
-  const shouldRequireWallet = !router.pathname.includes("/auth") && !router.pathname.includes("/landing") && !router.pathname.includes("/mint")
+  const shouldRequireWallet = !router.pathname.includes("/auth") && 
+                             !router.pathname.includes("/landing") && 
+                             !router.pathname.includes("/mint")
   
   return (
     <>
@@ -77,50 +84,56 @@ function GMApp({ Component, pageProps }: AppProps) {
         }}
       />
      
-      <ThirdwebProvider>
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-          toastOptions={{
-            className: 'custom-toast',
-            style: {
-              background: 'rgba(255, 255, 255, 0.9)',
-              color: '#1f2937',
-              backdropFilter: 'blur(8px)',
-            },
-            duration: 5000,
-          }}
-        />
-        {showLayout && <Navbar 
-          address={address}
-          connectWallet={adaptedConnectWallet}
-          disconnectWallet={disconnectWallet}
-          isConnecting={isWalletConnecting}
-          networkInfo={networkInfo}
-          scrollToLeaderboard={scrollToLeaderboard}
-        /> }
-        
-        <main>
-
-         {shouldRequireWallet ? ( <WalletRequired
-            isConnected={isConnected}
-            connectWallet={adaptedConnectWallet}
-            isConnecting={isWalletConnecting}
-          >
-            <SuccessAnimationProvider>
-              <Component {...pageProps} leaderboardRef={leaderboardRef} />
-            </SuccessAnimationProvider>
-          </WalletRequired>  
-            ) : (
-              <SuccessAnimationProvider>
-              <Component {...pageProps} leaderboardRef={leaderboardRef} />
-            </SuccessAnimationProvider>
+      <FarcasterProvider>
+        <OnchainProviders>
+          <ThirdwebProvider>
+            {/* Render Toaster hanya setelah mounted */}
+            {mounted && (
+              <Toaster
+                position="top-center"
+                reverseOrder={false}
+                toastOptions={{
+                  className: 'custom-toast',
+                  style: {
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    color: '#1f2937',
+                    backdropFilter: 'blur(8px)',
+                  },
+                  duration: 5000,
+                }}
+              />
             )}
-            {showLayout && <Footer /> }
-          
-        </main>
-      </ThirdwebProvider>
-      
+            
+            {showLayout && <Navbar 
+              address={address}
+              connectWallet={adaptedConnectWallet}
+              disconnectWallet={disconnectWallet}
+              isConnecting={isWalletConnecting}
+              networkInfo={networkInfo}
+              scrollToLeaderboard={scrollToLeaderboard}
+            /> }
+            
+            <main suppressHydrationWarning>
+              {shouldRequireWallet ? (
+                <WalletRequired
+                  isConnected={isConnected}
+                  connectWallet={adaptedConnectWallet}
+                  isConnecting={isWalletConnecting}
+                >
+                  <SuccessAnimationProvider>
+                    <Component {...pageProps} leaderboardRef={leaderboardRef} />
+                  </SuccessAnimationProvider>
+                </WalletRequired>  
+              ) : (
+                <SuccessAnimationProvider>
+                  <Component {...pageProps} leaderboardRef={leaderboardRef} />
+                </SuccessAnimationProvider>
+              )}
+              {showLayout && <Footer /> }
+            </main>
+          </ThirdwebProvider>
+        </OnchainProviders>
+      </FarcasterProvider>
     </>
   )
 }
