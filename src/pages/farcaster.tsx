@@ -1,5 +1,5 @@
 // src/pages/farcaster.tsx
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useFarcasterUser } from '@/hooks/useFarcasterContext';
 import { useWalletState } from '@/hooks/useWalletState';
 import { useUserStats } from '@/hooks/useSubgraph';
@@ -15,6 +15,20 @@ import { getChainConfig } from '@/utils/constants';
 const FarcasterMiniApp = () => {
   const { user, isLoading: userLoading } = useFarcasterUser();
   const { web3State, connectWallet } = useWalletState();
+
+  useEffect(() => {
+    const signalReady = async () => {
+      try {
+        const { default: sdk } = await import('@farcaster/frame-sdk');
+        sdk.actions.ready();
+        console.log('✅ Page ready signal sent');
+      } catch (error) {
+        console.warn('Could not signal ready:', error);
+      }
+    };
+    
+    signalReady();
+  }, []);
   
   // Get user stats from subgraph
   const { data: userStats, loading: userStatsLoading } = useUserStats(web3State.address || undefined);
