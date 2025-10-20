@@ -11,7 +11,13 @@ class MyDocument extends Document {
 
     return (
       <Html lang="en">
-        <Head />
+         <Head>
+        {/* Preload Farcaster SDK */}
+        <link
+          rel="modulepreload"
+          href="https://esm.sh/@farcaster/frame-sdk"
+        />
+      </Head>
         <body>
           <Main />
           <NextScript />
