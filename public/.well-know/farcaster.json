@@ -1,0 +1,27 @@
+{
+  "frame": {
+    "name": "GannetX",
+    "version": "1",
+    "iconUrl": "https://gannetx.space/icon2.png",
+    "homeUrl": "https://gannetx.space",
+    "imageUrl": "https://gannetx.space/image.png",
+    "buttonTitle": "GM",
+    "splashImageUrl": "https://gannetx.space/icon2.png",
+    "splashBackgroundColor": "#1A1A2E",
+    "subtitle": "Your Multichain GM Hub",
+    "description": "The ultimate multi-chain GM hub. Track your daily Web3 check-ins, build streaks, visualize on personalized heatmaps, and climb the leaderboard.",
+    "primaryCategory": "social",
+    "tags": [
+      "social",
+      "gm",
+      "check-ins",
+      "gannetx"
+    ],
+    "tagline": "Your Multichain GM Hub"
+  },
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
+  }
+}
