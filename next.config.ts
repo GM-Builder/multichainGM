@@ -4,13 +4,12 @@ const nextConfig = {
     domains: [
       'assets.coingecko.com', 
       'logos.covalenthq.com',
-      // Tambahan untuk Farcaster
       'i.imgur.com',
       'imagedelivery.net',
+      'api.dicebear.com',
     ],
   },
   
-  // Webpack configuration
   webpack: (config: { resolve: { fallback: any; alias: any; }; externals: string[]; }, { isServer }: { isServer: boolean }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -32,7 +31,6 @@ const nextConfig = {
     
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
     
-    // Ignore node-specific modules in browser
     config.resolve.alias = {
       ...config.resolve.alias,
       'pino-pretty': false,
@@ -41,11 +39,9 @@ const nextConfig = {
     return config;
   },
   
-  // Headers configuration - UPDATED untuk Farcaster
   async headers() {
     return [
       {
-        // Regular pages
         source: '/((?!farcaster).*)',
         headers: [
           {
@@ -63,12 +59,11 @@ const nextConfig = {
         ],
       },
       {
-        // Farcaster pages - Allow embedding
         source: '/farcaster/:path*',
         headers: [
           {
             key: 'X-Frame-Options',
-            value: 'ALLOWALL', // Allow Farcaster to embed
+            value: 'ALLOWALL', 
           },
           {
             key: 'Content-Security-Policy',
