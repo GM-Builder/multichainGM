@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "prisma generate || echo 'No Prisma schema'"
+    "lint": "next lint"
   },
   "dependencies": {
     "@apollo/client": "^4.0.7",
