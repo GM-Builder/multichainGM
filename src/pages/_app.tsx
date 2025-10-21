@@ -13,7 +13,7 @@ import Navbar from "@/components/Navbar"
 import { getChainConfig } from "@/utils/constants" 
 import { Toaster } from 'react-hot-toast'
 import { SuccessAnimationProvider } from "@/components/SuccessAnimationContext"
-import FarcasterProvider from "@/components/providers/FarcasterProvider"
+import {FarcasterProvider } from "@/components/providers/FarcasterProvider"
 import OnchainProviders from "@/components/providers/OnchainProviders"
 
 const NO_LAYOUT_PATHS = ['/mint', '/farcaster'];

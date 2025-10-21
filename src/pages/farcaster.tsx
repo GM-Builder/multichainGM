@@ -1,9 +1,5 @@
 // src/pages/farcaster.tsx
-import { useFarcasterContext } from '@/components/providers/FarcasterProvider';
-
 export default function FarcasterPage() {
-  const { context, isLoading, isReady } = useFarcasterContext();
-
   return (
     <div style={{
       minHeight: '100vh',
@@ -24,45 +20,20 @@ export default function FarcasterPage() {
           Your Multichain GM Hub
         </p>
 
-        {/* Status Indicator */}
-        {isLoading && (
-          <div style={{
-            padding: '15px 30px',
-            background: '#333',
-            borderRadius: '12px',
-            fontSize: '16px'
-          }}>
-            ⏳ Loading Mini App...
-          </div>
-        )}
+        <div style={{ 
+          padding: '15px 30px', 
+          background: '#00AA00', 
+          borderRadius: '12px',
+          fontSize: '16px',
+          fontWeight: 'bold'
+        }}>
+          ✅ Ready to GM!
+        </div>
 
-        {isReady && (
-          <div style={{ 
-            padding: '15px 30px', 
-            background: '#00AA00', 
-            borderRadius: '12px',
-            fontSize: '16px',
-            fontWeight: 'bold'
-          }}>
-            ✅ Ready to GM!
-          </div>
-        )}
-
-        {/* Debug Info (optional, hapus di production) */}
-        {context && (
-          <div style={{
-            marginTop: '20px',
-            padding: '10px',
-            background: '#222',
-            borderRadius: '8px',
-            fontSize: '12px',
-            textAlign: 'left',
-            fontFamily: 'monospace'
-          }}>
-            <div>FID: {context.user?.fid}</div>
-            <div>Username: {context.user?.username}</div>
-          </div>
-        )}
+        {/* Your actual Mini App content here */}
+        <div style={{ marginTop: '30px' }}>
+          {/* Add your Mini App features here */}
+        </div>
       </div>
     </div>
   );
