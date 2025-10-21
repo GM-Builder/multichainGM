@@ -68,6 +68,11 @@ interface MultiChainCheckinGridProps {
   onAnimationComplete?: () => void;
 }
 
+const SORT_OPTIONS: { value: SortOptionType; label: string }[] = [
+  { value: 'name', label: 'Sort by Name' },
+  { value: 'status', label: 'Sort by Status' },
+];
+
 const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
   isConnected,
   currentChainId,
@@ -97,10 +102,17 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
   chainId: null,
   chainName: '',
 });
+
+const SORT_OPTIONS: { value: SortOptionType; label: string }[] = [
+  { value: 'name', label: 'Sort by Name' },
+  { value: 'status', label: 'Sort by Status' },
+];
   
   const { soundEnabled } = useSuccessAnimation();
   const { data: userStats } = useUserStats(address || undefined);
   const filterMenuRef = useRef<HTMLDivElement>(null);
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const sortDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -117,6 +129,16 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isFilterMenuOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target as Node)) {
+        setIsSortDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (triggerAnimation) {
@@ -527,7 +549,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
             className="flex flex-wrap gap-2.5"
           >
             {/* Filter Dropdown */}
-            <div className="relative" ref={filterMenuRef}>
+            <div className="relative z-30" ref={filterMenuRef}>
               <button
                 onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
                 className="group flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-white/90 to-white/70 dark:from-slate-800/90 dark:to-slate-800/70 backdrop-blur-xl border border-gray-200/60 dark:border-slate-700/60 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:shadow-lg hover:scale-[1.02] hover:border-cyan-300/50 dark:hover:border-cyan-500/50 transition-all duration-300 shadow-sm"
@@ -555,7 +577,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.92, y: -15 }}
                     transition={{ duration: 0.25, ease: "easeOut" }}
-                    className="absolute right-0 mt-2 w-48 bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl border border-gray-200/60 dark:border-slate-700/60 rounded-2xl shadow-2xl z-20 overflow-hidden"
+                    className="absolute left-0 mt-2 w-48 bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl border border-gray-200/60 dark:border-slate-700/60 rounded-2xl shadow-2xl z-20 overflow-hidden"
                   >
                     <div className="py-1.5">
                       {['all', 'available', 'checked', 'favorites'].map((option, idx) => (
@@ -593,21 +615,65 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
               </AnimatePresence>
             </div>
             
-            {/* Sort Select */}
-            <div className="relative">
-              <select
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value as SortOptionType)}
-                className="appearance-none pl-4 pr-10 py-2.5 bg-gradient-to-br from-white/90 to-white/70 dark:from-slate-800/90 dark:to-slate-800/70 backdrop-blur-xl border border-gray-200/60 dark:border-slate-700/60 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:shadow-lg hover:scale-[1.02] hover:border-purple-300/50 dark:hover:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-400 dark:focus:border-purple-500 transition-all duration-300 shadow-sm cursor-pointer"
-              >
-                <option value="name">Sort by Name</option>
-                <option value="status">Sort by Status</option>
-              </select>
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
+            {/* Custom Sort Select (Menggantikan <select> native) */}
+            <div className="relative" ref={sortDropdownRef}>
+                
+                {/* Tombol Utama (Menggantikan <select>) */}
+                <button
+                    type="button"
+                    onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                    className={`
+                        pl-4 pr-10 py-2.5 
+                        
+                        // Gradien Dark Mode/Light Mode Transparan untuk Efek Kaca
+                        bg-gradient-to-br from-white/20 to-white/10 dark:from-slate-700/60 dark:to-slate-700/40 
+                        
+                        backdrop-blur-xl border border-gray-200/60 dark:border-slate-700/60 
+                        rounded-xl text-sm font-semibold 
+                        text-gray-700 dark:text-gray-200 hover:shadow-lg hover:scale-[1.02] hover:border-purple-300/50 dark:hover:border-purple-500/50 
+                        focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-400 dark:focus:border-purple-500 
+                        transition-all duration-300 shadow-sm cursor-pointer whitespace-nowrap
+                    `}
+                    aria-expanded={isSortDropdownOpen}
+                >
+                    {SORT_OPTIONS.find(opt => opt.value === sortOption)?.label || 'Sort'}
+                    
+                    {/* Ikon Panah */}
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                </button>
+                
+                {/* Menu Opsi Kustom (Menggantikan <option>) */}
+                {isSortDropdownOpen && (
+                    <div
+                        className="absolute z-40 mt-2 w-full min-w-[150px] overflow-hidden rounded-xl shadow-2xl 
+                                  focus:outline-none transform origin-top 
+                                  
+                                  // Fix Dark Mode: Background kustom Dark/Light
+                                  bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-gray-200 dark:border-slate-700"
+                    >
+                        {SORT_OPTIONS.map((option) => (
+                            <div
+                                key={option.value}
+                                onClick={() => {
+                                    setSortOption(option.value);
+                                    setIsSortDropdownOpen(false);
+                                }}
+                                className={`
+                                    px-4 py-2 text-sm cursor-pointer 
+                                    text-gray-800 dark:text-gray-100
+                                    hover:bg-purple-500/10 dark:hover:bg-purple-500/20 
+                                    ${sortOption === option.value ? 'bg-purple-500/20 dark:bg-purple-500/40 font-bold' : ''}
+                                `}
+                            >
+                                {option.label}
+                              </div>
+                      ))}
+                </div>
+              )}
             </div>
             
             {/* Refresh Button */}
