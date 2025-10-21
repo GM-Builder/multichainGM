@@ -3,119 +3,126 @@ import { useEffect, useState } from 'react';
 
 export default function FarcasterPage() {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [error, setError] = useState<string | null>(null);
+  const [logs, setLogs] = useState<string[]>([]);
+
+  const addLog = (msg: string) => {
+    console.log(msg);
+    setLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${msg}`]);
+  };
 
   useEffect(() => {
     let mounted = true;
+    let readyCalled = false;
 
-    async function initFarcaster() {
+    async function init() {
       try {
-        console.log('🚀 Initializing Farcaster SDK...');
+        addLog('🚀 Starting initialization...');
+        
+        // Check if we're in Farcaster context
+        const userAgent = navigator.userAgent;
+        addLog(`📱 User Agent: ${userAgent.substring(0, 50)}...`);
         
         // Import SDK
-        const { default: sdk } = await import('@farcaster/frame-sdk');
-        console.log('✅ SDK imported');
+        addLog('📦 Importing Farcaster SDK...');
+        const sdk = await import('@farcaster/frame-sdk');
+        addLog('✅ SDK imported successfully');
         
-        // Wait for context
-        console.log('⏳ Waiting for context...');
-        const context = await sdk.context;
-        console.log('✅ Context loaded:', context);
+        // Get context
+        addLog('⏳ Getting context...');
+        const ctx = await sdk.default.context;
+        addLog(`✅ Context received: ${JSON.stringify(ctx).substring(0, 80)}...`);
         
-        // Small delay to ensure everything is mounted
-        await new Promise(resolve => setTimeout(resolve, 150));
+        // Wait a bit to ensure everything is ready
+        addLog('⏳ Waiting 300ms before calling ready...');
+        await new Promise(resolve => setTimeout(resolve, 300));
         
         if (!mounted) {
-          console.log('⚠️ Component unmounted, skipping ready signal');
+          addLog('⚠️ Component unmounted, aborting');
           return;
         }
         
-        // Signal ready
-        console.log('📢 Signaling ready...');
-        sdk.actions.ready();
-        console.log('✅ Ready signal sent!');
+        // Call ready
+        addLog('📢 Calling sdk.actions.ready()...');
+        sdk.default.actions.ready();
+        readyCalled = true;
+        addLog('✅ sdk.actions.ready() called successfully!');
         
         setStatus('ready');
       } catch (err) {
-        console.error('❌ Farcaster init error:', err);
+        const errMsg = err instanceof Error ? err.message : String(err);
+        addLog(`❌ ERROR: ${errMsg}`);
         if (mounted) {
-          setError(err instanceof Error ? err.message : 'Unknown error');
           setStatus('error');
         }
       }
     }
 
-    initFarcaster();
+    init();
 
     return () => {
       mounted = false;
+      if (readyCalled) {
+        addLog('🧹 Cleanup: Component unmounting');
+      }
     };
   }, []);
 
   return (
     <div style={{
       minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: '#1A1A2E',
+      background: '#0a0a0a',
       color: '#fff',
-      fontFamily: 'system-ui, -apple-system, sans-serif'
+      fontFamily: 'monospace',
+      fontSize: '12px',
+      padding: '20px'
     }}>
-      <div style={{ 
-        textAlign: 'center', 
-        padding: '40px',
-        maxWidth: '500px'
-      }}>
-        <div style={{ fontSize: '60px', marginBottom: '20px' }}>
-          🦅
-        </div>
-        
-        <h1 style={{ fontSize: '32px', marginBottom: '10px', margin: 0 }}>
-          GannetX
-        </h1>
-        
-        <p style={{ 
-          fontSize: '18px', 
-          color: '#888',
+      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        {/* Header */}
+        <div style={{ 
+          textAlign: 'center', 
           marginBottom: '30px',
-          margin: '10px 0 30px 0'
+          paddingBottom: '20px',
+          borderBottom: '1px solid #333'
         }}>
-          Your Multichain GM Hub
-        </p>
+          <div style={{ fontSize: '48px', marginBottom: '10px' }}>🦅</div>
+          <h1 style={{ fontSize: '24px', margin: '0 0 5px 0' }}>GannetX</h1>
+          <p style={{ color: '#888', margin: 0, fontSize: '14px' }}>
+            Your Multichain GM Hub
+          </p>
+        </div>
 
-        {status === 'loading' && (
-          <div style={{
-            padding: '15px 30px',
-            background: '#333',
-            borderRadius: '12px',
-            fontSize: '16px'
-          }}>
-            ⏳ Loading...
-          </div>
-        )}
+        {/* Status */}
+        <div style={{
+          padding: '15px',
+          background: status === 'ready' ? '#003300' : status === 'error' ? '#330000' : '#333300',
+          borderRadius: '8px',
+          marginBottom: '20px',
+          textAlign: 'center',
+          fontSize: '14px',
+          fontWeight: 'bold'
+        }}>
+          {status === 'loading' && '⏳ LOADING...'}
+          {status === 'ready' && '✅ READY!'}
+          {status === 'error' && '❌ ERROR'}
+        </div>
 
-        {status === 'ready' && (
-          <div style={{
-            padding: '15px 30px',
-            background: '#00AA00',
-            borderRadius: '12px',
-            fontSize: '16px',
-            fontWeight: 'bold'
-          }}>
-            ✅ Ready to GM!
+        {/* Logs */}
+        <div style={{
+          background: '#000',
+          border: '1px solid #333',
+          borderRadius: '8px',
+          padding: '15px',
+          maxHeight: '500px',
+          overflowY: 'auto'
+        }}>
+          <div style={{ color: '#0f0', fontSize: '11px', lineHeight: '1.6' }}>
+            {logs.map((log, i) => (
+              <div key={i} style={{ marginBottom: '3px' }}>
+                {log}
+              </div>
+            ))}
           </div>
-        )}
-
-        {status === 'error' && (
-          <div style={{
-            padding: '15px 30px',
-            background: '#AA0000',
-            borderRadius: '12px',
-            fontSize: '14px'
-          }}>
-            ❌ Error: {error}
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
