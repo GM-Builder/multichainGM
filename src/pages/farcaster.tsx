@@ -134,7 +134,7 @@ const FarcasterMiniApp = () => {
       {/* Compact Header - Logo from public folder */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20 backdrop-blur-md bg-white/90 dark:bg-gray-900/90">
         <div className="px-3 py-3">
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-2">
               <img 
@@ -143,23 +143,6 @@ const FarcasterMiniApp = () => {
                 className="h-14 w-auto object-contain"
               />
             </div>
-
-            {/* Farcaster User Badge */}
-            {user && (
-              <div className="flex items-center gap-2">
-                {user.pfpUrl ? (
-                  <img 
-                    src={user.pfpUrl} 
-                    alt={user.username || 'User'} 
-                    className="w-8 h-8 rounded-full border-2 border-cyan-500"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center">
-                    <FaUser className="text-white text-xs" />
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* Farcaster User Badge */}
             {user && (
