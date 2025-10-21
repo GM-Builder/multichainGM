@@ -23,35 +23,41 @@ export default function FarcasterProvider({ children }: { children: ReactNode })
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    async function loadContext() {
+    async function initMiniApp() {
       try {
-        console.log('🚀 Loading Farcaster SDK...');
+        console.log('🚀 [FarcasterProvider] Initializing Mini App...');
+        console.log('📍 [FarcasterProvider] Current URL:', window.location.href);
         
-        // Import miniapp-sdk (BUKAN frame-sdk!)
+        // Import SDK
         const { sdk } = await import('@farcaster/miniapp-sdk');
-        console.log('📦 SDK imported');
+        console.log('✅ [FarcasterProvider] SDK imported');
         
-        // PENTING: Tunggu context dulu!
+        // CRITICAL: Wait for context first!
         const ctx = await sdk.context;
-        console.log('✅ Context loaded:', ctx);
+        console.log('✅ [FarcasterProvider] Context loaded:', ctx);
         setContext(ctx);
         
-        // Delay kecil untuk ensure DOM ready
-        await new Promise(resolve => setTimeout(resolve, 200));
+        // Small delay to ensure UI is fully mounted
+        console.log('⏳ [FarcasterProvider] Waiting 300ms for UI to stabilize...');
+        await new Promise(resolve => setTimeout(resolve, 300));
         
-        // Baru call ready SETELAH context siap
+        // NOW call ready()
+        console.log('📢 [FarcasterProvider] Calling sdk.actions.ready()...');
         await sdk.actions.ready();
-        console.log('✅ Ready signal sent!');
+        console.log('✅ [FarcasterProvider] Ready signal sent successfully!');
         
         setIsReady(true);
       } catch (err) {
-        console.error('❌ Provider error:', err);
+        console.error('❌ [FarcasterProvider] Init error:', err);
       } finally {
         setIsLoading(false);
+        console.log('🏁 [FarcasterProvider] Initialization complete');
       }
     }
     
-    loadContext();
+    initMiniApp().catch(err => {
+      console.error('❌ [FarcasterProvider] Uncaught error:', err);
+    });
   }, []);
 
   return (

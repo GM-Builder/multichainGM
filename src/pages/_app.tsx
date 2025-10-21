@@ -30,9 +30,6 @@ function GMApp({ Component, pageProps }: AppProps) {
     setMounted(true)
   }, [])
   
-  // HAPUS semua logika Farcaster Mini App dari sini!
-  // Biarkan FarcasterProvider yang handle semuanya
-  
   const scrollToLeaderboard = useCallback(() => {
     leaderboardRef.current?.scrollIntoView({ 
       behavior: 'smooth',
