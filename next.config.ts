@@ -41,102 +41,32 @@ const nextConfig = {
   
   async headers() {
     return [
-      // Redirect www to non-www
+      // Allow Farcaster to frame /farcaster pages
       {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'www.gannetx.space',
-          },
-        ],
+        source: '/farcaster',
         headers: [
           {
-            key: 'Location',
-            value: 'https://gannetx.space/:path*',
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors *", // ✅ Allow ALL for testing
           },
         ],
       },
-      
-      // Headers for NON-Farcaster pages (DENY framing)
+      {
+        source: '/farcaster/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors *", // ✅ Allow ALL for testing
+          },
+        ],
+      },
+      // Protect other pages
       {
         source: '/((?!farcaster).*)',
         headers: [
           {
             key: 'X-Frame-Options',
             value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-        ],
-      },
-      
-      // Headers for Farcaster Mini App pages (ALLOW framing)
-      {
-        source: '/farcaster/:path*',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'ALLOW-FROM https://warpcast.com', // ❌ Ganti dari ALLOWALL
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "frame-ancestors 'self' https://*.farcaster.xyz https://*.warpcast.com https://warpcast.com https://*.neynar.com",
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://esm.sh https://cdn.jsdelivr.net https://www.googletagmanager.com https://vercel.live",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://*.farcaster.xyz https://*.warpcast.com https://*.neynar.com https://pulse.walletconnect.network https://*.vercel.app wss://*",
-              "frame-src 'self' https://*.farcaster.xyz https://*.warpcast.com",
-            ].join('; '),
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-        ],
-      },
-      
-      // Also for exact /farcaster path
-      {
-        source: '/farcaster',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'ALLOW-FROM https://warpcast.com',
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "frame-ancestors 'self' https://*.farcaster.xyz https://*.warpcast.com https://warpcast.com https://*.neynar.com",
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://esm.sh https://cdn.jsdelivr.net https://www.googletagmanager.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://*.farcaster.xyz https://*.warpcast.com https://*.neynar.com https://pulse.walletconnect.network wss://*",
-              "frame-src 'self' https://*.farcaster.xyz https://*.warpcast.com",
-            ].join('; '),
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
           },
         ],
       },
