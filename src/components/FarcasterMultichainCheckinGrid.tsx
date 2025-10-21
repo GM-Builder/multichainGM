@@ -260,9 +260,10 @@ const FarcasterMultiChainCheckinGrid: React.FC<FarcasterMultiChainCheckinGridPro
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-  const checkAllChainsStatus = async (): Promise<void> => {
+
+const checkAllChainsStatus = async (): Promise<void> => {
     if (!isConnected || !publicClient || !address) {
-      return;
+        return;
     }
 
     setIsLoading(true);
@@ -270,97 +271,122 @@ const FarcasterMultiChainCheckinGrid: React.FC<FarcasterMultiChainCheckinGridPro
     const statusMap: Record<number, ChainCheckinStatus> = {};
 
     try {
-      // Initialize with default values
-      supportedChainIds.forEach(chainId => {
+        // Initialize with default values
+        supportedChainIds.forEach(chainId => {
         statusMap[chainId] = {
-          canCheckin: true,
-          lastCheckin: null,
-          timeUntilNextCheckin: 0
+            canCheckin: true,
+            lastCheckin: null,
+            timeUntilNextCheckin: 0
         };
-      });
-      
-      setChainStatusMap(statusMap);
+        });
+        
+        setChainStatusMap(statusMap);
 
-      const BATCH_SIZE = 3;
-      const DELAY_BETWEEN_REQUESTS = 500;
-      
-      for (let i = 0; i < supportedChainIds.length; i += BATCH_SIZE) {
+        const BATCH_SIZE = 3;
+        const DELAY_BETWEEN_REQUESTS = 500;
+        
+        for (let i = 0; i < supportedChainIds.length; i += BATCH_SIZE) {
         const batchChainIds = supportedChainIds.slice(i, i + BATCH_SIZE);
         
         const batchPromises = batchChainIds.map(async (chainId) => {
-          try {
+            try {
             await delay(Math.random() * 200);
             
             const contractAddress = getContractAddress(chainId);
+            const chainConfig = SUPPORTED_CHAINS[chainId];
             
-            try {
-              const canActivate = await publicClient.readContract({
-                address: contractAddress as `0x${string}`,
-                abi: CHECKIN_ABI,
-                functionName: 'canActivateToday',
-                args: [address],
-              }) as boolean;
-              
-              let lastBeacon = null;
-              let timeRemaining = 0;
-              
-              try {
-                const metrics = await publicClient.readContract({
-                  address: contractAddress as `0x${string}`,
-                  abi: CHECKIN_ABI,
-                  functionName: 'getNavigatorMetrics',
-                  args: [address],
-                }) as [bigint, bigint, bigint, bigint, bigint];
+            if (!chainConfig || !contractAddress) {
+                return { chainId, status: statusMap[chainId] };
+            }
+
+            // ✅ Try multiple RPC URLs
+            let canActivate = true;
+            let lastBeacon = null;
+            let timeRemaining = 0;
+            
+            for (const rpcUrl of chainConfig.rpcUrls) {
+                try {
+                // ✅ Create temporary public client for this chain
+                const { createPublicClient, http } = await import('viem');
                 
-                lastBeacon = Number(metrics[1]);
+                const tempClient = createPublicClient({
+                    transport: http(rpcUrl, {
+                    timeout: 10_000, // 10 second timeout
+                    retryCount: 2,
+                    }),
+                });
+
+                canActivate = await tempClient.readContract({
+                    address: contractAddress as `0x${string}`,
+                    abi: CHECKIN_ABI,
+                    functionName: 'canActivateToday',
+                    args: [address],
+                }) as boolean;
                 
-                if (!canActivate) {
-                  const nextResetTime = Number(metrics[4]);
-                  const currentTime = Math.floor(Date.now() / 1000);
-                  timeRemaining = Math.max(0, nextResetTime - currentTime);
+                try {
+                    const metrics = await tempClient.readContract({
+                    address: contractAddress as `0x${string}`,
+                    abi: CHECKIN_ABI,
+                    functionName: 'getNavigatorMetrics',
+                    args: [address],
+                    }) as [bigint, bigint, bigint, bigint, bigint];
+                    
+                    lastBeacon = Number(metrics[1]);
+                    
+                    if (!canActivate) {
+                    const nextResetTime = Number(metrics[4]);
+                    const currentTime = Math.floor(Date.now() / 1000);
+                    timeRemaining = Math.max(0, nextResetTime - currentTime);
+                    }
+                } catch (metricsError) {
+                    console.warn(`Couldn't get detailed metrics for chain ${chainId}:`, metricsError);
                 }
-              } catch (metricsError) {
-                console.warn(`Couldn't get detailed metrics for chain ${chainId}:`, metricsError);
-              }
-              
-              return {
+
+                // ✅ If successful, break the RPC loop
+                break;
+                
+                } catch (rpcError) {
+                console.warn(`RPC ${rpcUrl} failed for chain ${chainId}:`, rpcError);
+                // Continue to next RPC URL
+                continue;
+                }
+            }
+            
+            return {
                 chainId,
                 status: {
-                  canCheckin: canActivate,
-                  lastCheckin: lastBeacon,
-                  timeUntilNextCheckin: timeRemaining
+                canCheckin: canActivate,
+                lastCheckin: lastBeacon,
+                timeUntilNextCheckin: timeRemaining
                 }
-              };
+            };
+            
             } catch (error) {
-              console.error(`Error checking status for chain ${chainId}:`, error);
-              return { chainId, status: statusMap[chainId] };
-            }
-          } catch (error) {
             console.error(`Error processing chain ${chainId}:`, error);
             return { chainId, status: statusMap[chainId] };
-          }
+            }
         });
         
         const batchResults = await Promise.allSettled(batchPromises);
         
         batchResults.forEach(result => {
-          if (result.status === 'fulfilled') {
+            if (result.status === 'fulfilled') {
             statusMap[result.value.chainId] = result.value.status;
-          }
+            }
         });
         
         setChainStatusMap({...statusMap});
         
         if (i + BATCH_SIZE < supportedChainIds.length) {
-          await delay(DELAY_BETWEEN_REQUESTS);
+            await delay(DELAY_BETWEEN_REQUESTS);
         }
-      }
+        }
     } catch (error) {
-      console.error("Error checking chain statuses:", error);
+        console.error("Error checking chain statuses:", error);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+    };
 
 
     const handleCheckin = async (chainId: number): Promise<void> => {
