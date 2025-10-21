@@ -26,41 +26,12 @@ function GMApp({ Component, pageProps }: AppProps) {
   const leaderboardRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
   
-  // Fix hydration
   useEffect(() => {
     setMounted(true)
   }, [])
   
-  // Farcaster Mini-App initialization
-  useEffect(() => {
-    const initMiniApp = async () => {
-      try {
-        console.log('🚀 Initializing Farcaster Mini App...')
-        
-        // PENTING: Import dari miniapp-sdk, BUKAN frame-sdk!
-        const { sdk } = await import('@farcaster/miniapp-sdk')
-        
-        console.log('📦 SDK imported')
-        
-        // Call ready after app loaded
-        await sdk.actions.ready()
-        
-        console.log('✅ Mini App ready signal sent!')
-      } catch (err) {
-        console.error('❌ Mini App initialization error:', err)
-      }
-    }
-    
-    // Only init if on farcaster route or miniApp param
-    const url = new URL(window.location.href)
-    const isMiniApp = 
-      router.pathname === '/farcaster' ||
-      url.searchParams.get('miniApp') === 'true'
-    
-    if (isMiniApp) {
-      initMiniApp()
-    }
-  }, [router.pathname])
+  // HAPUS semua logika Farcaster Mini App dari sini!
+  // Biarkan FarcasterProvider yang handle semuanya
   
   const scrollToLeaderboard = useCallback(() => {
     leaderboardRef.current?.scrollIntoView({ 
@@ -88,7 +59,7 @@ function GMApp({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>GannetX: Your Multi-Chain GM Hub</title>
-        <meta name="description" content="The ultimate multi-chain GM hub. Track your daily Web3 check-ins, build streaks, visualize on personalized heatmaps, and climb the leaderboard." />
+        <meta name="description" content="The ultimate multi-chain GM hub." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
