@@ -22,7 +22,7 @@ export default function FarcasterProvider({ children }: { children: ReactNode })
   useEffect(() => {
     const loadContext = async () => {
       try {
-        const { default: sdk } = await import('@farcaster/frame-sdk');
+        const { default: sdk } = await import('@farcaster/miniapp-sdk');
         const frameContext = await sdk.context;
         setContext(frameContext);
         console.log('✅ Farcaster context loaded in provider');

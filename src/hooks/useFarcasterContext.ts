@@ -19,7 +19,7 @@ export function useFarcasterContext() {
   useEffect(() => {
     const loadContext = async () => {
       try {
-        const { default: sdk } = await import('@farcaster/frame-sdk');
+        const { default: sdk } = await import('@farcaster/miniapp-sdk');
         const frameContext = await sdk.context;
         setContext(frameContext as FarcasterContext);
       } catch (error) {

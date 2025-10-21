@@ -31,35 +31,34 @@ function GMApp({ Component, pageProps }: AppProps) {
     setMounted(true)
   }, [])
   
-  // Farcaster Mini-App Detection & Ready Signal
+  // Farcaster Mini-App initialization
   useEffect(() => {
+    const initMiniApp = async () => {
+      try {
+        console.log('🚀 Initializing Farcaster Mini App...')
+        
+        // PENTING: Import dari miniapp-sdk, BUKAN frame-sdk!
+        const { sdk } = await import('@farcaster/miniapp-sdk')
+        
+        console.log('📦 SDK imported')
+        
+        // Call ready after app loaded
+        await sdk.actions.ready()
+        
+        console.log('✅ Mini App ready signal sent!')
+      } catch (err) {
+        console.error('❌ Mini App initialization error:', err)
+      }
+    }
+    
+    // Only init if on farcaster route or miniApp param
     const url = new URL(window.location.href)
     const isMiniApp = 
-      url.pathname === '/farcaster' ||
+      router.pathname === '/farcaster' ||
       url.searchParams.get('miniApp') === 'true'
     
     if (isMiniApp) {
-      console.log('🎯 Mini-App detected, initializing SDK...')
-      
-      import('@farcaster/frame-sdk').then(({ default: sdk }) => {
-        console.log('📦 SDK imported')
-        
-        // Wait for context then signal ready
-        sdk.context.then((context) => {
-          console.log('✅ Context ready:', context)
-          
-          // Small delay to ensure everything is mounted
-          setTimeout(() => {
-            console.log('📢 Calling sdk.actions.ready()...')
-            sdk.actions.ready()
-            console.log('✅ Ready signal sent!')
-          }, 200)
-        }).catch((err) => {
-          console.error('❌ Context error:', err)
-        })
-      }).catch((err) => {
-        console.error('❌ SDK import error:', err)
-      })
+      initMiniApp()
     }
   }, [router.pathname])
   
@@ -89,15 +88,9 @@ function GMApp({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>GannetX: Your Multi-Chain GM Hub</title>
-        <meta name="description" content="The ultimate multi-chain GM hub. Track your daily Web3 check-ins, build streaks, visualize on personalized heatmaps, and climb the leaderboard. Qualify for exclusive Early Adopter NFTs & future rewards. Secure your spot now!" />
+        <meta name="description" content="The ultimate multi-chain GM hub. Track your daily Web3 check-ins, build streaks, visualize on personalized heatmaps, and climb the leaderboard." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
       </Head>
       
       <Script
