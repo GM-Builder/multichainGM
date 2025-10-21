@@ -1,380 +1,173 @@
+// src/components/UnifiedAudioPlayer.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { FaVolumeUp, FaVolumeMute, FaMusic } from 'react-icons/fa';
+import { FaMusic, FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
 
+const DEFAULT_MUSIC = '/music/dashboard-ambient.mp3';
+const PROFILE_MUSIC = '/music/profile-ambient.mp3';
 
-const DEFAULT_MUSIC = '/music/dashboard-ambient.mp3';   
-const PROFILE_MUSIC = '/music/profile-ambient.mp3';     
 interface AudioPlayerProps {
-  initialVolume?: number;
+  showOnFarcaster?: boolean; // Show floating player on /farcaster
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ initialVolume = 0.3 }) => {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ 
+  showOnFarcaster = true 
+}) => {
   const router = useRouter();
-  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(initialVolume);
+  const [volume] = useState(0.3);
   const [currentMusic, setCurrentMusic] = useState('');
-  const [isVisible, setIsVisible] = useState(false);
-  const [fadeTimeout, setFadeTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [isProfileTab, setIsProfileTab] = useState(false); 
+
+  const isFarcasterPage = router.pathname === '/farcaster';
+
+  // Don't render on farcaster if disabled
+  if (isFarcasterPage && !showOnFarcaster) {
+    return null;
+  }
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const audio = new Audio();
-      audio.loop = true;
-      audio.volume = 0; 
-      audioRef.current = audio;
+    if (typeof window === 'undefined') return;
 
-      const musicEnabled = localStorage.getItem('musicEnabled') !== 'false';
-      setIsPlaying(musicEnabled);
+    const audio = new Audio();
+    audio.loop = true;
+    audio.volume = volume;
+    audioRef.current = audio;
 
-      const savedTheme = localStorage.getItem('theme');
-      setIsDarkMode(savedTheme !== 'light');
+    const musicEnabled = localStorage.getItem('musicEnabled') !== 'false';
+    setIsPlaying(musicEnabled);
 
-      return () => {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current = null;
-        }
-        
-        if (fadeIntervalRef.current) {
-          clearInterval(fadeIntervalRef.current);
-        }
-        
-        if (fadeTimeout) {
-          clearTimeout(fadeTimeout);
-        }
-      };
+    if (musicEnabled) {
+      setTimeout(() => {
+        audio.play().catch(error => {
+          console.log('Autoplay prevented:', error);
+          setIsPlaying(false);
+        });
+      }, 1000);
     }
-  }, []);
 
-  useEffect(() => {
-    const handleThemeChange = () => {
-      const savedTheme = localStorage.getItem('theme');
-      setIsDarkMode(savedTheme !== 'light');
-    };
-    
-    window.addEventListener('storage', handleThemeChange);
-    document.addEventListener('themeChanged', handleThemeChange as EventListener);
-    
     return () => {
-      window.removeEventListener('storage', handleThemeChange);
-      document.removeEventListener('themeChanged', handleThemeChange as EventListener);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleTabChange = (event: CustomEvent) => {
-      if (event.detail && event.detail.tab) {
-        setIsProfileTab(event.detail.tab === 'profile');
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
       }
     };
-
-    window.addEventListener('tabChanged', handleTabChange as EventListener);
-    
-    return () => {
-      window.removeEventListener('tabChanged', handleTabChange as EventListener);
-    };
   }, []);
 
+  // Listen to music changes
   useEffect(() => {
     if (!audioRef.current) return;
 
-    const musicPath = isProfileTab ? PROFILE_MUSIC : DEFAULT_MUSIC;
+    const musicPath = DEFAULT_MUSIC; // You can add logic for different pages
     
-    if (currentMusic !== musicPath || (isPlaying && audioRef.current.paused)) {
+    if (currentMusic !== musicPath) {
       setCurrentMusic(musicPath);
+      audioRef.current.src = musicPath;
       
-      if (audioRef.current.paused === false) {
-        fadeOutCurrentMusic().then(() => {
-          if (!audioRef.current) return; 
-          
-          audioRef.current.src = musicPath;
-          if (isPlaying) {
-            audioRef.current.play().catch(error => {
-              console.warn('Audio autoplay was prevented:', error);
-            });
-            fadeInMusic();
-          }
-        });
-      } else if (isPlaying) {
-        audioRef.current.src = musicPath;
+      if (isPlaying) {
         audioRef.current.play().catch(error => {
-          console.warn('Audio autoplay was prevented:', error);
+          console.log('Play failed:', error);
         });
-        fadeInMusic();
-      } else {
-        audioRef.current.src = musicPath;
       }
-    } else if (!isPlaying && audioRef.current.paused === false) {
-      fadeOutCurrentMusic().then(() => {
-        if (audioRef.current) {
+    }
+  }, [currentMusic, isPlaying]);
+
+  // Listen to toggle events from Settings
+  useEffect(() => {
+    const handleToggle = (event: Event) => {
+      const customEvent = event as CustomEvent<{ enabled: boolean }>;
+      const enabled = customEvent.detail.enabled;
+      
+      setIsPlaying(enabled);
+      
+      if (audioRef.current) {
+        if (enabled) {
+          audioRef.current.play().catch(error => {
+            console.log('Play failed:', error);
+          });
+        } else {
           audioRef.current.pause();
         }
-      });
-    }
-  }, [isPlaying, currentMusic, isProfileTab]);
-
-  useEffect(() => {
-    const handleMusicToggle = (event: Event) => {
-      const customEvent = event as CustomEvent<{ enabled: boolean }>;
-      const newPlayingState = customEvent.detail.enabled;
-      
-      setIsPlaying(newPlayingState);
-      
-      if (newPlayingState) {
-        if (audioRef.current) {
-          const musicPath = isProfileTab ? PROFILE_MUSIC : DEFAULT_MUSIC;
-          
-          if (currentMusic !== musicPath) {
-            setCurrentMusic(musicPath);
-            audioRef.current.src = musicPath;
-          }
-          
-          audioRef.current.play().catch(error => {
-            console.warn('Audio autoplay was prevented:', error);
-          });
-          fadeInMusic();
-        }
-      } else {
-        if (audioRef.current && !audioRef.current.paused) {
-          fadeOutCurrentMusic().then(() => {
-            if (audioRef.current) {
-              audioRef.current.pause();
-            }
-          });
-        }
       }
     };
 
-    window.addEventListener('toggle-music', handleMusicToggle as EventListener);
+    window.addEventListener('toggle-music', handleToggle as EventListener);
     return () => {
-      window.removeEventListener('toggle-music', handleMusicToggle as EventListener);
+      window.removeEventListener('toggle-music', handleToggle as EventListener);
     };
-  }, [currentMusic, isProfileTab]);
+  }, []);
 
-  const fadeOutCurrentMusic = async (): Promise<void> => {
-    if (!audioRef.current || audioRef.current.paused) return Promise.resolve();
-    
-    if (fadeIntervalRef.current) {
-      clearInterval(fadeIntervalRef.current);
-      fadeIntervalRef.current = null;
+  // Handle mute
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
     }
+  }, [isMuted, volume]);
 
-    const currentVolume = audioRef.current.volume;
-    if (currentVolume <= 0.01) return Promise.resolve();
-    
-    const steps = 20;
-    const interval = 50; 
-    const decrementAmount = currentVolume / steps;
-    
-    return new Promise<void>((resolve) => {
-      let step = 0;
-      
-      fadeIntervalRef.current = setInterval(() => {
-        step++;
-        
-        if (!audioRef.current || step >= steps) {
-          if (fadeIntervalRef.current) {
-            clearInterval(fadeIntervalRef.current);
-            fadeIntervalRef.current = null;
-          }
-          
-          if (audioRef.current) {
-            audioRef.current.volume = 0;
-          }
-          
-          resolve();
-          return;
-        }
-        
-        const newVolume = Math.max(0, currentVolume - (decrementAmount * step));
-        audioRef.current.volume = newVolume;
-      }, interval);
-    });
-  };
-
-  const fadeInMusic = (): void => {
+  const togglePlay = () => {
     if (!audioRef.current) return;
     
-    if (fadeIntervalRef.current) {
-      clearInterval(fadeIntervalRef.current);
-      fadeIntervalRef.current = null;
-    }
+    const newState = !isPlaying;
+    setIsPlaying(newState);
     
-    audioRef.current.volume = 0;
-    if (isMuted) return; 
-    
-    const targetVolume = volume;
-    const steps = 20;
-    const interval = 50; 
-    const incrementAmount = targetVolume / steps;
-    
-    let step = 0;
-    
-    fadeIntervalRef.current = setInterval(() => {
-      step++;
-      
-      if (!audioRef.current || step >= steps) {
-        if (fadeIntervalRef.current) {
-          clearInterval(fadeIntervalRef.current);
-          fadeIntervalRef.current = null;
-        }
-        
-        if (audioRef.current) {
-          audioRef.current.volume = isMuted ? 0 : targetVolume;
-        }
-        
-        return;
-      }
-      
-      const newVolume = incrementAmount * step;
-      audioRef.current.volume = newVolume;
-    }, interval);
-  };
-
-  const togglePlay = (): void => {
-    if (!audioRef.current) return;
-    
-    const newPlayingState = !isPlaying;
-    setIsPlaying(newPlayingState);
-    
-    if (newPlayingState) {
-      const musicPath = isProfileTab ? PROFILE_MUSIC : DEFAULT_MUSIC;
-      
-      if (currentMusic !== musicPath) {
-        setCurrentMusic(musicPath);
-        audioRef.current.src = musicPath;
-      }
-      
+    if (newState) {
       audioRef.current.play().catch(error => {
-        console.warn('Audio autoplay was prevented:', error);
+        console.log('Play failed:', error);
         setIsPlaying(false);
       });
-      
-      fadeInMusic();
     } else {
-      fadeOutCurrentMusic().then(() => {
-        if (audioRef.current) {
-          audioRef.current.pause();
-        }
-      });
+      audioRef.current.pause();
     }
     
-    localStorage.setItem('musicEnabled', newPlayingState.toString());
+    localStorage.setItem('musicEnabled', newState.toString());
+    window.dispatchEvent(new CustomEvent('toggle-music', { detail: { enabled: newState } }));
   };
 
-  const toggleMute = (): void => {
-    if (!audioRef.current) return;
-    
-    const newMutedState = !isMuted;
-    setIsMuted(newMutedState);
-    
-    if (newMutedState) {
-      fadeOutCurrentMusic();
-    } else {
-      fadeInMusic();
-    }
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
   };
 
-  useEffect(() => {
-    setIsVisible(true);
-    
-    if (fadeTimeout) {
-      clearTimeout(fadeTimeout);
-    }
-    
-    const timeout = setTimeout(() => {
-      setIsVisible(false);
-    }, 3000);
-    
-    setFadeTimeout(timeout);
-    
-    return () => {
-      if (fadeTimeout) {
-        clearTimeout(fadeTimeout);
-      }
-    };
-  }, [isPlaying, isMuted]);
-
-  const handleMouseEnter = (): void => {
-    setIsVisible(true);
-    if (fadeTimeout) {
-      clearTimeout(fadeTimeout);
-      setFadeTimeout(null);
-    }
-  };
-
-  const handleMouseLeave = (): void => {
-    const timeout = setTimeout(() => {
-      setIsVisible(false);
-    }, 3000);
-    setFadeTimeout(timeout);
-  };
+  // Only show floating controls on /farcaster or when explicitly enabled
+  if (!isFarcasterPage) {
+    return null; // Invisible player for other pages
+  }
 
   return (
-    <div 
-      className={`fixed bottom-8 right-8 z-40 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0 hover:opacity-100'}`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div className={`${
-        isDarkMode 
-          ? 'bg-slate-900/80 border-cyan-500/20' 
-          : 'bg-white/80 border-cyan-600/20'
-        } backdrop-blur-md rounded-full shadow-lg border p-2 flex items-center`}>
+    <div className="fixed bottom-24 right-4 z-40 md:bottom-8 md:right-8">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-full shadow-lg border border-gray-200 dark:border-cyan-500/20 p-2 flex items-center gap-2">
         <button
           onClick={togglePlay}
-          className={`h-8 w-8 rounded-full flex items-center justify-center ${
+          className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${
             isPlaying 
-              ? isDarkMode
-                ? 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30' 
-                : 'bg-cyan-100 text-cyan-600 hover:bg-cyan-200'
-              : isDarkMode
-                ? 'bg-gray-700 text-gray-400 hover:bg-gray-600'
-                : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
-          } transition-all`}
+              ? 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30' 
+              : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
+          }`}
           aria-label={isPlaying ? 'Pause music' : 'Play music'}
-          title={isPlaying ? 'Pause music' : 'Play music'}
         >
           {isPlaying ? (
             <div className="flex space-x-0.5">
-              <div className={`w-0.5 h-4 ${isDarkMode ? 'bg-cyan-400' : 'bg-cyan-600'} animate-music-bar1`}></div>
-              <div className={`w-0.5 h-3 ${isDarkMode ? 'bg-cyan-400' : 'bg-cyan-600'} animate-music-bar2`}></div>
-              <div className={`w-0.5 h-2 ${isDarkMode ? 'bg-cyan-400' : 'bg-cyan-600'} animate-music-bar3`}></div>
+              <div className="w-0.5 h-4 bg-cyan-400 animate-music-bar1"></div>
+              <div className="w-0.5 h-3 bg-cyan-400 animate-music-bar2"></div>
+              <div className="w-0.5 h-2 bg-cyan-400 animate-music-bar3"></div>
             </div>
           ) : (
-            <FaMusic className="h-4 w-4" />
+            <FaMusic className="h-5 w-5" />
           )}
         </button>
         
         {isPlaying && (
           <button
             onClick={toggleMute}
-            className={`ml-2 h-8 w-8 rounded-full flex items-center justify-center ${
+            className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${
               isMuted 
-                ? isDarkMode
-                  ? 'bg-gray-700 text-gray-400 hover:bg-gray-600' 
-                  : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
-                : isDarkMode
-                  ? 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'
-                  : 'bg-cyan-100 text-cyan-600 hover:bg-cyan-200'
-            } transition-all`}
+                ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400' 
+                : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'
+            }`}
             aria-label={isMuted ? 'Unmute' : 'Mute'}
-            title={isMuted ? 'Unmute' : 'Mute'}
           >
-            {isMuted ? <FaVolumeMute className="h-4 w-4" /> : <FaVolumeUp className="h-4 w-4" />}
+            {isMuted ? <FaVolumeMute className="h-5 w-5" /> : <FaVolumeUp className="h-5 w-5" />}
           </button>
-        )}
-        
-        {isPlaying && !isMuted && (
-          <div className={`text-xs ${isDarkMode ? 'text-cyan-400/70' : 'text-cyan-600/70'}`}>
-          </div>
         )}
       </div>
     </div>

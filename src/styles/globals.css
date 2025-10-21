@@ -1000,3 +1000,62 @@ html {
     #1f2937 75%
   );
 }
+
+/* Safe area support for iOS */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.h-safe-bottom {
+  height: env(safe-area-inset-bottom);
+}
+
+/* Smooth tab transitions */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes music-bar1 {
+  0%, 100% { height: 1rem; }
+  50% { height: 0.5rem; }
+}
+
+@keyframes music-bar2 {
+  0%, 100% { height: 0.75rem; }
+  50% { height: 1rem; }
+}
+
+@keyframes music-bar3 {
+  0%, 100% { height: 0.5rem; }
+  50% { height: 0.75rem; }
+}
+
+.animate-music-bar1 {
+  animation: music-bar1 0.8s ease-in-out infinite;
+}
+
+.animate-music-bar2 {
+  animation: music-bar2 0.8s ease-in-out infinite 0.2s;
+}
+
+.animate-music-bar3 {
+  animation: music-bar3 0.8s ease-in-out infinite 0.4s;
+}

@@ -14,6 +14,8 @@ import { getChainConfig } from "@/utils/constants"
 import { Toaster } from 'react-hot-toast'
 import { SuccessAnimationProvider } from "@/components/SuccessAnimationContext"
 import OnchainProviders from "@/components/providers/OnchainProviders"
+import { FarcasterProvider } from '@/hooks/useFarcasterContext'
+import AudioPlayer from "@/components/AudioPlayer"
 
 const NO_LAYOUT_PATHS = ['/mint', '/farcaster'];
 
@@ -76,7 +78,9 @@ function GMApp({ Component, pageProps }: AppProps) {
           `,
         }}
       />
-     
+
+
+       <FarcasterProvider>
         <OnchainProviders>
           <ThirdwebProvider>
             {mounted && (
@@ -103,6 +107,8 @@ function GMApp({ Component, pageProps }: AppProps) {
               networkInfo={networkInfo}
               scrollToLeaderboard={scrollToLeaderboard}
             /> }
+
+            {mounted && <AudioPlayer showOnFarcaster={true} />}
             
             <main suppressHydrationWarning>
               {shouldRequireWallet ? (
@@ -124,6 +130,7 @@ function GMApp({ Component, pageProps }: AppProps) {
             </main>
           </ThirdwebProvider>
         </OnchainProviders>
+      </FarcasterProvider> 
     </>
   )
 }

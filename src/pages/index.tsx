@@ -16,7 +16,6 @@ import {
 } from 'react-icons/fa';
 import { SUPPORTED_CHAINS, BASE_CHAIN_ID } from '@/utils/constants';
 import { motion, AnimatePresence } from 'framer-motion';
-import AudioPlayer from '@/components/AudioPlayer';
 import { useUserStats, useUserCheckins } from '@/hooks/useSubgraph';
 import { useUserChainStats } from '@/hooks/useUserChainStats';
 import { useUserRanking } from '@/hooks/useUserRangking';
@@ -327,7 +326,6 @@ const CheckinPageIntegration: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800 relative overflow-hidden">
       <BlobPatternBottomLeft />
       <SquigglyPatternTopRight />
-      <AudioPlayer />
       
       <Notification
         isOpen={showSuccessNotification}
@@ -468,9 +466,7 @@ const CheckinPageIntegration: React.FC = () => {
         </div>
       </div>
 
-      {/* ============================================
-          FLOATING SIDEBAR - Right Side
-          ============================================ */}
+      {/* FLOATING SIDEBAR - Right Side */}
       {web3State.isConnected && web3State.address && (
         <>
           {/* Toggle Button - Sticks to right edge */}
