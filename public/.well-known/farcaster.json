@@ -6,7 +6,7 @@
     "homeUrl": "https://gannetx.space/farcaster",
     "imageUrl": "https://gannetx.space/image.png",
     "buttonTitle": "GM",
-    "splashImageUrl": "https://gannetx.space/icon2.png",
+    "splashImageUrl": "https://gannetx.space/icon.png",
     "splashBackgroundColor": "#1A1A2E",
     "webhookUrl": "https://gannetx.space/api/webhook",
     "subtitle": "Your Multichain GM Hub",

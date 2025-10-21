@@ -1,14 +1,12 @@
 // src/pages/farcaster.tsx
 import React, { useState, useCallback } from 'react';
 import { useFarcasterUser } from '@/hooks/useFarcasterContext';
-import { useWalletState } from '@/hooks/useWalletState';
 import FixedMultiChainCheckinGrid from '@/components/MultiChainCheckinGrid';
 import HeroStatsSection from '@/components/HeroStatsSection';
 import ActivityHeatmap from '@/components/ActivityHeatmap';
 import QuestDashboard from '@/components/QuestDashboard';
 import BottomNav, { TabType } from '@/components/BottomNav';
 import Settings from '@/components/Settings';
-import CustomConnectModal from '@/components/CustomConnectModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaUser,
@@ -28,22 +26,26 @@ import Notification from '@/components/Notification';
 import toast from 'react-hot-toast';
 import SidebarReferralCard from '@/components/SidebarReferralCard';
 import LeaderboardView from '@/components/LeaderboardView';
+import { useFarcasterWallet } from '@/hooks/useFarcasterWallet';
 
 type NetworkTabType = 'all' | 'mainnet' | 'testnet';
 
 const FarcasterMiniApp = () => {
   const { user, isLoading: userLoading, isReady } = useFarcasterUser();
-  const { 
-    web3State, 
-    connectWallet: rawConnectWallet, 
+  
+  const {
+    address,
+    provider,
+    signer,
+    chainId,
+    isConnected,
+    isLoading: walletLoading,
+    connectWallet,
     disconnectWallet,
     switchNetwork,
-  } = useWalletState();
+  } = useFarcasterWallet();
 
-  // Tab State
   const [activeTab, setActiveTab] = useState<TabType>('home');
-  
-  // Other States
   const [networkTab, setNetworkTab] = useState<NetworkTabType>('mainnet');
   const [lastTxHash, setLastTxHash] = useState<string | null>(null);
   const [lastCheckinChainId, setLastCheckinChainId] = useState<number | null>(null);
@@ -54,31 +56,29 @@ const FarcasterMiniApp = () => {
     chainId: number;
     chainName: string;
   } | null>(null);
-  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const [isSwitchingChain, setIsSwitchingChain] = useState(false);
 
-  // Subgraph data
-  const { data: userCheckins } = useUserCheckins(web3State.address || undefined, 365);
-  const { data: userStats, loading: userStatsLoading } = useUserStats(web3State.address || undefined);
+  const { data: userCheckins } = useUserCheckins(address || undefined, 365);
+  const { data: userStats, loading: userStatsLoading } = useUserStats(address || undefined);
   const { data: currentChainStats, loading: chainStatsLoading } = useUserChainStats(
-    web3State.chainId || null, 
-    web3State.address || null
+    chainId || null, 
+    address || null
   );
-  const { data: userRanking, loading: rankingLoading } = useUserRanking(web3State.address || null);
+  const { data: userRanking, loading: rankingLoading } = useUserRanking(address || null);
 
-  const currentChainName = web3State.chainId 
-    ? (SUPPORTED_CHAINS[web3State.chainId]?.chainName || 'Unknown') 
+  const currentChainName = chainId 
+    ? (SUPPORTED_CHAINS[chainId]?.chainName || 'Unknown') 
     : 'No Chain';
 
-  // Get avatar URL
-  const getAvatarUrl = (address: string): string => 
-    `https://api.dicebear.com/6.x/identicon/svg?seed=${address}`;
+  const currentChainConfig = chainId && SUPPORTED_CHAINS[chainId] ? SUPPORTED_CHAINS[chainId] : null;
+  const networkInfo = currentChainConfig ? {
+    name: currentChainConfig.chainName,
+    logoUrl: currentChainConfig.logoUrl
+  } : null;
 
-  // Handlers
-  const connectWallet = useCallback(async (): Promise<void> => {
-    await rawConnectWallet();
-  }, [rawConnectWallet]);
+  const getAvatarUrl = (addr: string): string => 
+    `https://api.dicebear.com/6.x/identicon/svg?seed=${addr}`;
 
   const handleCheckinSuccess = useCallback((chainId: number, txHash: string): void => {
     setLastTxHash(txHash);
@@ -97,27 +97,27 @@ const FarcasterMiniApp = () => {
     setShowErrorNotification(true);
   }, []);
 
-  const handleSwitchChain = useCallback(async (chainId: number) => {
+  const handleSwitchChain = useCallback(async (targetChainId: number) => {
     try {
       setIsSwitchingChain(true);
-      await switchNetwork(chainId);
+      await switchNetwork(targetChainId);
     } catch (error) {
       console.error('Failed to switch chain:', error);
+      toast.error('Failed to switch network');
     } finally {
       setIsSwitchingChain(false);
     }
   }, [switchNetwork]);
 
   const handleCopyAddress = useCallback(() => {
-    if (web3State.address) {
-      navigator.clipboard.writeText(web3State.address);
+    if (address) {
+      navigator.clipboard.writeText(address);
       setCopySuccess(true);
       toast.success('Address copied!', { duration: 2000 });
       setTimeout(() => setCopySuccess(false), 2000);
     }
-  }, [web3State.address]);
+  }, [address]);
 
-  // Loading state
   if (userLoading || !isReady) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800 flex items-center justify-center">
@@ -131,20 +131,18 @@ const FarcasterMiniApp = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800">
-      {/* Compact Header - Logo from public folder */}
+      {/* Compact Header */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20 backdrop-blur-md bg-white/90 dark:bg-gray-900/90">
         <div className="px-3 py-3">
           <div className="flex items-center justify-between">
-            {/* Logo */}
             <div className="flex items-center gap-2">
               <img 
                 src="/logo.png" 
                 alt="GannetX Logo" 
-                className="h-14 w-auto object-contain"
+                className="h-10 w-auto object-contain"
               />
             </div>
 
-            {/* Farcaster User Badge */}
             {user && (
               <div className="flex items-center gap-2">
                 {user.pfpUrl ? (
@@ -163,13 +161,6 @@ const FarcasterMiniApp = () => {
           </div>
         </div>
       </div>
-
-      {/* Custom Connect Modal */}
-      <CustomConnectModal
-        isOpen={isConnectModalOpen}
-        onClose={() => setIsConnectModalOpen(false)}
-        connectWallet={connectWallet}
-      />
 
       {/* Notifications */}
       <Notification
@@ -195,7 +186,6 @@ const FarcasterMiniApp = () => {
       <div className="pb-20 md:pb-6">
         <div className="max-w-7xl mx-auto px-3 md:px-4">
           
-          {/* Tab Content */}
           <AnimatePresence mode="wait">
             {/* HOME TAB */}
             {activeTab === 'home' && (
@@ -207,11 +197,11 @@ const FarcasterMiniApp = () => {
                 transition={{ duration: 0.2 }}
                 className="space-y-4 py-4"
               >
-                {web3State.isConnected && (
-                  <QuestDashboard address={web3State.address} />
+                {isConnected && address && (
+                  <QuestDashboard address={address} />
                 )}
 
-                {web3State.isConnected && (
+                {isConnected && (
                   <div className="flex justify-center">
                     <div className="flex bg-white dark:bg-gray-800 px-1.5 py-1 rounded-full shadow-md border border-gray-200 dark:border-gray-700">
                       <button
@@ -259,13 +249,13 @@ const FarcasterMiniApp = () => {
                   </div>
                 )}
 
-                {web3State.isConnected ? (
+                {isConnected ? (
                   <FixedMultiChainCheckinGrid
-                    isConnected={web3State.isConnected}
-                    currentChainId={web3State.chainId}
-                    address={web3State.address}
-                    signer={web3State.signer}
-                    provider={web3State.provider}
+                    isConnected={isConnected}
+                    currentChainId={chainId}
+                    address={address}
+                    signer={signer}
+                    provider={provider}
                     onCheckinSuccess={handleCheckinSuccess}
                     networkType={networkTab}
                     triggerAnimation={animationTrigger}
@@ -279,12 +269,15 @@ const FarcasterMiniApp = () => {
                       <FaWallet className="text-white text-3xl" />
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2">Connect Wallet</h3>
-                    <p className="text-white/80 mb-4 text-sm">Start checking in</p>
+                    <p className="text-white/80 mb-4 text-sm">
+                      {walletLoading ? 'Connecting...' : 'Tap to connect your Farcaster wallet'}
+                    </p>
                     <button
-                      onClick={() => setIsConnectModalOpen(true)}
-                      className="bg-white text-cyan-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg"
+                      onClick={connectWallet}
+                      disabled={walletLoading}
+                      className="bg-white text-cyan-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg disabled:opacity-50"
                     >
-                      Connect
+                      {walletLoading ? 'Connecting...' : 'Connect Wallet'}
                     </button>
                   </motion.div>
                 )}
@@ -302,7 +295,7 @@ const FarcasterMiniApp = () => {
                 className="py-4"
               >
                 <Settings
-                  currentChainId={web3State.chainId}
+                  currentChainId={chainId}
                   onSwitchChain={handleSwitchChain}
                   isSwitchingChain={isSwitchingChain}
                 />
@@ -319,11 +312,11 @@ const FarcasterMiniApp = () => {
                 transition={{ duration: 0.2 }}
                 className="py-4"
               >
-                <LeaderboardView address={web3State.address} />
+                <LeaderboardView address={address} />
               </motion.div>
             )}
             
-            {/* PROFILE TAB - Now includes Stats */}
+            {/* PROFILE TAB */}
             {activeTab === 'profile' && (
               <motion.div
                 key="profile"
@@ -333,14 +326,14 @@ const FarcasterMiniApp = () => {
                 transition={{ duration: 0.2 }}
                 className="space-y-4 py-4"
               >
-                {web3State.isConnected && web3State.address ? ( // ✅ Add explicit check
+                {isConnected && address ? (
                   <>
                     {/* Wallet Info Card */}
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-200 dark:border-gray-700">
                       <div className="flex items-center gap-3 mb-4">
                         <div className="w-16 h-16 rounded-full overflow-hidden ring-4 ring-cyan-400/30">
                           <img 
-                            src={getAvatarUrl(web3State.address)} 
+                            src={getAvatarUrl(address)} 
                             alt="Avatar" 
                             className="w-full h-full"
                           />
@@ -352,7 +345,7 @@ const FarcasterMiniApp = () => {
                             className="flex items-center gap-2 font-mono text-sm bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                           >
                             <span className="text-gray-800 dark:text-gray-200">
-                              {formatAddress(web3State.address)}
+                              {formatAddress(address)}
                             </span>
                             <FaCopy className={`text-xs ${copySuccess ? 'text-green-500' : 'text-gray-400'}`} />
                           </div>
@@ -403,7 +396,7 @@ const FarcasterMiniApp = () => {
                       </div>
 
                       <HeroStatsSection
-                        currentChainId={web3State.chainId || null}
+                        currentChainId={chainId || null}
                         currentChainName={currentChainName}
                         currentChainCheckins={currentChainStats?.totalCheckins || 0}
                         currentChainStreak={currentChainStats?.currentStreak || 0}
@@ -415,7 +408,6 @@ const FarcasterMiniApp = () => {
                         loading={chainStatsLoading || userStatsLoading || rankingLoading}
                       />
 
-                      {/* HEATMAP */}
                       {userStats && userCheckins && (
                         <ActivityHeatmap
                           checkins={userCheckins}
@@ -424,13 +416,12 @@ const FarcasterMiniApp = () => {
                         />
                       )}
 
-                      {/* REFERRAL CARD */}
                       <SidebarReferralCard
                         canUseReferral={true}
                         myReferralsCount={0}
                         userReferredBy={null}
                         onCopyLink={() => {
-                          const referralLink = `${window.location.origin}?ref=${web3State.address}`;
+                          const referralLink = `${window.location.origin}?ref=${address}`;
                           navigator.clipboard.writeText(referralLink);
                           toast.success('Referral link copied!'); 
                         }}
@@ -451,10 +442,11 @@ const FarcasterMiniApp = () => {
                     </div>
                     <p className="text-gray-500 dark:text-gray-400 mb-4">Connect wallet to view profile</p>
                     <button
-                      onClick={() => setIsConnectModalOpen(true)}
-                      className="bg-cyan-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-cyan-600 transition-colors"
+                      onClick={connectWallet}
+                      disabled={walletLoading}
+                      className="bg-cyan-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-cyan-600 transition-colors disabled:opacity-50"
                     >
-                      Connect Wallet
+                      {walletLoading ? 'Connecting...' : 'Connect Wallet'}
                     </button>
                   </div>
                 )}
@@ -464,11 +456,11 @@ const FarcasterMiniApp = () => {
         </div>
       </div>
 
-      {/* Bottom Navigation - Mobile Only */}
+      {/* Bottom Navigation */}
       <BottomNav 
         activeTab={activeTab} 
         onTabChange={setActiveTab}
-        hasNotification={!web3State.isConnected}
+        hasNotification={!isConnected}
       />
     </div>
   );
