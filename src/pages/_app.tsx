@@ -13,7 +13,6 @@ import Navbar from "@/components/Navbar"
 import { getChainConfig } from "@/utils/constants" 
 import { Toaster } from 'react-hot-toast'
 import { SuccessAnimationProvider } from "@/components/SuccessAnimationContext"
-import {FarcasterProvider } from "@/components/providers/FarcasterProvider"
 import OnchainProviders from "@/components/providers/OnchainProviders"
 
 const NO_LAYOUT_PATHS = ['/mint', '/farcaster'];
@@ -78,7 +77,6 @@ function GMApp({ Component, pageProps }: AppProps) {
         }}
       />
      
-      <FarcasterProvider>
         <OnchainProviders>
           <ThirdwebProvider>
             {mounted && (
@@ -126,7 +124,6 @@ function GMApp({ Component, pageProps }: AppProps) {
             </main>
           </ThirdwebProvider>
         </OnchainProviders>
-      </FarcasterProvider>
     </>
   )
 }
