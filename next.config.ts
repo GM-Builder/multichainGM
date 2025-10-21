@@ -41,32 +41,13 @@ const nextConfig = {
   
   async headers() {
     return [
-      // Allow Farcaster to frame /farcaster pages
+      // Allow Farcaster to iframe /farcaster
       {
         source: '/farcaster',
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "frame-ancestors *", // ✅ Allow ALL for testing
-          },
-        ],
-      },
-      {
-        source: '/farcaster/:path*',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: "frame-ancestors *", // ✅ Allow ALL for testing
-          },
-        ],
-      },
-      // Protect other pages
-      {
-        source: '/((?!farcaster).*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            value: "frame-ancestors *",
           },
         ],
       },
@@ -75,19 +56,7 @@ const nextConfig = {
   
   async redirects() {
     return [
-      // Redirect www to non-www
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'www.gannetx.space',
-          },
-        ],
-        destination: 'https://gannetx.space/:path*',
-        permanent: true,
-      },
-      // Farcaster manifest redirect
+      // ONLY farcaster manifest redirect
       {
         source: '/.well-known/farcaster.json',
         destination: 'https://api.farcaster.xyz/miniapps/hosted-manifest/019a04eb-5297-ed7a-811e-77ff01276024',
