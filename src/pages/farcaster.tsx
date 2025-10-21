@@ -2,86 +2,118 @@
 import { useEffect, useState } from 'react';
 
 export default function FarcasterPage() {
-  const [isReady, setIsReady] = useState(false);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
+    let mounted = true;
 
-    const initializeFarcaster = async () => {
+    async function initFarcaster() {
       try {
         console.log('🚀 Initializing Farcaster SDK...');
         
         // Import SDK
         const { default: sdk } = await import('@farcaster/frame-sdk');
+        console.log('✅ SDK imported');
         
-        // Wait for context to be ready
+        // Wait for context
         console.log('⏳ Waiting for context...');
         const context = await sdk.context;
         console.log('✅ Context loaded:', context);
         
         // Small delay to ensure everything is mounted
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 150));
         
-        if (isMounted) {
-          // Signal ready
-          console.log('📢 Signaling ready...');
-          sdk.actions.ready();
-          console.log('✅ Ready signal sent!');
-          setIsReady(true);
+        if (!mounted) {
+          console.log('⚠️ Component unmounted, skipping ready signal');
+          return;
         }
+        
+        // Signal ready
+        console.log('📢 Signaling ready...');
+        sdk.actions.ready();
+        console.log('✅ Ready signal sent!');
+        
+        setStatus('ready');
       } catch (err) {
-        console.error('❌ Error initializing Farcaster:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        console.error('❌ Farcaster init error:', err);
+        if (mounted) {
+          setError(err instanceof Error ? err.message : 'Unknown error');
+          setStatus('error');
+        }
       }
-    };
+    }
 
-    initializeFarcaster();
+    initFarcaster();
 
     return () => {
-      isMounted = false;
+      mounted = false;
     };
   }, []);
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
       justifyContent: 'center',
-      flexDirection: 'column',
       background: '#1A1A2E',
       color: '#fff',
-      padding: '20px'
+      fontFamily: 'system-ui, -apple-system, sans-serif'
     }}>
-      <div style={{ textAlign: 'center', maxWidth: '600px' }}>
-        <h1>🦅 GannetX</h1>
-        <p>Your Multichain GM Hub</p>
+      <div style={{ 
+        textAlign: 'center', 
+        padding: '40px',
+        maxWidth: '500px'
+      }}>
+        <div style={{ fontSize: '60px', marginBottom: '20px' }}>
+          🦅
+        </div>
         
-        {error && (
-          <div style={{ 
-            marginTop: '20px', 
-            padding: '10px', 
-            background: '#ff4444', 
-            borderRadius: '8px' 
+        <h1 style={{ fontSize: '32px', marginBottom: '10px', margin: 0 }}>
+          GannetX
+        </h1>
+        
+        <p style={{ 
+          fontSize: '18px', 
+          color: '#888',
+          marginBottom: '30px',
+          margin: '10px 0 30px 0'
+        }}>
+          Your Multichain GM Hub
+        </p>
+
+        {status === 'loading' && (
+          <div style={{
+            padding: '15px 30px',
+            background: '#333',
+            borderRadius: '12px',
+            fontSize: '16px'
           }}>
-            Error: {error}
+            ⏳ Loading...
           </div>
         )}
-        
-        {isReady ? (
-          <div style={{ 
-            marginTop: '20px', 
-            padding: '10px', 
-            background: '#44ff44', 
-            color: '#000',
-            borderRadius: '8px' 
+
+        {status === 'ready' && (
+          <div style={{
+            padding: '15px 30px',
+            background: '#00AA00',
+            borderRadius: '12px',
+            fontSize: '16px',
+            fontWeight: 'bold'
           }}>
-            ✅ App Ready!
+            ✅ Ready to GM!
           </div>
-        ) : (
-          <div style={{ marginTop: '20px' }}>
-            ⏳ Loading...
+        )}
+
+        {status === 'error' && (
+          <div style={{
+            padding: '15px 30px',
+            background: '#AA0000',
+            borderRadius: '12px',
+            fontSize: '14px'
+          }}>
+            ❌ Error: {error}
           </div>
         )}
       </div>
