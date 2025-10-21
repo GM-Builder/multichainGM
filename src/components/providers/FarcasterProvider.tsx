@@ -1,29 +1,41 @@
+// src/components/providers/FarcasterMiniAppProvider.tsx
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export function FarcasterProvider({ children }: { children: React.ReactNode }) {
+  const [isReady, setIsReady] = useState(false)
+
   useEffect(() => {
-    const initFarcaster = async () => {
+    const initMiniApp = async () => {
       try {
-        // Try frame-sdk first
-        const { sdk } = await import('@farcaster/frame-sdk')
-        sdk.actions.ready()
-        console.log('✅ [frame-sdk] Ready called')
+        console.log('🚀 [MiniApp] Initializing...')
+        
+        // Import SDK sesuai docs
+        const { sdk } = await import('@farcaster/miniapp-sdk')
+        
+        console.log('📦 [MiniApp] SDK imported')
+        
+        // CRITICAL: Wait for app to be fully loaded
+        // Docs says: "After your app is fully loaded and ready to display"
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        console.log('📢 [MiniApp] Calling sdk.actions.ready()...')
+        
+        // Call ready() - note: docs show it CAN be awaited
+        await sdk.actions.ready()
+        
+        console.log('✅ [MiniApp] Ready called successfully!')
+        setIsReady(true)
       } catch (err) {
-        console.warn('frame-sdk failed, trying miniapp-sdk...', err)
-        try {
-          // Fallback to miniapp-sdk
-          const { sdk } = await import('@farcaster/miniapp-sdk')
-          sdk.actions.ready()
-          console.log('✅ [miniapp-sdk] Ready called')
-        } catch (err2) {
-          console.error('❌ Both SDKs failed:', err2)
-        }
+        console.error('❌ [MiniApp] Error:', err)
+        // Even on error, set ready to prevent infinite loading
+        setIsReady(true)
       }
     }
-    
-    initFarcaster()
+
+    initMiniApp()
   }, [])
 
+  // Don't block rendering, provider is transparent
   return <>{children}</>
 }
