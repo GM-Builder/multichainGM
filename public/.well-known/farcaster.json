@@ -18,7 +18,10 @@
       "community",
       "check-ins"
     ],
-    "tagline": "track your onchian activity"
+    "heroImageUrl": "https://gannetx.space/",
+    "tagline": "track your onchian activity",
+    "ogTitle": "GannetX - Multichain GM Hub",
+    "ogImageUrl": "https://gannetx.space/image.png"
   },
   "accountAssociation": {
     "header": "eyJmaWQiOjM5MDUyMSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDQyYjM1RDc2MWRmNWE1NTQ4Nzc1OGZGMEQ3MjM3NzEzNTg4NjI3MzcifQ",
