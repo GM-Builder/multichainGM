@@ -261,7 +261,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/ink.png",
     status: "Ready!",
     isTestnet: false,
-    abi: GMTestnetABI, 
+    abi: GMMainnetABI, 
   },
 
 };

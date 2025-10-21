@@ -25,7 +25,7 @@ import {
   getChainAbi,
 } from '@/utils/constants';
 import ChainLogo from '@/components/ChainLogo';
-import { parseEther } from 'viem';
+import { parseEther, createPublicClient, http } from 'viem';
 import type { WalletClient, PublicClient } from 'viem';
 import toast from 'react-hot-toast';
 import SuccessAnimation from '@/components/SuccessAnimation';
@@ -362,115 +362,163 @@ const FarcasterMultiChainCheckinGrid: React.FC<FarcasterMultiChainCheckinGridPro
     }
   };
 
-  const handleCheckin = async (chainId: number): Promise<void> => {
+
+    const handleCheckin = async (chainId: number): Promise<void> => {
     if (!isConnected || !walletClient || !address || processingChainId !== null) {
-      return;
+        return;
     }
     
     setProcessingChainId(chainId);
     const toastId = toast.loading('Preparing transaction...');
 
     try {
-      // Switch chain if needed
-      if (currentChainId !== chainId) {
+        const chainConfig = SUPPORTED_CHAINS[chainId];
+        if (!chainConfig) {
+        throw new Error('Chain configuration not found');
+        }
+
+        const viemChain = {
+        id: chainId,
+        name: chainConfig.chainName,
+        network: chainConfig.chainName.toLowerCase().replace(/\s+/g, '-'),
+        nativeCurrency: chainConfig.nativeCurrency,
+        rpcUrls: {
+            default: { http: chainConfig.rpcUrls },
+            public: { http: chainConfig.rpcUrls },
+        },
+        blockExplorers: chainConfig.blockExplorerUrls ? {
+            default: { 
+            name: 'Explorer', 
+            url: chainConfig.blockExplorerUrls[0] 
+            },
+        } : undefined,
+        };
+
+        if (currentChainId !== chainId) {
         setNetworkSwitchingChainId(chainId);
         toast.loading('Switching network...', { id: toastId });
         
-        await walletClient.switchChain({ id: chainId });
-        
-        toast.dismiss(toastId);
-        await delay(1000);
-      }
-      
-      const contractAddress = getContractAddress(chainId);
-      if (!contractAddress) {
-        throw new Error('Contract not deployed on this chain');
-      }
-
-      toast.loading('Waiting for confirmation...', { id: toastId });
-
-      // Get current tax
-      let currentTax = parseEther(CHECKIN_FEE);
-      if (publicClient) {
         try {
-          const metrics = await publicClient.readContract({
+            await walletClient.switchChain({ id: chainId });
+        } catch (switchError: any) {
+            if (switchError.code === 4902 || switchError.message?.includes('Unrecognized chain')) {
+            toast.loading('Adding network...', { id: toastId });
+            
+            await walletClient.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                chainId: `0x${chainId.toString(16)}`,
+                chainName: chainConfig.chainName,
+                nativeCurrency: chainConfig.nativeCurrency,
+                rpcUrls: chainConfig.rpcUrls,
+                blockExplorerUrls: chainConfig.blockExplorerUrls || [],
+                }],
+            });
+            } else {
+            throw switchError;
+            }
+        }
+        
+        await delay(1500); 
+        }
+        
+        const contractAddress = getContractAddress(chainId);
+        if (!contractAddress) {
+        throw new Error('Contract not deployed on this chain');
+        }
+
+        toast.loading('Waiting for confirmation...', { id: toastId });
+
+        let currentTax = parseEther(CHECKIN_FEE);
+        if (publicClient) {
+        try {
+            const metrics = await publicClient.readContract({
             address: contractAddress as `0x${string}`,
             abi: CHECKIN_ABI,
             functionName: 'getSystemMetrics',
-          }) as [bigint, bigint, bigint];
-          
-          currentTax = metrics[2];
+            }) as [bigint, bigint, bigint];
+            
+            currentTax = metrics[2];
         } catch (error) {
-          console.warn('Could not get current tax, using default');
+            console.warn('Could not get current tax, using default');
         }
-      }
+        }
 
-      // Send check-in transaction
-      const hash = await walletClient.writeContract({
+        const hash = await walletClient.writeContract({
         address: contractAddress as `0x${string}`,
         abi: CHECKIN_ABI,
         functionName: 'activateBeacon',
         value: currentTax,
-        chain: walletClient.chain,
+        chain: viemChain, 
         account: address,
-      });
+        });
 
-      setSuccessChainId(chainId);
+        setSuccessChainId(chainId);
 
-      if (onCheckinSuccess) {
+        if (onCheckinSuccess) {
         onCheckinSuccess(chainId, hash);
-      }
-      
-      toast.loading('Transaction sent, waiting for confirmation...', { id: toastId });
+        }
+        
+        toast.loading('Transaction sent, waiting for confirmation...', { id: toastId });
 
-      // Wait for transaction
-      if (publicClient) {
-        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+        if (publicClient) {
+        const receipt = await publicClient.waitForTransactionReceipt({ 
+            hash,
+            timeout: 120_000, 
+        });
         
         if (receipt.status === 'success') {
-          toast.success('GM Sent successfully!', {
+            toast.success('GM Sent successfully!', {
             id: toastId, 
             duration: 5000,
-          });
-          
-          // Update status
-          setChainStatusMap(prev => ({
+            });
+            
+            setChainStatusMap(prev => ({
             ...prev,
             [chainId]: {
-              ...prev[chainId],
-              canCheckin: false,
-              lastCheckin: Math.floor(Date.now() / 1000),
-              timeUntilNextCheckin: 86400,
+                ...prev[chainId],
+                canCheckin: false,
+                lastCheckin: Math.floor(Date.now() / 1000),
+                timeUntilNextCheckin: 86400,
             }
-          }));
+            }));
         } else {
-          throw new Error('Transaction failed');
+            throw new Error('Transaction failed');
         }
-      }
+        } else {
+        toast.success('Transaction sent!', {
+            id: toastId, 
+            duration: 5000,
+        });
+        }
 
     } catch (error: any) {
-      console.error("Failed to perform checkin:", error);
+        console.error("Failed to perform checkin:", error);
 
-      let friendlyMessage = "An unknown error occurred. Please try again.";
+        let friendlyMessage = "An unknown error occurred. Please try again.";
 
-      if (error.message?.includes('User rejected') || error.message?.includes('rejected')) {
+        if (error.message?.includes('User rejected') || error.message?.includes('rejected')) {
         friendlyMessage = "Transaction Rejected: You cancelled the request in your wallet.";
-      } else if (error.message?.includes('insufficient funds')) {
+        } else if (error.message?.includes('insufficient funds')) {
         friendlyMessage = "Insufficient Funds: You don't have enough balance for the transaction fee.";
-      } else if (error.message) {
+        } else if (error.code === 4902) {
+        friendlyMessage = "Network not added to wallet. Please add it manually.";
+        } else if (error.message?.includes('Unknown provider')) {
+        friendlyMessage = "RPC Error: Network connection issue. Please try again.";
+        } else if (error.message) {
         friendlyMessage = error.message;
-      }
-      
-      toast.error(friendlyMessage, {
+        }
+        
+        toast.error(friendlyMessage, {
         id: toastId,
         duration: 6000,
-      });
-      
+        });
+        
     } finally {
-      setProcessingChainId(null);
-      setNetworkSwitchingChainId(null);
+        setProcessingChainId(null);
+        setNetworkSwitchingChainId(null);
     }
-  };
+    };
 
   const formatTime = (seconds: number): string => {
     if (seconds <= 0) return "Available";
