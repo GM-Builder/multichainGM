@@ -6,7 +6,7 @@
     "homeUrl": "https://gannetx.space/farcaster",
     "imageUrl": "https://gannetx.space/image.png",
     "buttonTitle": "GM",
-    "splashImageUrl": "https://gannetx.space/s.png",
+    "splashImageUrl": "https://gannetx.space/icon2.png",
     "splashBackgroundColor": "#1A1A2E",
     "webhookUrl": "https://gannetx.space/api/webhook",
     "subtitle": "Your Multichain GM Hub",
@@ -18,7 +18,7 @@
       "community",
       "check-ins"
     ],
-    "heroImageUrl": "https://gannetx.space/",
+    "heroImageUrl": "https://gannetx.space/image.png",
     "tagline": "track your onchian activity",
     "ogTitle": "GannetX - Multichain GM Hub",
     "ogImageUrl": "https://gannetx.space/image.png"
