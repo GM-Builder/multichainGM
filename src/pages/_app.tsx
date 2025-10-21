@@ -16,7 +16,7 @@ import { SuccessAnimationProvider } from "@/components/SuccessAnimationContext"
 import FarcasterProvider from "@/components/providers/FarcasterProvider"
 import OnchainProviders from "@/components/providers/OnchainProviders"
 
-const NO_LAYOUT_PATHS = ['/mint'];
+const NO_LAYOUT_PATHS = ['/mint', '/farcaster'];
 
 function GMApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -26,10 +26,42 @@ function GMApp({ Component, pageProps }: AppProps) {
   const leaderboardRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
   
-  // Fix hydration dengan useEffect
+  // Fix hydration
   useEffect(() => {
     setMounted(true)
   }, [])
+  
+  // Farcaster Mini-App Detection & Ready Signal
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const isMiniApp = 
+      url.pathname === '/farcaster' ||
+      url.searchParams.get('miniApp') === 'true'
+    
+    if (isMiniApp) {
+      console.log('🎯 Mini-App detected, initializing SDK...')
+      
+      import('@farcaster/frame-sdk').then(({ default: sdk }) => {
+        console.log('📦 SDK imported')
+        
+        // Wait for context then signal ready
+        sdk.context.then((context) => {
+          console.log('✅ Context ready:', context)
+          
+          // Small delay to ensure everything is mounted
+          setTimeout(() => {
+            console.log('📢 Calling sdk.actions.ready()...')
+            sdk.actions.ready()
+            console.log('✅ Ready signal sent!')
+          }, 200)
+        }).catch((err) => {
+          console.error('❌ Context error:', err)
+        })
+      }).catch((err) => {
+        console.error('❌ SDK import error:', err)
+      })
+    }
+  }, [router.pathname])
   
   const scrollToLeaderboard = useCallback(() => {
     leaderboardRef.current?.scrollIntoView({ 
@@ -50,7 +82,8 @@ function GMApp({ Component, pageProps }: AppProps) {
   
   const shouldRequireWallet = !router.pathname.includes("/auth") && 
                              !router.pathname.includes("/landing") && 
-                             !router.pathname.includes("/mint")
+                             !router.pathname.includes("/mint") &&
+                             !router.pathname.includes("/farcaster")
   
   return (
     <>
@@ -87,7 +120,6 @@ function GMApp({ Component, pageProps }: AppProps) {
       <FarcasterProvider>
         <OnchainProviders>
           <ThirdwebProvider>
-            {/* Render Toaster hanya setelah mounted */}
             {mounted && (
               <Toaster
                 position="top-center"
