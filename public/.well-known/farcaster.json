@@ -11,10 +11,12 @@
     "description": "The ultimate multi-chain GM hub. Track your daily Web3 check-ins, build streaks, visualize on personalized heatmaps, and climb the leaderboard.",
     "primaryCategory": "social",
     "tags": [
+      "gm",
       "social",
-      "check-ins",
-      "gm"
-    ]
+      "community",
+      "check-ins"
+    ],
+    "tagline": "track your onchain activity"
   },
   "accountAssociation": {
     "header": "eyJmaWQiOjM5MDUyMSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDQyYjM1RDc2MWRmNWE1NTQ4Nzc1OGZGMEQ3MjM3NzEzNTg4NjI3MzcifQ",
