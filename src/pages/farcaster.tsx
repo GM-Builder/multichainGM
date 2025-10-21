@@ -1,19 +1,19 @@
 // src/pages/farcaster.tsx
 import React, { useState, useCallback } from 'react';
 import { useFarcasterUser } from '@/hooks/useFarcasterContext';
-import FixedMultiChainCheckinGrid from '@/components/MultiChainCheckinGrid';
+import { useFarcasterWallet } from '@/hooks/useFarcasterWallet';
+import FarcasterMultiChainCheckinGrid from '@/components/FarcasterMultichainCheckinGrid';
 import HeroStatsSection from '@/components/HeroStatsSection';
 import ActivityHeatmap from '@/components/ActivityHeatmap';
 import QuestDashboard from '@/components/QuestDashboard';
 import BottomNav, { TabType } from '@/components/BottomNav';
 import Settings from '@/components/Settings';
+import LeaderboardView from '@/components/LeaderboardView';
+import SidebarReferralCard from '@/components/SidebarReferralCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaUser,
   FaWallet,
-  FaLayerGroup,
-  FaGlobe,
-  FaFlask,
   FaCopy,
   FaSignOutAlt,
 } from 'react-icons/fa';
@@ -24,9 +24,6 @@ import { SUPPORTED_CHAINS } from '@/utils/constants';
 import { formatAddress } from '@/utils/web3';
 import Notification from '@/components/Notification';
 import toast from 'react-hot-toast';
-import SidebarReferralCard from '@/components/SidebarReferralCard';
-import LeaderboardView from '@/components/LeaderboardView';
-import { useFarcasterWallet } from '@/hooks/useFarcasterWallet';
 
 type NetworkTabType = 'all' | 'mainnet' | 'testnet';
 
@@ -35,14 +32,15 @@ const FarcasterMiniApp = () => {
   
   const {
     address,
-    provider,
-    signer,
+    walletClient,
+    publicClient,
     chainId,
     isConnected,
     isLoading: walletLoading,
     connectWallet,
     disconnectWallet,
     switchNetwork,
+    error: walletError,
   } = useFarcasterWallet();
 
   const [activeTab, setActiveTab] = useState<TabType>('home');
@@ -71,12 +69,6 @@ const FarcasterMiniApp = () => {
     ? (SUPPORTED_CHAINS[chainId]?.chainName || 'Unknown') 
     : 'No Chain';
 
-  const currentChainConfig = chainId && SUPPORTED_CHAINS[chainId] ? SUPPORTED_CHAINS[chainId] : null;
-  const networkInfo = currentChainConfig ? {
-    name: currentChainConfig.chainName,
-    logoUrl: currentChainConfig.logoUrl
-  } : null;
-
   const getAvatarUrl = (addr: string): string => 
     `https://api.dicebear.com/6.x/identicon/svg?seed=${addr}`;
 
@@ -90,11 +82,6 @@ const FarcasterMiniApp = () => {
       chainId: chainId,
       chainName: chainConfig?.chainName || 'Unknown Chain',
     });
-  }, []);
-
-  const handleError = useCallback((errorMessage: string): void => {
-    setError(errorMessage);
-    setShowErrorNotification(true);
   }, []);
 
   const handleSwitchChain = useCallback(async (targetChainId: number) => {
@@ -131,17 +118,15 @@ const FarcasterMiniApp = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800">
-      {/* Compact Header */}
+      {/* Header */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20 backdrop-blur-md bg-white/90 dark:bg-gray-900/90">
         <div className="px-3 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <img 
-                src="/logo.png" 
-                alt="GannetX Logo" 
-                className="h-10 w-auto object-contain"
-              />
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="GannetX Logo" 
+              className="h-10 w-auto object-contain"
+            />
 
             {user && (
               <div className="flex items-center gap-2">
@@ -185,7 +170,46 @@ const FarcasterMiniApp = () => {
       {/* Main Content */}
       <div className="pb-20 md:pb-6">
         <div className="max-w-7xl mx-auto px-3 md:px-4">
-          
+
+          {isConnected && (
+            <div className="flex justify-center">
+              <div className="flex bg-white dark:bg-gray-800 px-1.5 py-1 rounded-full shadow-md border border-gray-200 dark:border-gray-700 gap-1">
+                <button
+                  onClick={() => setNetworkTab('all')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
+                    networkTab === 'all' 
+                      ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
+                      : 'text-gray-600 dark:text-gray-400'
+                  }`}
+                >
+                  All
+                </button>
+                
+                <button
+                  onClick={() => setNetworkTab('mainnet')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
+                    networkTab === 'mainnet' 
+                      ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
+                      : 'text-gray-600 dark:text-gray-400'
+                  }`}
+                >
+                  Mainnet
+                </button>
+                
+                <button
+                  onClick={() => setNetworkTab('testnet')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
+                    networkTab === 'testnet' 
+                      ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
+                      : 'text-gray-600 dark:text-gray-400'
+                  }`}
+                >
+                  Testnet
+                </button>
+              </div>
+            </div>
+          )}
+                    
           <AnimatePresence mode="wait">
             {/* HOME TAB */}
             {activeTab === 'home' && (
@@ -201,88 +225,40 @@ const FarcasterMiniApp = () => {
                   <QuestDashboard address={address} />
                 )}
 
-                {isConnected && (
-                  <div className="flex justify-center">
-                    <div className="flex bg-white dark:bg-gray-800 px-1.5 py-1 rounded-full shadow-md border border-gray-200 dark:border-gray-700">
-                      <button
-                        onClick={() => setNetworkTab('all')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
-                          networkTab === 'all' 
-                            ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
-                            : 'text-gray-600 dark:text-gray-400'
-                        }`}
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <FaLayerGroup className="text-[10px]" />
-                          <span>All</span>
-                        </div>
-                      </button>
-                      
-                      <button
-                        onClick={() => setNetworkTab('mainnet')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
-                          networkTab === 'mainnet' 
-                            ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
-                            : 'text-gray-600 dark:text-gray-400'
-                        }`}
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <FaGlobe className="text-[10px]" />
-                          <span>Mainnet</span>
-                        </div>
-                      </button>
-                      
-                      <button
-                        onClick={() => setNetworkTab('testnet')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
-                          networkTab === 'testnet' 
-                            ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
-                            : 'text-gray-600 dark:text-gray-400'
-                        }`}
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <FaFlask className="text-[10px]" />
-                          <span>Testnet</span>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                )}
-
                 {isConnected ? (
-                <FixedMultiChainCheckinGrid
-                  isConnected={isConnected}
-                  currentChainId={chainId}
-                  address={address}
-                  signer={signer}
-                  provider={provider}
-                  onCheckinSuccess={handleCheckinSuccess}
-                  networkType={networkTab}
-                  triggerAnimation={animationTrigger}
-                  onAnimationComplete={() => setAnimationTrigger(null)}
-                />
-              ) : walletLoading ? (
-                <motion.div className="bg-white dark:bg-gray-800 rounded-xl p-8 text-center shadow-lg border border-gray-200 dark:border-gray-700">
-                  <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-gray-600 dark:text-gray-400">Connecting to Farcaster wallet...</p>
-                </motion.div>
-              ) : (
-                <motion.div className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl p-6 text-center shadow-lg">
-                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FaWallet className="text-white text-3xl" />
+                  <FarcasterMultiChainCheckinGrid
+                    isConnected={isConnected}
+                    currentChainId={chainId}
+                    address={address}
+                    walletClient={walletClient}
+                    publicClient={publicClient}
+                    onCheckinSuccess={handleCheckinSuccess}
+                    networkType={networkTab}
+                    triggerAnimation={animationTrigger}
+                    onAnimationComplete={() => setAnimationTrigger(null)}
+                  />
+                ) : walletLoading ? (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-8 text-center shadow-lg border border-gray-200 dark:border-gray-700">
+                    <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600 dark:text-gray-400">Connecting wallet...</p>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Connect Wallet</h3>
-                  <p className="text-white/80 mb-4 text-sm">
-                    Tap to connect your Farcaster wallet
-                  </p>
-                  <button
-                    onClick={connectWallet}
-                    className="bg-white text-cyan-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg"
-                  >
-                    Connect Wallet
-                  </button>
-                </motion.div>
-              )}
+                ) : (
+                  <motion.div className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl p-6 text-center shadow-lg">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FaWallet className="text-white text-3xl" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Connect Wallet</h3>
+                    <p className="text-white/80 mb-4 text-sm">
+                      {walletError || 'Tap to connect your Farcaster wallet'}
+                    </p>
+                    <button
+                      onClick={connectWallet}
+                      className="bg-white text-cyan-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg"
+                    >
+                      Connect Wallet
+                    </button>
+                  </motion.div>
+                )}
               </motion.div>
             )}
 
@@ -410,6 +386,7 @@ const FarcasterMiniApp = () => {
                         loading={chainStatsLoading || userStatsLoading || rankingLoading}
                       />
 
+                      {/* HEATMAP */}
                       {userStats && userCheckins && (
                         <ActivityHeatmap
                           checkins={userCheckins}
@@ -418,6 +395,7 @@ const FarcasterMiniApp = () => {
                         />
                       )}
 
+                      {/* REFERRAL CARD */}
                       <SidebarReferralCard
                         canUseReferral={true}
                         myReferralsCount={0}
@@ -425,13 +403,13 @@ const FarcasterMiniApp = () => {
                         onCopyLink={() => {
                           const referralLink = `${window.location.origin}?ref=${address}`;
                           navigator.clipboard.writeText(referralLink);
-                          toast.success('Referral link copied!'); 
+                          toast.success('Referral link copied!');
                         }}
                         onCardClick={() => {
-                          toast('Referral dashboard coming soon!'); 
+                          toast('Referral dashboard coming soon!');
                         }}
                         onSwitchToBase={() => {
-                          handleSwitchChain(8453); 
+                          handleSwitchChain(8453);
                         }}
                         formatAddress={formatAddress}
                       />
@@ -445,10 +423,9 @@ const FarcasterMiniApp = () => {
                     <p className="text-gray-500 dark:text-gray-400 mb-4">Connect wallet to view profile</p>
                     <button
                       onClick={connectWallet}
-                      disabled={walletLoading}
-                      className="bg-cyan-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-cyan-600 transition-colors disabled:opacity-50"
+                      className="bg-cyan-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-cyan-600 transition-colors"
                     >
-                      {walletLoading ? 'Connecting...' : 'Connect Wallet'}
+                      Connect Wallet
                     </button>
                   </div>
                 )}
