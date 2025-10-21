@@ -24,7 +24,7 @@ export default function FarcasterPage() {
         
         // Wait for DOM to be fully ready
         addLog('⏳ [FarcasterPage] Waiting 1000ms for stability...');
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 5000));
         
         // Call ready
         addLog('📢 [FarcasterPage] Calling sdk.actions.ready()...');
