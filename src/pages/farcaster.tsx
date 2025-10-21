@@ -250,37 +250,39 @@ const FarcasterMiniApp = () => {
                 )}
 
                 {isConnected ? (
-                  <FixedMultiChainCheckinGrid
-                    isConnected={isConnected}
-                    currentChainId={chainId}
-                    address={address}
-                    signer={signer}
-                    provider={provider}
-                    onCheckinSuccess={handleCheckinSuccess}
-                    networkType={networkTab}
-                    triggerAnimation={animationTrigger}
-                    onAnimationComplete={() => setAnimationTrigger(null)}
-                  />
-                ) : (
-                  <motion.div
-                    className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl p-6 text-center shadow-lg"
+                <FixedMultiChainCheckinGrid
+                  isConnected={isConnected}
+                  currentChainId={chainId}
+                  address={address}
+                  signer={signer}
+                  provider={provider}
+                  onCheckinSuccess={handleCheckinSuccess}
+                  networkType={networkTab}
+                  triggerAnimation={animationTrigger}
+                  onAnimationComplete={() => setAnimationTrigger(null)}
+                />
+              ) : walletLoading ? (
+                <motion.div className="bg-white dark:bg-gray-800 rounded-xl p-8 text-center shadow-lg border border-gray-200 dark:border-gray-700">
+                  <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-gray-600 dark:text-gray-400">Connecting to Farcaster wallet...</p>
+                </motion.div>
+              ) : (
+                <motion.div className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl p-6 text-center shadow-lg">
+                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FaWallet className="text-white text-3xl" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Connect Wallet</h3>
+                  <p className="text-white/80 mb-4 text-sm">
+                    Tap to connect your Farcaster wallet
+                  </p>
+                  <button
+                    onClick={connectWallet}
+                    className="bg-white text-cyan-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg"
                   >
-                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <FaWallet className="text-white text-3xl" />
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-2">Connect Wallet</h3>
-                    <p className="text-white/80 mb-4 text-sm">
-                      {walletLoading ? 'Connecting...' : 'Tap to connect your Farcaster wallet'}
-                    </p>
-                    <button
-                      onClick={connectWallet}
-                      disabled={walletLoading}
-                      className="bg-white text-cyan-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg disabled:opacity-50"
-                    >
-                      {walletLoading ? 'Connecting...' : 'Connect Wallet'}
-                    </button>
-                  </motion.div>
-                )}
+                    Connect Wallet
+                  </button>
+                </motion.div>
+              )}
               </motion.div>
             )}
 
