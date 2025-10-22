@@ -22,7 +22,9 @@ const NO_LAYOUT_PATHS = ['/mint', '/farcaster'];
 
 function GMApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
-  const { web3State, connectWallet, disconnectWallet, switchNetwork, isMiniApp } = useWalletState()
+  const isFarcasterPage = router.pathname === '/farcaster'
+  
+  const { web3State, connectWallet, disconnectWallet, switchNetwork } = useWalletState()
   const { address, isConnected, isLoading: isWalletConnecting, chainId } = web3State
   const leaderboardRef = useRef<HTMLDivElement>(null)
   
@@ -32,7 +34,7 @@ function GMApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     setMounted(true)
 
-    if (router.pathname === '/farcaster') {
+    if (isFarcasterPage) {
       import('@farcaster/miniapp-sdk').then(({ sdk }) => {
         console.log('🎯 Calling sdk.actions.ready()...');
         sdk.actions.ready().then(() => {
@@ -46,7 +48,7 @@ function GMApp({ Component, pageProps }: AppProps) {
     } else {
       setSdkReady(true);
     }
-  }, [router.pathname])
+  }, [isFarcasterPage])
 
   const scrollToLeaderboard = useCallback(() => {
     leaderboardRef.current?.scrollIntoView({ 
@@ -79,12 +81,14 @@ function GMApp({ Component, pageProps }: AppProps) {
                              !router.pathname.includes("/mint") &&
                              !router.pathname.includes("/farcaster")
 
-  if (!mounted || !sdkReady) {
+  if (!mounted || (isFarcasterPage && !sdkReady)) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {isFarcasterPage ? 'Initializing Farcaster...' : 'Loading...'}
+          </p>
         </div>
       </div>
     );
@@ -117,8 +121,8 @@ function GMApp({ Component, pageProps }: AppProps) {
       />
 
       <FarcasterProvider>
-        <OnchainProviders>
-          <ThirdwebProvider>
+        {isFarcasterPage ? (
+          <OnchainProviders>
             <Toaster
               position="top-center"
               reverseOrder={false}
@@ -133,42 +137,68 @@ function GMApp({ Component, pageProps }: AppProps) {
               }}
             />
             
-            {showLayout && !isMiniApp && (
-              <Navbar 
-                address={address}
-                connectWallet={adaptedConnectWallet}
-                disconnectWallet={disconnectWallet}
-                isConnecting={isWalletConnecting}
-                networkInfo={networkInfo}
-                scrollToLeaderboard={scrollToLeaderboard}
-                currentChainId={chainId}
-                onSwitchChain={handleSwitchChain}
-              />
-            )}
-
             <AudioPlayer showOnFarcaster={true} />
             
             <main suppressHydrationWarning>
-              {shouldRequireWallet && !isMiniApp ? (
-                <WalletRequired
-                  isConnected={isConnected}
+              <SuccessAnimationProvider>
+                <Component {...pageProps} leaderboardRef={leaderboardRef} />
+              </SuccessAnimationProvider>
+            </main>
+          </OnchainProviders>
+        ) : (
+          <OnchainProviders>
+            <ThirdwebProvider>
+              <Toaster
+                position="top-center"
+                reverseOrder={false}
+                toastOptions={{
+                  className: 'custom-toast',
+                  style: {
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    color: '#1f2937',
+                    backdropFilter: 'blur(8px)',
+                  },
+                  duration: 5000,
+                }}
+              />
+              
+              {showLayout && (
+                <Navbar 
+                  address={address}
                   connectWallet={adaptedConnectWallet}
+                  disconnectWallet={disconnectWallet}
                   isConnecting={isWalletConnecting}
-                >
+                  networkInfo={networkInfo}
+                  scrollToLeaderboard={scrollToLeaderboard}
+                  currentChainId={chainId}
+                  onSwitchChain={handleSwitchChain}
+                />
+              )}
+
+              <AudioPlayer showOnFarcaster={false} />
+              
+              <main suppressHydrationWarning>
+                {shouldRequireWallet ? (
+                  <WalletRequired
+                    isConnected={isConnected}
+                    connectWallet={adaptedConnectWallet}
+                    isConnecting={isWalletConnecting}
+                  >
+                    <SuccessAnimationProvider>
+                      <Component {...pageProps} leaderboardRef={leaderboardRef} />
+                    </SuccessAnimationProvider>
+                  </WalletRequired>  
+                ) : (
                   <SuccessAnimationProvider>
                     <Component {...pageProps} leaderboardRef={leaderboardRef} />
                   </SuccessAnimationProvider>
-                </WalletRequired>  
-              ) : (
-                <SuccessAnimationProvider>
-                  <Component {...pageProps} leaderboardRef={leaderboardRef} />
-                </SuccessAnimationProvider>
-              )}
-              
-              {showLayout && !isMiniApp && <Footer />}
-            </main>
-          </ThirdwebProvider>
-        </OnchainProviders>
+                )}
+                
+                {showLayout && <Footer />}
+              </main>
+            </ThirdwebProvider>
+          </OnchainProviders>
+        )}
       </FarcasterProvider> 
     </>
   )

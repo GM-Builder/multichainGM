@@ -1,6 +1,6 @@
 // src/hooks/useFarcasterWallet.ts
 import { useState, useEffect, useCallback } from 'react';
-import sdk from '@farcaster/frame-sdk';
+import sdk from '@farcaster/miniapp-sdk';
 import { ethers } from 'ethers';
 
 interface FarcasterWalletState {

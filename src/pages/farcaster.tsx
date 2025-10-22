@@ -1,15 +1,14 @@
-// src/pages/farcaster.tsx
 import React, { useState, useCallback, useEffect } from 'react';
-import { WagmiProvider, useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
+import { WagmiProvider, useAccount, useConnect, useDisconnect } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { wagmiConfig } from '@/config/wagmi';
 import { useFarcasterUser } from '@/hooks/useFarcasterContext';
+import { sdk } from '@farcaster/miniapp-sdk';
 import FixedMultiChainCheckinGrid from '@/components/MultiChainCheckinGrid';
 import HeroStatsSection from '@/components/HeroStatsSection';
 import ActivityHeatmap from '@/components/ActivityHeatmap';
 import QuestDashboard from '@/components/QuestDashboard';
 import BottomNav, { TabType } from '@/components/BottomNav';
-import Settings from '@/components/Settings';
 import LeaderboardView from '@/components/LeaderboardView';
 import SidebarReferralCard from '@/components/SidebarReferralCard';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,9 +16,6 @@ import { ethers } from 'ethers';
 import { 
   FaUser,
   FaWallet,
-  FaLayerGroup,
-  FaGlobe,
-  FaFlask,
   FaCopy,
   FaSignOutAlt,
   FaExclamationCircle,
@@ -42,10 +38,8 @@ const FarcasterMiniAppContent = () => {
   const { address, isConnected, chainId: wagmiChainId } = useAccount();
   const { connect, connectors, isPending: isConnecting } = useConnect();
   const { disconnect } = useDisconnect();
-  const { switchChain } = useSwitchChain();
 
   const [activeTab, setActiveTab] = useState<TabType>('home');
-  const [networkTab, setNetworkTab] = useState<NetworkTabType>('mainnet');
   const [lastTxHash, setLastTxHash] = useState<string | null>(null);
   const [lastCheckinChainId, setLastCheckinChainId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +50,6 @@ const FarcasterMiniAppContent = () => {
     chainName: string;
   } | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
-  const [isSwitchingChain, setIsSwitchingChain] = useState(false);
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer | null>(null);
 
@@ -71,27 +64,37 @@ const FarcasterMiniAppContent = () => {
   }, [isReady, isConnected, isConnecting, connect, connectors]);
 
   useEffect(() => {
-    if (isConnected && window.ethereum) {
-      const ethProvider = new ethers.providers.Web3Provider(window.ethereum as any);
-      setProvider(ethProvider);
-      setSigner(ethProvider.getSigner());
-    } else {
-      setProvider(null);
-      setSigner(null);
-    }
+    const initProvider = async () => {
+      if (isConnected) {
+        try {
+          const ethProvider = await sdk.wallet.ethProvider;
+          console.log('✅ Got SDK provider:', ethProvider);
+          
+          const web3Provider = new ethers.providers.Web3Provider(ethProvider as any);
+          const web3Signer = web3Provider.getSigner();
+          
+          setProvider(web3Provider);
+          setSigner(web3Signer);
+          console.log('✅ Provider and signer ready!');
+        } catch (err) {
+          console.error('❌ Failed to get provider:', err);
+        }
+      } else {
+        setProvider(null);
+        setSigner(null);
+      }
+    };
+
+    initProvider();
   }, [isConnected]);
 
   const { data: userCheckins } = useUserCheckins(address || undefined, 365);
   const { data: userStats, loading: userStatsLoading } = useUserStats(address || undefined);
   const { data: currentChainStats, loading: chainStatsLoading } = useUserChainStats(
-    chainId || null, 
+    8453,
     address || null
   );
   const { data: userRanking, loading: rankingLoading } = useUserRanking(address || null);
-
-  const currentChainName = chainId 
-    ? (SUPPORTED_CHAINS[chainId]?.chainName || 'Unknown') 
-    : 'No Chain';
 
   const getAvatarUrl = (addr: string): string => 
     `https://api.dicebear.com/6.x/identicon/svg?seed=${addr}`;
@@ -107,19 +110,6 @@ const FarcasterMiniAppContent = () => {
       chainName: chainConfig?.chainName || 'Unknown Chain',
     });
   }, []);
-
-  const handleSwitchChain = useCallback(async (targetChainId: number) => {
-    try {
-      setIsSwitchingChain(true);
-      switchChain({ chainId: targetChainId });
-      toast.success('Network switched!');
-    } catch (error) {
-      console.error('Failed to switch chain:', error);
-      toast.error('Failed to switch network');
-    } finally {
-      setIsSwitchingChain(false);
-    }
-  }, [switchChain]);
 
   const handleCopyAddress = useCallback(() => {
     if (address) {
@@ -178,6 +168,18 @@ const FarcasterMiniAppContent = () => {
         </div>
       </div>
 
+      {chainId && chainId !== 8453 && (
+        <div className="mx-3 mt-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700/30 rounded-lg p-3">
+          <div className="flex items-start gap-2">
+            <FaExclamationCircle className="text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-yellow-800 dark:text-yellow-200">
+              <p className="font-semibold mb-1">Base Chain Only</p>
+              <p className="text-xs">Farcaster mini app only supports Base chain.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Notification
         isOpen={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
@@ -214,63 +216,15 @@ const FarcasterMiniAppContent = () => {
                   <QuestDashboard address={address} />
                 )}
 
-                {isConnected && (
-                  <div className="flex justify-center">
-                    <div className="flex bg-white dark:bg-gray-800 px-1.5 py-1 rounded-full shadow-md border border-gray-200 dark:border-gray-700 gap-1">
-                      <button
-                        onClick={() => setNetworkTab('all')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
-                          networkTab === 'all' 
-                            ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
-                            : 'text-gray-600 dark:text-gray-400'
-                        }`}
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <FaLayerGroup className="text-[10px]" />
-                          <span>All</span>
-                        </div>
-                      </button>
-                      
-                      <button
-                        onClick={() => setNetworkTab('mainnet')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
-                          networkTab === 'mainnet' 
-                            ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
-                            : 'text-gray-600 dark:text-gray-400'
-                        }`}
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <FaGlobe className="text-[10px]" />
-                          <span>Mainnet</span>
-                        </div>
-                      </button>
-                      
-                      <button
-                        onClick={() => setNetworkTab('testnet')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
-                          networkTab === 'testnet' 
-                            ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
-                            : 'text-gray-600 dark:text-gray-400'
-                        }`}
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <FaFlask className="text-[10px]" />
-                          <span>Testnet</span>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                )}
-
                 {isConnected ? (
                   <FixedMultiChainCheckinGrid
                     isConnected={isConnected}
-                    currentChainId={chainId}
+                    currentChainId={8453}
                     address={address}
                     signer={signer}
                     provider={provider}
                     onCheckinSuccess={handleCheckinSuccess}
-                    networkType={networkTab}
+                    networkType="mainnet"
                     triggerAnimation={animationTrigger}
                     onAnimationComplete={() => setAnimationTrigger(null)}
                   />
@@ -308,11 +262,68 @@ const FarcasterMiniAppContent = () => {
                 transition={{ duration: 0.2 }}
                 className="py-4"
               >
-                <Settings
-                  currentChainId={chainId}
-                  onSwitchChain={handleSwitchChain}
-                  isSwitchingChain={isSwitchingChain}
-                />
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Network Settings</h3>
+                  
+                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800 mb-4">
+                    <div className="flex items-center gap-3">
+                      <img src="/assets/chains/base.png" alt="Base" className="w-10 h-10" />
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 dark:text-white">Base Mainnet</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">Chain ID: 8453</p>
+                      </div>
+                      <div className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-semibold">
+                        Active
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      <strong>Note:</strong> Farcaster mini apps only support Base chain.
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Multi-chain support is not available in Farcaster environment.
+                    </p>
+                  </div>
+                </div>
+
+                {isConnected && address && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 mt-4">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Wallet Info</h3>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Address</p>
+                        <div 
+                          onClick={handleCopyAddress}
+                          className="flex items-center gap-2 font-mono text-sm bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        >
+                          <span className="text-gray-800 dark:text-gray-200 flex-1">
+                            {address}
+                          </span>
+                          <FaCopy className={`text-xs ${copySuccess ? 'text-green-500' : 'text-gray-400'}`} />
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Network</p>
+                        <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
+                          <img src="/assets/chains/base.png" alt="Base" className="w-5 h-5" />
+                          <span className="text-sm text-gray-800 dark:text-gray-200">Base</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => disconnect()}
+                      className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                    >
+                      <FaSignOutAlt />
+                      <span className="font-medium">Disconnect Wallet</span>
+                    </button>
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -399,8 +410,8 @@ const FarcasterMiniAppContent = () => {
                       <h3 className="text-base font-bold text-gray-900 dark:text-white">Your Statistics</h3>
                       
                       <HeroStatsSection
-                        currentChainId={chainId || null}
-                        currentChainName={currentChainName}
+                        currentChainId={8453}
+                        currentChainName="Base"
                         currentChainCheckins={currentChainStats?.totalCheckins || 0}
                         currentChainStreak={currentChainStats?.currentStreak || 0}
                         totalCheckins={userStats?.totalCheckins || 0}
@@ -429,7 +440,7 @@ const FarcasterMiniAppContent = () => {
                           toast.success('Referral link copied!');
                         }}
                         onCardClick={() => toast('Referral dashboard coming soon!')}
-                        onSwitchToBase={() => handleSwitchChain(8453)}
+                        onSwitchToBase={() => toast('Already on Base chain!')}
                         formatAddress={formatAddress}
                       />
                     </div>
