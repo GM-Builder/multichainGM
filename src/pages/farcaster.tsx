@@ -1,8 +1,8 @@
 // src/pages/farcaster.tsx
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useFarcasterUser } from '@/hooks/useFarcasterContext';
-import { useFarcasterWallet } from '@/hooks/useFarcasterWallet';
-import FixedMultiChainCheckinGrid from '@/components/MultiChainCheckinGrid'; // ✅ Use original component
+import { useWalletState } from '@/hooks/useWalletState'; // ✅ Use original hook unchanged!
+import FixedMultiChainCheckinGrid from '@/components/MultiChainCheckinGrid';
 import HeroStatsSection from '@/components/HeroStatsSection';
 import ActivityHeatmap from '@/components/ActivityHeatmap';
 import QuestDashboard from '@/components/QuestDashboard';
@@ -33,19 +33,9 @@ type NetworkTabType = 'all' | 'mainnet' | 'testnet';
 const FarcasterMiniApp = () => {
   const { user, isLoading: userLoading, isReady } = useFarcasterUser();
   
-  // ✅ Use ethers-based hook
-  const {
-    address,
-    provider,
-    signer,
-    chainId,
-    isConnected,
-    isLoading: walletLoading,
-    connectWallet,
-    disconnectWallet,
-    switchNetwork,
-    error: walletError,
-  } = useFarcasterWallet();
+  // ✅ Use UNCHANGED useWalletState - works because FarcasterProvider injected wallet!
+  const { web3State, connectWallet, disconnectWallet, switchNetwork } = useWalletState();
+  const { provider, signer, address, chainId, isConnected, isLoading: walletLoading, error: walletError } = web3State;
 
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [networkTab, setNetworkTab] = useState<NetworkTabType>('mainnet');
@@ -60,6 +50,14 @@ const FarcasterMiniApp = () => {
   } | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
   const [isSwitchingChain, setIsSwitchingChain] = useState(false);
+
+  // ✅ Auto-connect wallet when Farcaster is ready
+  useEffect(() => {
+    if (isReady && !isConnected && !walletLoading && typeof window !== 'undefined' && window.ethereum) {
+      console.log('🔌 Auto-connecting wallet in Farcaster...');
+      connectWallet();
+    }
+  }, [isReady, isConnected, walletLoading, connectWallet]);
 
   const { data: userCheckins } = useUserCheckins(address || undefined, 365);
   const { data: userStats, loading: userStatsLoading } = useUserStats(address || undefined);
@@ -91,8 +89,12 @@ const FarcasterMiniApp = () => {
   const handleSwitchChain = useCallback(async (targetChainId: number) => {
     try {
       setIsSwitchingChain(true);
-      await switchNetwork(targetChainId);
-      toast.success('Network switched successfully!');
+      const success = await switchNetwork(targetChainId);
+      if (success) {
+        toast.success('Network switched successfully!');
+      } else {
+        toast.error('Failed to switch network');
+      }
     } catch (error) {
       console.error('Failed to switch chain:', error);
       toast.error('Failed to switch network');
@@ -115,7 +117,7 @@ const FarcasterMiniApp = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading Farcaster...</p>
         </div>
       </div>
     );
@@ -240,7 +242,6 @@ const FarcasterMiniApp = () => {
                 )}
 
                 {isConnected ? (
-                  // ✅ Use original MultiChainCheckinGrid with ethers
                   <FixedMultiChainCheckinGrid
                     isConnected={isConnected}
                     currentChainId={chainId}
@@ -264,7 +265,7 @@ const FarcasterMiniApp = () => {
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2">Connect Wallet</h3>
                     <p className="text-white/80 mb-4 text-sm">
-                      {walletError || 'Tap to connect your Farcaster wallet'}
+                      {walletError || 'Tap to connect your wallet'}
                     </p>
                     <button
                       onClick={connectWallet}
@@ -321,7 +322,7 @@ const FarcasterMiniApp = () => {
               >
                 {isConnected && address ? (
                   <>
-                    {/* Wallet Info Card */}
+                    {/* Wallet Card */}
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-200 dark:border-gray-700">
                       <div className="flex items-center gap-3 mb-4">
                         <div className="w-16 h-16 rounded-full overflow-hidden ring-4 ring-cyan-400/30">
@@ -350,7 +351,7 @@ const FarcasterMiniApp = () => {
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
                       >
                         <FaSignOutAlt />
-                        <span className="font-medium">Disconnect Wallet</span>
+                        <span className="font-medium">Disconnect</span>
                       </button>
                     </div>
 
@@ -360,11 +361,7 @@ const FarcasterMiniApp = () => {
                         <p className="text-xs text-purple-600 dark:text-purple-400 font-semibold mb-3">FARCASTER ACCOUNT</p>
                         <div className="flex items-center gap-3">
                           {user.pfpUrl ? (
-                            <img 
-                              src={user.pfpUrl} 
-                              alt={user.username || 'User'} 
-                              className="w-12 h-12 rounded-full"
-                            />
+                            <img src={user.pfpUrl} alt={user.username || 'User'} className="w-12 h-12 rounded-full" />
                           ) : (
                             <div className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center">
                               <FaUser className="text-white" />
@@ -382,10 +379,10 @@ const FarcasterMiniApp = () => {
                       </div>
                     )}
 
-                    {/* STATS SECTION */}
+                    {/* Stats */}
                     <div className="space-y-4">
                       <h3 className="text-base font-bold text-gray-900 dark:text-white">Your Statistics</h3>
-
+                      
                       <HeroStatsSection
                         currentChainId={chainId || null}
                         currentChainName={currentChainName}
@@ -416,12 +413,8 @@ const FarcasterMiniApp = () => {
                           navigator.clipboard.writeText(referralLink);
                           toast.success('Referral link copied!');
                         }}
-                        onCardClick={() => {
-                          toast('Referral dashboard coming soon!');
-                        }}
-                        onSwitchToBase={() => {
-                          handleSwitchChain(8453);
-                        }}
+                        onCardClick={() => toast('Referral dashboard coming soon!')}
+                        onSwitchToBase={() => handleSwitchChain(8453)}
                         formatAddress={formatAddress}
                       />
                     </div>
@@ -446,7 +439,6 @@ const FarcasterMiniApp = () => {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
       <BottomNav 
         activeTab={activeTab} 
         onTabChange={setActiveTab}
