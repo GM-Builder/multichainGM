@@ -7,8 +7,6 @@ interface FarcasterUser {
   username: string | null;
   displayName: string | null;
   pfpUrl: string | null;
-  custody?: string;
-  verifications?: string[];
 }
 
 interface FarcasterContextType {
@@ -16,6 +14,7 @@ interface FarcasterContextType {
   isLoading: boolean;
   isReady: boolean;
   error: string | null;
+  ethProvider: any | null; // ✅ Expose eth provider
 }
 
 const FarcasterContext = createContext<FarcasterContextType>({
@@ -23,6 +22,7 @@ const FarcasterContext = createContext<FarcasterContextType>({
   isLoading: true,
   isReady: false,
   error: null,
+  ethProvider: null,
 });
 
 export const useFarcasterUser = () => useContext(FarcasterContext);
@@ -36,15 +36,20 @@ export const FarcasterProvider: React.FC<FarcasterProviderProps> = ({ children }
   const [isLoading, setIsLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [ethProvider, setEthProvider] = useState<any | null>(null);
 
   useEffect(() => {
     const initializeFarcaster = async () => {
       try {
-        // ✅ Initialize Farcaster SDK
-        await sdk.actions.ready();
+        console.log('🎯 Initializing Farcaster SDK...');
         
-        // ✅ Get Farcaster context
+        // ✅ Step 1: Initialize SDK
+        await sdk.actions.ready();
+        console.log('✅ Farcaster SDK ready');
+        
+        // ✅ Step 2: Get context
         const context = await sdk.context;
+        console.log('📱 Farcaster context:', context);
         
         if (context?.user) {
           setUser({
@@ -55,29 +60,35 @@ export const FarcasterProvider: React.FC<FarcasterProviderProps> = ({ children }
           });
         }
 
-        // ✅ CRITICAL: Inject Farcaster wallet provider into window.ethereum
-        // This makes useWalletState work without any changes!
-        if (typeof window !== 'undefined' && window.location.pathname === '/farcaster') {
-          try {
-            const ethProvider = await sdk.wallet.ethProvider;
+        // ✅ Step 3: Get Ethereum Provider (works on both mobile & desktop)
+        try {
+          const provider = await sdk.wallet.ethProvider;
+          console.log('💼 Farcaster eth provider:', provider);
+          
+          if (provider) {
+            setEthProvider(provider);
             
-            if (ethProvider && !window.ethereum) {
-              console.log('🎯 Injecting Farcaster wallet provider...');
-              (window as any).ethereum = ethProvider;
-              console.log('✅ Farcaster provider injected successfully!');
-            } else if (ethProvider && window.ethereum) {
-              console.log('⚠️ window.ethereum already exists, not overriding');
+            // ✅ Inject to window.ethereum ONLY if on /farcaster page
+            if (typeof window !== 'undefined' && window.location.pathname === '/farcaster') {
+              if (!window.ethereum) {
+                (window as any).ethereum = provider;
+                console.log('✅ Injected Farcaster provider to window.ethereum');
+              } else {
+                console.log('⚠️ window.ethereum already exists');
+              }
             }
-          } catch (providerError) {
-            console.error('Failed to inject Farcaster provider:', providerError);
+          } else {
+            console.warn('⚠️ No eth provider from Farcaster SDK');
           }
+        } catch (providerError) {
+          console.error('❌ Failed to get eth provider:', providerError);
         }
 
         setIsReady(true);
       } catch (err) {
-        console.error('Failed to initialize Farcaster:', err);
+        console.error('❌ Failed to initialize Farcaster:', err);
         setError(err instanceof Error ? err.message : 'Failed to initialize');
-        setIsReady(true); // Still set ready to allow app to continue
+        setIsReady(true); // Still set ready to allow fallback
       } finally {
         setIsLoading(false);
       }
@@ -87,7 +98,7 @@ export const FarcasterProvider: React.FC<FarcasterProviderProps> = ({ children }
   }, []);
 
   return (
-    <FarcasterContext.Provider value={{ user, isLoading, isReady, error }}>
+    <FarcasterContext.Provider value={{ user, isLoading, isReady, error, ethProvider }}>
       {children}
     </FarcasterContext.Provider>
   );
