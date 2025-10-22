@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import { useFarcasterUser } from '@/hooks/useFarcasterContext';
 import { useFarcasterWallet } from '@/hooks/useFarcasterWallet';
-import FarcasterMultiChainCheckinGrid from '@/components/FarcasterMultichainCheckinGrid';
+import FixedMultiChainCheckinGrid from '@/components/MultiChainCheckinGrid'; // ✅ Use original component
 import HeroStatsSection from '@/components/HeroStatsSection';
 import ActivityHeatmap from '@/components/ActivityHeatmap';
 import QuestDashboard from '@/components/QuestDashboard';
@@ -14,6 +14,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaUser,
   FaWallet,
+  FaLayerGroup,
+  FaGlobe,
+  FaFlask,
   FaCopy,
   FaSignOutAlt,
 } from 'react-icons/fa';
@@ -30,10 +33,11 @@ type NetworkTabType = 'all' | 'mainnet' | 'testnet';
 const FarcasterMiniApp = () => {
   const { user, isLoading: userLoading, isReady } = useFarcasterUser();
   
+  // ✅ Use ethers-based hook
   const {
     address,
-    walletClient,
-    publicClient,
+    provider,
+    signer,
     chainId,
     isConnected,
     isLoading: walletLoading,
@@ -88,6 +92,7 @@ const FarcasterMiniApp = () => {
     try {
       setIsSwitchingChain(true);
       await switchNetwork(targetChainId);
+      toast.success('Network switched successfully!');
     } catch (error) {
       console.error('Failed to switch chain:', error);
       toast.error('Failed to switch network');
@@ -170,46 +175,7 @@ const FarcasterMiniApp = () => {
       {/* Main Content */}
       <div className="pb-20 md:pb-6">
         <div className="max-w-7xl mx-auto px-3 md:px-4">
-
-          {isConnected && (
-            <div className="flex justify-center">
-              <div className="flex bg-white dark:bg-gray-800 px-1.5 py-1 rounded-full shadow-md border border-gray-200 dark:border-gray-700 gap-1">
-                <button
-                  onClick={() => setNetworkTab('all')}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
-                    networkTab === 'all' 
-                      ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
-                      : 'text-gray-600 dark:text-gray-400'
-                  }`}
-                >
-                  All
-                </button>
-                
-                <button
-                  onClick={() => setNetworkTab('mainnet')}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
-                    networkTab === 'mainnet' 
-                      ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
-                      : 'text-gray-600 dark:text-gray-400'
-                  }`}
-                >
-                  Mainnet
-                </button>
-                
-                <button
-                  onClick={() => setNetworkTab('testnet')}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
-                    networkTab === 'testnet' 
-                      ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
-                      : 'text-gray-600 dark:text-gray-400'
-                  }`}
-                >
-                  Testnet
-                </button>
-              </div>
-            </div>
-          )}
-                    
+          
           <AnimatePresence mode="wait">
             {/* HOME TAB */}
             {activeTab === 'home' && (
@@ -225,13 +191,62 @@ const FarcasterMiniApp = () => {
                   <QuestDashboard address={address} />
                 )}
 
+                {isConnected && (
+                  <div className="flex justify-center">
+                    <div className="flex bg-white dark:bg-gray-800 px-1.5 py-1 rounded-full shadow-md border border-gray-200 dark:border-gray-700 gap-1">
+                      <button
+                        onClick={() => setNetworkTab('all')}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
+                          networkTab === 'all' 
+                            ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
+                            : 'text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <FaLayerGroup className="text-[10px]" />
+                          <span>All</span>
+                        </div>
+                      </button>
+                      
+                      <button
+                        onClick={() => setNetworkTab('mainnet')}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
+                          networkTab === 'mainnet' 
+                            ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
+                            : 'text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <FaGlobe className="text-[10px]" />
+                          <span>Mainnet</span>
+                        </div>
+                      </button>
+                      
+                      <button
+                        onClick={() => setNetworkTab('testnet')}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
+                          networkTab === 'testnet' 
+                            ? 'bg-cyan-100 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400' 
+                            : 'text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <FaFlask className="text-[10px]" />
+                          <span>Testnet</span>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {isConnected ? (
-                  <FarcasterMultiChainCheckinGrid
+                  // ✅ Use original MultiChainCheckinGrid with ethers
+                  <FixedMultiChainCheckinGrid
                     isConnected={isConnected}
                     currentChainId={chainId}
                     address={address}
-                    walletClient={walletClient}
-                    publicClient={publicClient}
+                    signer={signer}
+                    provider={provider}
                     onCheckinSuccess={handleCheckinSuccess}
                     networkType={networkTab}
                     triggerAnimation={animationTrigger}
@@ -369,9 +384,7 @@ const FarcasterMiniApp = () => {
 
                     {/* STATS SECTION */}
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-base font-bold text-gray-900 dark:text-white">Your Statistics</h3>
-                      </div>
+                      <h3 className="text-base font-bold text-gray-900 dark:text-white">Your Statistics</h3>
 
                       <HeroStatsSection
                         currentChainId={chainId || null}
@@ -386,7 +399,6 @@ const FarcasterMiniApp = () => {
                         loading={chainStatsLoading || userStatsLoading || rankingLoading}
                       />
 
-                      {/* HEATMAP */}
                       {userStats && userCheckins && (
                         <ActivityHeatmap
                           checkins={userCheckins}
@@ -395,7 +407,6 @@ const FarcasterMiniApp = () => {
                         />
                       )}
 
-                      {/* REFERRAL CARD */}
                       <SidebarReferralCard
                         canUseReferral={true}
                         myReferralsCount={0}
