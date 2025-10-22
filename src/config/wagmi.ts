@@ -1,6 +1,6 @@
 // src/config/wagmi.ts
 import { createConfig, http } from 'wagmi';
-import { base, optimism, arbitrum } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import { Chain } from 'wagmi/chains';
 import { farcasterMiniApp } from '@farcaster/miniapp-wagmi-connector';
 
@@ -9,7 +9,7 @@ const soneium: Chain = {
   name: 'Soneium',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
-    default: { http: ['https://rpc.soneium.org', 'https://soneium-mainnet.rpc.caldera.xyz/http'] },
+    default: { http: ['https://rpc.soneium.org'] },
     public: { http: ['https://rpc.soneium.org'] },
   },
   blockExplorers: {
@@ -23,7 +23,7 @@ const ink: Chain = {
   name: 'Ink',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
-    default: { http: ['https://rpc-gel.inkonchain.com', 'https://rpc-qnd.inkonchain.com'] },
+    default: { http: ['https://rpc-gel.inkonchain.com'] },
     public: { http: ['https://rpc-gel.inkonchain.com'] },
   },
   blockExplorers: {
@@ -33,19 +33,11 @@ const ink: Chain = {
 };
 
 export const wagmiConfig = createConfig({
-  chains: [
-    base,
-    soneium,
-    ink,
-    optimism,
-    arbitrum,
-  ],
+  chains: [base, soneium, ink],
   transports: {
     [base.id]: http('https://mainnet.base.org'),
     [soneium.id]: http('https://rpc.soneium.org'),
     [ink.id]: http('https://rpc-gel.inkonchain.com'),
-    [optimism.id]: http('https://mainnet.optimism.io'),
-    [arbitrum.id]: http('https://arb1.arbitrum.io/rpc'),
   },
   connectors: [
     farcasterMiniApp(),

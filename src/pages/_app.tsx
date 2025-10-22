@@ -27,10 +27,26 @@ function GMApp({ Component, pageProps }: AppProps) {
   const leaderboardRef = useRef<HTMLDivElement>(null)
   
   const [mounted, setMounted] = useState(false)
-  
+  const [sdkReady, setSdkReady] = useState(false)
+
   useEffect(() => {
     setMounted(true)
-  }, [])
+
+    if (router.pathname === '/farcaster') {
+      import('@farcaster/miniapp-sdk').then(({ sdk }) => {
+        console.log('🎯 Calling sdk.actions.ready()...');
+        sdk.actions.ready().then(() => {
+          console.log('✅ SDK ready!');
+          setSdkReady(true);
+        });
+      }).catch(err => {
+        console.error('❌ Failed to initialize SDK:', err);
+        setSdkReady(true);
+      });
+    } else {
+      setSdkReady(true);
+    }
+  }, [router.pathname])
 
   const scrollToLeaderboard = useCallback(() => {
     leaderboardRef.current?.scrollIntoView({ 
@@ -63,7 +79,7 @@ function GMApp({ Component, pageProps }: AppProps) {
                              !router.pathname.includes("/mint") &&
                              !router.pathname.includes("/farcaster")
 
-  if (!mounted) {
+  if (!mounted || !sdkReady) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800">
         <div className="text-center">
@@ -159,4 +175,3 @@ function GMApp({ Component, pageProps }: AppProps) {
 }
 
 export default GMApp
-
