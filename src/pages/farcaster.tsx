@@ -1,4 +1,3 @@
-// src/pages/farcaster.tsx
 import React, { useState, useCallback, useEffect } from 'react';
 import { useFarcasterUser } from '@/hooks/useFarcasterContext';
 import { useWalletState } from '@/hooks/useWalletState';
@@ -32,7 +31,7 @@ import toast from 'react-hot-toast';
 type NetworkTabType = 'all' | 'mainnet' | 'testnet';
 
 const FarcasterMiniApp = () => {
-  const { user, isLoading: userLoading, isReady, ethProvider } = useFarcasterUser();
+  const { user, isLoading: userLoading, isReady, ethProvider, sdkContext } = useFarcasterUser();
   
   const { web3State, connectWallet, disconnectWallet, switchNetwork } = useWalletState();
   const { provider, signer, address, chainId, isConnected, isLoading: walletLoading, error: walletError } = web3State;
@@ -51,23 +50,33 @@ const FarcasterMiniApp = () => {
   const [copySuccess, setCopySuccess] = useState(false);
   const [isSwitchingChain, setIsSwitchingChain] = useState(false);
   const [autoConnectAttempted, setAutoConnectAttempted] = useState(false);
+  const [providerReady, setProviderReady] = useState(false);
 
-  // ✅ Auto-connect when Farcaster is ready and has provider
   useEffect(() => {
-    const attemptAutoConnect = async () => {
-      if (isReady && ethProvider && !isConnected && !walletLoading && !autoConnectAttempted) {
-        console.log('🔌 Attempting auto-connect...');
-        setAutoConnectAttempted(true);
-        
-        // Small delay to ensure provider is fully ready
-        setTimeout(() => {
-          connectWallet();
-        }, 500);
-      }
-    };
+    if (isReady && ethProvider) {
+      const timer = setTimeout(() => {
+        if (window.ethereum) {
+          console.log('✅ Provider ready and injected');
+          setProviderReady(true);
+        } else {
+          console.error('❌ Provider not in window.ethereum');
+        }
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isReady, ethProvider]);
 
-    attemptAutoConnect();
-  }, [isReady, ethProvider, isConnected, walletLoading, autoConnectAttempted, connectWallet]);
+  useEffect(() => {
+    if (providerReady && !isConnected && !walletLoading && !autoConnectAttempted) {
+      console.log('🔌 Auto-connecting wallet...');
+      setAutoConnectAttempted(true);
+      
+      setTimeout(() => {
+        connectWallet();
+      }, 500);
+    }
+  }, [providerReady, isConnected, walletLoading, autoConnectAttempted, connectWallet]);
 
   const { data: userCheckins } = useUserCheckins(address || undefined, 365);
   const { data: userStats, loading: userStatsLoading } = useUserStats(address || undefined);
@@ -127,24 +136,23 @@ const FarcasterMiniApp = () => {
     connectWallet();
   }, [connectWallet]);
 
-  // Loading state
-  if (userLoading || !isReady) {
+  if (userLoading || !isReady || (isReady && ethProvider && !providerReady)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading Farcaster...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {userLoading ? 'Loading Farcaster...' : 'Preparing wallet...'}
+          </p>
         </div>
       </div>
     );
   }
 
-  // Warning if no provider
   const showProviderWarning = isReady && !ethProvider;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800">
-      {/* Header */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20 backdrop-blur-md bg-white/90 dark:bg-gray-900/90">
         <div className="px-3 py-3">
           <div className="flex items-center justify-between">
@@ -173,7 +181,6 @@ const FarcasterMiniApp = () => {
         </div>
       </div>
 
-      {/* Provider Warning */}
       {showProviderWarning && (
         <div className="mx-3 mt-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700/30 rounded-lg p-3">
           <div className="flex items-start gap-2">
@@ -186,7 +193,6 @@ const FarcasterMiniApp = () => {
         </div>
       )}
 
-      {/* Notifications */}
       <Notification
         isOpen={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
@@ -206,12 +212,10 @@ const FarcasterMiniApp = () => {
         message={error || "An unknown error occurred. Please try again."}
       />
 
-      {/* Main Content */}
       <div className="pb-20 md:pb-6">
         <div className="max-w-7xl mx-auto px-3 md:px-4">
           
           <AnimatePresence mode="wait">
-            {/* HOME TAB */}
             {activeTab === 'home' && (
               <motion.div
                 key="home"
@@ -316,7 +320,6 @@ const FarcasterMiniApp = () => {
               </motion.div>
             )}
 
-            {/* SETTINGS TAB */}
             {activeTab === 'settings' && (
               <motion.div
                 key="settings"
@@ -334,7 +337,6 @@ const FarcasterMiniApp = () => {
               </motion.div>
             )}
 
-            {/* LEADERBOARD TAB */}
             {activeTab === 'leaderboard' && (
               <motion.div
                 key="leaderboard"
@@ -348,7 +350,6 @@ const FarcasterMiniApp = () => {
               </motion.div>
             )}
             
-            {/* PROFILE TAB */}
             {activeTab === 'profile' && (
               <motion.div
                 key="profile"

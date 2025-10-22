@@ -30,18 +30,6 @@ function GMApp({ Component, pageProps }: AppProps) {
   const [mounted, setMounted] = useState(false)
   const [isSDKLoaded, setIsSDKLoaded] = useState(false)
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        await sdk.actions.ready();
-        setIsSDKLoaded(true);
-      } catch (error) {
-        console.error('Failed to load Farcaster SDK:', error);
-        setIsSDKLoaded(true);
-      }
-    };
-    load();
-  }, []);
   
   useEffect(() => {
     setMounted(true)
@@ -78,7 +66,7 @@ function GMApp({ Component, pageProps }: AppProps) {
                              !router.pathname.includes("/mint") &&
                              !router.pathname.includes("/farcaster")
 
-  if (!isSDKLoaded || !mounted) {
+  if (!mounted) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800">
         <div className="text-center">
