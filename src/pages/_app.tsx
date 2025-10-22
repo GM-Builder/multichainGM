@@ -17,19 +17,16 @@ import { SuccessAnimationProvider } from "@/components/SuccessAnimationContext"
 import OnchainProviders from "@/components/providers/OnchainProviders"
 import { FarcasterProvider } from '@/hooks/useFarcasterContext'
 import AudioPlayer from "@/components/AudioPlayer"
-import sdk from "@farcaster/frame-sdk"
 
 const NO_LAYOUT_PATHS = ['/mint', '/farcaster'];
 
 function GMApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
-  const { web3State, connectWallet, disconnectWallet, switchNetwork } = useWalletState()
+  const { web3State, connectWallet, disconnectWallet, switchNetwork, isMiniApp } = useWalletState()
   const { address, isConnected, isLoading: isWalletConnecting, chainId } = web3State
   const leaderboardRef = useRef<HTMLDivElement>(null)
   
   const [mounted, setMounted] = useState(false)
-  const [isSDKLoaded, setIsSDKLoaded] = useState(false)
-
   
   useEffect(() => {
     setMounted(true)
@@ -45,7 +42,7 @@ function GMApp({ Component, pageProps }: AppProps) {
   const adaptedConnectWallet = useCallback(async (): Promise<void> => {
     await connectWallet()
   }, [connectWallet])
-  
+
   const handleSwitchChain = useCallback(async (targetChainId: number): Promise<void> => {
     try {
       await switchNetwork(targetChainId);
@@ -71,7 +68,7 @@ function GMApp({ Component, pageProps }: AppProps) {
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading GannetX...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </div>
     );
@@ -120,7 +117,7 @@ function GMApp({ Component, pageProps }: AppProps) {
               }}
             />
             
-            {showLayout && (
+            {showLayout && !isMiniApp && (
               <Navbar 
                 address={address}
                 connectWallet={adaptedConnectWallet}
@@ -129,14 +126,14 @@ function GMApp({ Component, pageProps }: AppProps) {
                 networkInfo={networkInfo}
                 scrollToLeaderboard={scrollToLeaderboard}
                 currentChainId={chainId}
-                onSwitchChain={handleSwitchChain} 
+                onSwitchChain={handleSwitchChain}
               />
             )}
 
             <AudioPlayer showOnFarcaster={true} />
             
             <main suppressHydrationWarning>
-              {shouldRequireWallet ? (
+              {shouldRequireWallet && !isMiniApp ? (
                 <WalletRequired
                   isConnected={isConnected}
                   connectWallet={adaptedConnectWallet}
@@ -152,7 +149,7 @@ function GMApp({ Component, pageProps }: AppProps) {
                 </SuccessAnimationProvider>
               )}
               
-              {showLayout && <Footer />}
+              {showLayout && !isMiniApp && <Footer />}
             </main>
           </ThirdwebProvider>
         </OnchainProviders>
@@ -162,3 +159,4 @@ function GMApp({ Component, pageProps }: AppProps) {
 }
 
 export default GMApp
+

@@ -1,6 +1,9 @@
+// src/pages/farcaster.tsx
 import React, { useState, useCallback, useEffect } from 'react';
+import { WagmiProvider, useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { wagmiConfig } from '@/config/wagmi';
 import { useFarcasterUser } from '@/hooks/useFarcasterContext';
-import { useWalletState } from '@/hooks/useWalletState';
 import FixedMultiChainCheckinGrid from '@/components/MultiChainCheckinGrid';
 import HeroStatsSection from '@/components/HeroStatsSection';
 import ActivityHeatmap from '@/components/ActivityHeatmap';
@@ -10,6 +13,7 @@ import Settings from '@/components/Settings';
 import LeaderboardView from '@/components/LeaderboardView';
 import SidebarReferralCard from '@/components/SidebarReferralCard';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ethers } from 'ethers';
 import { 
   FaUser,
   FaWallet,
@@ -30,11 +34,15 @@ import toast from 'react-hot-toast';
 
 type NetworkTabType = 'all' | 'mainnet' | 'testnet';
 
-const FarcasterMiniApp = () => {
-  const { user, isLoading: userLoading, isReady, ethProvider, sdkContext } = useFarcasterUser();
+const queryClient = new QueryClient();
+
+const FarcasterMiniAppContent = () => {
+  const { user, isLoading: userLoading, isReady } = useFarcasterUser();
   
-  const { web3State, connectWallet, disconnectWallet, switchNetwork } = useWalletState();
-  const { provider, signer, address, chainId, isConnected, isLoading: walletLoading, error: walletError } = web3State;
+  const { address, isConnected, chainId: wagmiChainId } = useAccount();
+  const { connect, connectors, isPending: isConnecting } = useConnect();
+  const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
 
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [networkTab, setNetworkTab] = useState<NetworkTabType>('mainnet');
@@ -49,34 +57,29 @@ const FarcasterMiniApp = () => {
   } | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
   const [isSwitchingChain, setIsSwitchingChain] = useState(false);
-  const [autoConnectAttempted, setAutoConnectAttempted] = useState(false);
-  const [providerReady, setProviderReady] = useState(false);
+  const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
+  const [signer, setSigner] = useState<ethers.Signer | null>(null);
+
+  const chainId = wagmiChainId ? Number(wagmiChainId) : null;
 
   useEffect(() => {
-    if (isReady && ethProvider) {
-      const timer = setTimeout(() => {
-        if (window.ethereum) {
-          console.log('✅ Provider ready and injected');
-          setProviderReady(true);
-        } else {
-          console.error('❌ Provider not in window.ethereum');
-        }
-      }, 1000);
-      
-      return () => clearTimeout(timer);
+    const farcasterConnector = connectors.find(c => c.id === 'farcasterMiniApp');
+    if (isReady && !isConnected && !isConnecting && farcasterConnector) {
+      console.log('🔌 Auto-connecting with Farcaster connector...');
+      connect({ connector: farcasterConnector });
     }
-  }, [isReady, ethProvider]);
+  }, [isReady, isConnected, isConnecting, connect, connectors]);
 
   useEffect(() => {
-    if (providerReady && !isConnected && !walletLoading && !autoConnectAttempted) {
-      console.log('🔌 Auto-connecting wallet...');
-      setAutoConnectAttempted(true);
-      
-      setTimeout(() => {
-        connectWallet();
-      }, 500);
+    if (isConnected && window.ethereum) {
+      const ethProvider = new ethers.providers.Web3Provider(window.ethereum as any);
+      setProvider(ethProvider);
+      setSigner(ethProvider.getSigner());
+    } else {
+      setProvider(null);
+      setSigner(null);
     }
-  }, [providerReady, isConnected, walletLoading, autoConnectAttempted, connectWallet]);
+  }, [isConnected]);
 
   const { data: userCheckins } = useUserCheckins(address || undefined, 365);
   const { data: userStats, loading: userStatsLoading } = useUserStats(address || undefined);
@@ -108,19 +111,15 @@ const FarcasterMiniApp = () => {
   const handleSwitchChain = useCallback(async (targetChainId: number) => {
     try {
       setIsSwitchingChain(true);
-      const success = await switchNetwork(targetChainId);
-      if (success) {
-        toast.success('Network switched!');
-      } else {
-        toast.error('Failed to switch network');
-      }
+      switchChain({ chainId: targetChainId });
+      toast.success('Network switched!');
     } catch (error) {
       console.error('Failed to switch chain:', error);
       toast.error('Failed to switch network');
     } finally {
       setIsSwitchingChain(false);
     }
-  }, [switchNetwork]);
+  }, [switchChain]);
 
   const handleCopyAddress = useCallback(() => {
     if (address) {
@@ -132,24 +131,22 @@ const FarcasterMiniApp = () => {
   }, [address]);
 
   const handleManualConnect = useCallback(() => {
-    console.log('🖱️ Manual connect triggered');
-    connectWallet();
-  }, [connectWallet]);
+    const farcasterConnector = connectors.find(c => c.id === 'farcasterMiniApp');
+    if (farcasterConnector) {
+      connect({ connector: farcasterConnector });
+    }
+  }, [connect, connectors]);
 
-  if (userLoading || !isReady || (isReady && ethProvider && !providerReady)) {
+  if (userLoading || !isReady) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">
-            {userLoading ? 'Loading Farcaster...' : 'Preparing wallet...'}
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">Loading Farcaster...</p>
         </div>
       </div>
     );
   }
-
-  const showProviderWarning = isReady && !ethProvider;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800">
@@ -180,18 +177,6 @@ const FarcasterMiniApp = () => {
           </div>
         </div>
       </div>
-
-      {showProviderWarning && (
-        <div className="mx-3 mt-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700/30 rounded-lg p-3">
-          <div className="flex items-start gap-2">
-            <FaExclamationCircle className="text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
-            <div className="text-sm text-yellow-800 dark:text-yellow-200">
-              <p className="font-semibold mb-1">Wallet Not Available</p>
-              <p className="text-xs">Please open this app in Warpcast mobile app for full functionality.</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       <Notification
         isOpen={showSuccessNotification}
@@ -289,7 +274,7 @@ const FarcasterMiniApp = () => {
                     triggerAnimation={animationTrigger}
                     onAnimationComplete={() => setAnimationTrigger(null)}
                   />
-                ) : walletLoading ? (
+                ) : isConnecting ? (
                   <div className="bg-white dark:bg-gray-800 rounded-xl p-8 text-center shadow-lg border border-gray-200 dark:border-gray-700">
                     <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-gray-600 dark:text-gray-400">Connecting wallet...</p>
@@ -301,20 +286,14 @@ const FarcasterMiniApp = () => {
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2">Connect Wallet</h3>
                     <p className="text-white/80 mb-4 text-sm">
-                      {walletError || 'Tap to connect your wallet'}
+                      Tap to connect your Farcaster wallet
                     </p>
                     <button
                       onClick={handleManualConnect}
-                      disabled={!ethProvider}
-                      className="bg-white text-cyan-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-white text-cyan-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg"
                     >
-                      {!ethProvider ? 'Wallet Not Available' : 'Connect Wallet'}
+                      Connect Wallet
                     </button>
-                    {!ethProvider && (
-                      <p className="text-white/60 text-xs mt-2">
-                        Please open in Warpcast app
-                      </p>
-                    )}
                   </motion.div>
                 )}
               </motion.div>
@@ -346,7 +325,7 @@ const FarcasterMiniApp = () => {
                 transition={{ duration: 0.2 }}
                 className="py-4"
               >
-                <LeaderboardView address={address} />
+                <LeaderboardView address={address || null} />
               </motion.div>
             )}
             
@@ -385,7 +364,7 @@ const FarcasterMiniApp = () => {
                       </div>
 
                       <button
-                        onClick={disconnectWallet}
+                        onClick={() => disconnect()}
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
                       >
                         <FaSignOutAlt />
@@ -463,8 +442,7 @@ const FarcasterMiniApp = () => {
                     <p className="text-gray-500 dark:text-gray-400 mb-4">Connect wallet to view profile</p>
                     <button
                       onClick={handleManualConnect}
-                      disabled={!ethProvider}
-                      className="bg-cyan-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-cyan-600 transition-colors disabled:opacity-50"
+                      className="bg-cyan-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-cyan-600 transition-colors"
                     >
                       Connect Wallet
                     </button>
@@ -482,6 +460,16 @@ const FarcasterMiniApp = () => {
         hasNotification={!isConnected}
       />
     </div>
+  );
+};
+
+const FarcasterMiniApp = () => {
+  return (
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <FarcasterMiniAppContent />
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 };
 
