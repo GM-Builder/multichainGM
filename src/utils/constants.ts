@@ -18,6 +18,7 @@ export const CHAINBASE_TESTNET_CHAIN_ID = 8453;
 export const BASE_CHAIN_ID = 8453;
 export const SONEIUM_CHAIN_ID = 1868;
 export const INK_CHAIN_ID= 57073;
+export const INCENTIVE_TESTNET_CHAIN_ID = 28802;
 
 export interface ChainConfig {
   chainId: string;
@@ -213,6 +214,24 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     isTestnet: true,
     abi: GMTestnetABI, 
   },
+  [INCENTIVE_TESTNET_CHAIN_ID]: {
+    chainId: `0x${INCENTIVE_TESTNET_CHAIN_ID.toString(16)}`,
+    chainName: "Incentive Testnet",
+    nativeCurrency: {
+      name: "TCENT",
+      symbol: "TCENT",
+      decimals: 18,
+    },
+    rpcUrls: [process.env.INCENTIVE_TESTNET_RPC_URL || "https://rpc2.testnet.incentiv.io/"],
+    blockExplorerUrls: ["https://explorer-testnet.incentiv.io/"],
+    contractAddress: process.env.INCENTIVE_TESTNET_CONTRACT_ADDRESS || "0x8e171981411f2C5F65E5301fB6A78FfA286Ee383",
+    logoUrl: "/assets/chains/incentive.png",
+    status: "Ready!",
+    isTestnet: true,
+    abi: GMTestnetABI, 
+  },
+
+  
 
   // Mainnet
   [BASE_CHAIN_ID]: {
@@ -268,6 +287,12 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
 
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0xaF8471a2968a30a63Cdced851cDA2B7ce9e5dB90";
 export const TEA_SEPOLIA_RPC_URL = process.env.NEXT_PUBLIC_TEA_SEPOLIA_RPC_URL || "https://tea-sepolia.g.alchemy.com/public";
+
+// GannetX Interactive Chat contract (Base Sepolia) and RPC
+export const GANNETX_CHAT_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_GANNETX_CHAT_CONTRACT_ADDRESS || "0x24cF04855f0F33f8aEBaDe075c80C24272aE1Fc5";
+export const BASE_SEPOLIA_RPC = process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || "https://sepolia.base.org";
+// GannetX Token Factory (for deploying tokens)
+export const GANNETX_TOKEN_FACTORY_ADDRESS = process.env.NEXT_PUBLIC_GANNETX_TOKEN_FACTORY_ADDRESS || "0x1ae8Fb376EB4f2F5fCe0d30d84C28cD5582f3512";
 export const TEA_SEPOLIA_CHAIN = SUPPORTED_CHAINS[TEA_SEPOLIA_CHAIN_ID];
 
 export const CHECKIN_FEE = process.env.NEXT_PUBLIC_CHECKIN_FEE || "0.000029";

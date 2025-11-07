@@ -16,6 +16,7 @@ import {
 } from 'react-icons/fa';
 import { SUPPORTED_CHAINS, BASE_CHAIN_ID } from '@/utils/constants';
 import { motion, AnimatePresence } from 'framer-motion';
+import AudioPlayer from '@/components/AudioPlayer';
 import { useUserStats, useUserCheckins } from '@/hooks/useSubgraph';
 import { useUserChainStats } from '@/hooks/useUserChainStats';
 import { useUserRanking } from '@/hooks/useUserRangking';
@@ -35,6 +36,7 @@ import { SidebarReferralCard} from '@/components/SidebarReferralCard';
 import SidebarLeaderboardCard from '@/components/SidebarLeaderboard';
 import LeaderboardModal from '@/components/LeaderboardModal';
 import Footer from '@/components/Footer';
+import GannetXChatSidebar from '@/components/GannetXChatSidebar';
 
 type NetworkTabType = 'all' | 'mainnet' | 'testnet';
 
@@ -109,6 +111,7 @@ const CheckinPageIntegration: React.FC = () => {
     chainName: string;
   } | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [activeSidebar, setActiveSidebar] = useState<string | null>('right');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
@@ -326,6 +329,7 @@ const CheckinPageIntegration: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800 relative overflow-hidden">
       <BlobPatternBottomLeft />
       <SquigglyPatternTopRight />
+      <AudioPlayer />
       
       <Notification
         isOpen={showSuccessNotification}
@@ -466,7 +470,9 @@ const CheckinPageIntegration: React.FC = () => {
         </div>
       </div>
 
-      {/* FLOATING SIDEBAR - Right Side */}
+      {/* ============================================
+          FLOATING SIDEBAR - Right Side
+          ============================================ */}
       {web3State.isConnected && web3State.address && (
         <>
           {/* Toggle Button - Sticks to right edge */}
@@ -603,6 +609,11 @@ const CheckinPageIntegration: React.FC = () => {
                 </div>
               </motion.aside>
             )}
+            {/* Chat sidebar (GannetX) on the right - mutually exclusive with right/profile sidebar */}
+  <GannetXChatSidebar
+    isOpen={activeSidebar === 'chat'}
+    toggle={() => setActiveSidebar(prev => (prev === 'chat' ? null : 'chat'))}
+  />
           </AnimatePresence>
         </>
       )}
