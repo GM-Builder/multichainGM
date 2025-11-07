@@ -18,7 +18,7 @@ export const CHAINBASE_TESTNET_CHAIN_ID = 8453;
 export const BASE_CHAIN_ID = 8453;
 export const SONEIUM_CHAIN_ID = 1868;
 export const INK_CHAIN_ID= 57073;
-export const INCENTIVE_TESTNET_CHAIN_ID = 28802;
+export const incentiv_TESTNET_CHAIN_ID = 28802;
 
 export interface ChainConfig {
   chainId: string;
@@ -214,18 +214,18 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     isTestnet: true,
     abi: GMTestnetABI, 
   },
-  [INCENTIVE_TESTNET_CHAIN_ID]: {
-    chainId: `0x${INCENTIVE_TESTNET_CHAIN_ID.toString(16)}`,
-    chainName: "Incentive Testnet",
+  [incentiv_TESTNET_CHAIN_ID]: {
+    chainId: `0x${incentiv_TESTNET_CHAIN_ID.toString(16)}`,
+    chainName: "Incentiv Testnet",
     nativeCurrency: {
       name: "TCENT",
       symbol: "TCENT",
       decimals: 18,
     },
-    rpcUrls: [process.env.INCENTIVE_TESTNET_RPC_URL || "https://rpc2.testnet.incentiv.io/"],
+    rpcUrls: [process.env.incentiv_TESTNET_RPC_URL || "https://rpc2.testnet.incentiv.io/"],
     blockExplorerUrls: ["https://explorer-testnet.incentiv.io/"],
-    contractAddress: process.env.INCENTIVE_TESTNET_CONTRACT_ADDRESS || "0x8e171981411f2C5F65E5301fB6A78FfA286Ee383",
-    logoUrl: "/assets/chains/incentive.png",
+    contractAddress: process.env.incentiv_TESTNET_CONTRACT_ADDRESS || "0x8e171981411f2C5F65E5301fB6A78FfA286Ee383",
+    logoUrl: "/assets/chains/incentiv.png",
     status: "Ready!",
     isTestnet: true,
     abi: GMTestnetABI, 
