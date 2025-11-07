@@ -1,11 +1,8 @@
-// src/utils/apolloClient.ts
-
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 import { SUBGRAPH_ENDPOINTS, ChainName } from './subgraph';
 import { REFERRAL_SUBGRAPH_ENDPOINT } from './constants';
 import fetch from 'cross-fetch';
 
-// Create Apollo Client for specific chain
 export const createSubgraphClient = (chain: ChainName) => {
   return new ApolloClient({
     link: new HttpLink({
@@ -35,7 +32,6 @@ export const createSubgraphClient = (chain: ChainName) => {
   });
 };
 
-// Create clients for all chains
 export const subgraphClients = {
   base: createSubgraphClient('base'),
   ink: createSubgraphClient('ink'),

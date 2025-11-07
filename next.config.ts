@@ -1,33 +1,25 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      'assets.coingecko.com', 
-      'logos.covalenthq.com',
-      'i.imgur.com',
-      'imagedelivery.net',
-      'api.dicebear.com',
-    ],
+    domains: ['assets.coingecko.com', 'logos.covalenthq.com'],
   },
   
-  webpack: (config: { resolve: { fallback: any; alias: any; }; externals: string[]; }, { isServer }: { isServer: boolean }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        crypto: false,
-        stream: false,
-        url: false,
-        zlib: false,
-        http: false,
-        https: false,
-        assert: false,
-        os: false,
-        path: false,
-      };
-    }
+  webpack: (config: { resolve: { fallback: any; alias: any; }; externals: string[]; }) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+      crypto: false,
+      stream: false,
+      url: false,
+      zlib: false,
+      http: false,
+      https: false,
+      assert: false,
+      os: false,
+      path: false,
+    };
     
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
     
@@ -41,54 +33,55 @@ const nextConfig = {
   
   async headers() {
     return [
-      // Allow Farcaster to iframe /farcaster
       {
-        source: '/farcaster',
+        source: '/(.*)',
         headers: [
           {
-            key: 'Content-Security-Policy',
-            value: "frame-ancestors *",
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
           },
         ],
       },
     ];
   },
   
-  async redirects() {
-    return [
-      // ONLY farcaster manifest redirect
-      {
-        source: '/.well-known/farcaster.json',
-        destination: 'https://api.farcaster.xyz/miniapps/hosted-manifest/019a04eb-5297-ed7a-811e-77ff01276024',
-        permanent: false,
-      },
-    ];
-  },
-  
   reactStrictMode: true,
-  swcMinify: true,
   
   experimental: {
-    turbo: false,
-    optimizePackageImports: ['@thirdweb-dev/react', 'ethers', '@farcaster/miniapp-sdk'],
+    appDir: true,
+    
+    optimizePackageImports: ['@thirdweb-dev/react', 'ethers'],
   },
   
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   
+  swcMinify: true,
+  
   output: 'standalone',
+  
   poweredByHeader: false,
   
+  env: {
+    CUSTOM_KEY: 'custom-value',
+  },
+  
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
-  
-  transpilePackages: ['ethers', '@farcaster/miniapp-sdk'],
 };
 
 module.exports = nextConfig;

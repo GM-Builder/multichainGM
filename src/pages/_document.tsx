@@ -7,17 +7,9 @@ class MyDocument extends Document {
   }
 
   render() {
-    const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://gannetx.space';
-
     return (
       <Html lang="en">
-         <Head>
-        {/* Preload Farcaster SDK */}
-        <link
-          rel="modulepreload"
-          href="https://esm.sh/@farcaster/frame-sdk"
-        />
-      </Head>
+        <Head />
         <body>
           <Main />
           <NextScript />

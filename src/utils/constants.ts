@@ -287,14 +287,10 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
 
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0xaF8471a2968a30a63Cdced851cDA2B7ce9e5dB90";
 export const TEA_SEPOLIA_RPC_URL = process.env.NEXT_PUBLIC_TEA_SEPOLIA_RPC_URL || "https://tea-sepolia.g.alchemy.com/public";
-
-// GannetX Interactive Chat contract (Base Sepolia) and RPC
 export const GANNETX_CHAT_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_GANNETX_CHAT_CONTRACT_ADDRESS || "0x24cF04855f0F33f8aEBaDe075c80C24272aE1Fc5";
 export const BASE_SEPOLIA_RPC = process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || "https://sepolia.base.org";
-// GannetX Token Factory (for deploying tokens)
 export const GANNETX_TOKEN_FACTORY_ADDRESS = process.env.NEXT_PUBLIC_GANNETX_TOKEN_FACTORY_ADDRESS || "0x1ae8Fb376EB4f2F5fCe0d30d84C28cD5582f3512";
 export const TEA_SEPOLIA_CHAIN = SUPPORTED_CHAINS[TEA_SEPOLIA_CHAIN_ID];
-
 export const CHECKIN_FEE = process.env.NEXT_PUBLIC_CHECKIN_FEE || "0.000029";
 
 export const DAY_IN_MS = 86400000;
@@ -376,7 +372,6 @@ export const SUBGRAPH_ENDPOINTS = {
 } as const;
 
 export const REFERRAL_CONTRACT_CONFIG = {
-  // Base mainnet (only chain with referral contract)
   [BASE_CHAIN_ID]: {
     address: process.env.REFERRAL_CONTRACT_ADDRESS || "0x577990A6b1D9403Db0477985787F0d687E77dfB4",
     abi: ReferralABI,
@@ -387,7 +382,6 @@ export const REFERRAL_SUBGRAPH_ENDPOINT =
   process.env.NEXT_PUBLIC_REFERRAL_SUBGRAPH_URL || 
   'https://api.studio.thegraph.com/query/XXXXX/gannetx-referral/version/latest';
 
-// Helper functions for referral
 export const getReferralContractAddress = (): string => {
   return REFERRAL_CONTRACT_CONFIG[BASE_CHAIN_ID].address;
 };

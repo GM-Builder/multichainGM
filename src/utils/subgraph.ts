@@ -14,21 +14,18 @@ export type ChainName = keyof typeof SUBGRAPH_ENDPOINTS;
 
 export const SUPPORTED_CHAINS: ChainName[] = ['base', 'ink', 'soneium'];
 
-// Mapping Chain ID (number) ke ChainName (string)
 export const CHAIN_ID_TO_NAME: Record<number, ChainName> = {
   [BASE_CHAIN_ID]: 'base',
   [INK_CHAIN_ID]: 'ink',
   [SONEIUM_CHAIN_ID]: 'soneium',
 };
 
-// Mapping ChainName (string) ke Chain ID (number)
 export const CHAIN_NAME_TO_ID: Record<ChainName, number> = {
   base: BASE_CHAIN_ID,
   ink: INK_CHAIN_ID,
   soneium: SONEIUM_CHAIN_ID,
 };
 
-// Helper functions
 export function chainIdToName(chainId: number): ChainName | undefined {
   return CHAIN_ID_TO_NAME[chainId];
 }

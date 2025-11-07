@@ -22,7 +22,7 @@ const DeployPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-[var(--cyber-cyan)] to-blue-400 bg-clip-text text-transparent">
-                Token Hub
+                Token Hub <span className="text-md font-normal text-gray-300">| Testnet</span>
               </h1>
               <p className="text-sm text-gray-400">Deploy and manage your ERC20 tokens</p>
             </div>
