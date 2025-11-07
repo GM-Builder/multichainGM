@@ -7,7 +7,8 @@ import {
   FaChevronRight,
   FaWallet,
   FaCheckCircle,
-  FaSpinner
+  FaSpinner,
+  FaChevronLeft
 } from 'react-icons/fa';
 import { useWalletState } from '@/hooks/useWalletState';
 import GannetXABI from '@/abis/GannetXInteractiveChat.json';
@@ -249,17 +250,17 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         onClick={toggle}
-        className="fixed z-40 bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-3 rounded-l-xl shadow-xl hover:shadow-2xl transition-all duration-300"
+        className="fixed z-40 bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-3 rounded-r-xl shadow-xl hover:shadow-2xl transition-all duration-300"
         style={{ 
           top: 'calc(50% + 72px)', 
-          right: isOpen ? '400px' : '0', 
+          left: isOpen ? '320px' : '0', 
           width: '48px', 
           height: '48px' 
         }}
       >
         <div className="relative flex items-center justify-center">
           {isOpen ? (
-            <FaChevronRight className="text-xl" />
+            <FaChevronLeft className="text-xl" />
           ) : (
             <div className="flex items-center justify-center">
               <FaComments className="w-5 h-5" />
@@ -270,10 +271,10 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
 
       {/* Sidebar Panel */}
       <motion.div
-        initial={{ opacity: 0, x: 400 }}
-        animate={{ opacity: 1, x: isOpen ? 0 : 400 }}
+        initial={{ opacity: 0, x: -320 }}
+        animate={{ opacity: 1, x: isOpen ? 0 : -320 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="fixed right-0 top-24 bottom-0 z-30 w-[400px] bg-white dark:bg-gray-900 shadow-2xl flex flex-col rounded-l-lg"
+        className="fixed left-0 top-50 bottom-0 z-30 w-80 bg-white dark:bg-gray-900 shadow-2xl flex flex-col rounded-r-xl"
       >
               {/* Header */}
               <div className="flex-shrink-0 px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-gray-800 dark:to-gray-900">

@@ -26,7 +26,7 @@ const Footer: React.FC<FooterProps> = ({
   const router = useRouter();
 
   return (
-    <footer className="relative bg-gradient-to-b from-cyan-900/90 to-black overflow-hidden py-8 md:py-16">
+    <footer className="relative bg-gradient-to-b from-cyan-900/90 to-black overflow-hidden py-8 md:py-16 z-20">
       {/* Background elements - Hidden on mobile */}
       <div className="hidden md:block absolute inset-0 bg-[url('/grid-pattern.svg')] bg-repeat opacity-5 pointer-events-none"></div>
       

@@ -9,13 +9,10 @@ import {
   FaGlobe,
   FaFlask,
   FaLayerGroup,
-  FaUser,
   FaCopy,
-  FaChevronLeft,
-  FaChevronRight,
 } from 'react-icons/fa';
 import { SUPPORTED_CHAINS, BASE_CHAIN_ID } from '@/utils/constants';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import AudioPlayer from '@/components/AudioPlayer';
 import { useUserStats, useUserCheckins } from '@/hooks/useSubgraph';
 import { useUserChainStats } from '@/hooks/useUserChainStats';
@@ -28,14 +25,11 @@ import {
   generateReferralLink, 
   extractReferralCode, 
   validateReferralCode,
-  hasReferrer,
   formatAddress
 } from '@/utils/web3';
 import toast from 'react-hot-toast';
 import { SidebarReferralCard} from '@/components/SidebarReferralCard';
-import SidebarLeaderboardCard from '@/components/SidebarLeaderboard';
 import LeaderboardModal from '@/components/LeaderboardModal';
-import Footer from '@/components/Footer';
 import GannetXChatSidebar from '@/components/GannetXChatSidebar';
 
 type NetworkTabType = 'all' | 'mainnet' | 'testnet';
@@ -88,7 +82,6 @@ const CheckinPageIntegration: React.FC = () => {
   const { 
     web3State, 
     connectWallet: rawConnectWallet, 
-    disconnectWallet,
     refreshReferralStatus,
   } = useWalletState();
   
@@ -111,8 +104,7 @@ const CheckinPageIntegration: React.FC = () => {
     chainName: string;
   } | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
-  const [activeSidebar, setActiveSidebar] = useState<string | null>('right');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [referralCodeFromUrl, setReferralCodeFromUrl] = useState<string | null>(null);
@@ -134,7 +126,6 @@ const CheckinPageIntegration: React.FC = () => {
     ? (SUPPORTED_CHAINS[web3State.chainId]?.chainName || 'Unknown') 
     : 'No Chain';
 
-  // Check if on referral chain
   useEffect(() => {
     const checkReferralChain = async () => {
       try {
@@ -151,7 +142,6 @@ const CheckinPageIntegration: React.FC = () => {
     }
   }, [web3State.isConnected, web3State.chainId]);
 
-  // Check for referral code in URL on mount
   useEffect(() => {
     try {
       const refCode = extractReferralCode();
@@ -161,10 +151,7 @@ const CheckinPageIntegration: React.FC = () => {
         
         if (validation.valid && validation.address) {
           setReferralCodeFromUrl(validation.address);
-          console.log('Valid referral code detected:', validation.address);
         } else {
-          console.warn('Invalid referral code:', validation.error);
-          // Clear invalid ref from URL
           const url = new URL(window.location.href);
           url.searchParams.delete('ref');
           window.history.replaceState({}, document.title, url.pathname + url.search);
@@ -175,23 +162,15 @@ const CheckinPageIntegration: React.FC = () => {
     }
   }, []);
 
-  // Auto-show register modal when conditions are met
   useEffect(() => {
     const checkAndShowRegisterModal = async () => {
-      // Need: wallet connected, referral code present
       if (!web3State.isConnected || !web3State.address || !referralCodeFromUrl) {
         return;
       }
 
       try {
-        // Check if trying to refer themselves
         if (referralCodeFromUrl.toLowerCase() === web3State.address.toLowerCase()) {
-          toast.error('You cannot refer yourself!', {
-            duration: 3000,
-            icon: '❌',
-          });
-          
-          // Clear invalid ref from URL
+          toast.error('You cannot refer yourself!');
           const url = new URL(window.location.href);
           url.searchParams.delete('ref');
           window.history.replaceState({}, document.title, url.pathname + url.search);
@@ -199,14 +178,8 @@ const CheckinPageIntegration: React.FC = () => {
           return;
         }
 
-        // Check if user already has a referrer (from web3State)
         if (web3State.hasReferrer) {
-          toast('You already have a referrer!', {
-            duration: 3000,
-            icon: 'ℹ️',
-          });
-          
-          // Clear URL
+          toast('You already have a referrer!');
           const url = new URL(window.location.href);
           url.searchParams.delete('ref');
           window.history.replaceState({}, document.title, url.pathname + url.search);
@@ -221,42 +194,26 @@ const CheckinPageIntegration: React.FC = () => {
     };
 
     checkAndShowRegisterModal();
-  }, [
-    web3State.isConnected, 
-    web3State.address, 
-    web3State.hasReferrer,
-    referralCodeFromUrl
-  ]);
+  }, [web3State.isConnected, web3State.address, web3State.hasReferrer, referralCodeFromUrl]);
 
-  // Handle successful referral registration
   const handleReferralSuccess = async () => {
-    toast.success('Referral registered successfully!', {
-      duration: 5000,
-      icon: '🎉',
-    });
-    
-    // Clear URL parameter
+    toast.success('Referral registered successfully!');
     const url = new URL(window.location.href);
     url.searchParams.delete('ref');
     window.history.replaceState({}, document.title, url.pathname + url.search);
     setReferralCodeFromUrl(null);
     
-    // Refresh referral status
     if (refreshReferralStatus) {
       await refreshReferralStatus();
     }
     
-    // Refresh page to update referral data
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
+    setTimeout(() => window.location.reload(), 2000);
   };
 
   const handleCheckinSuccess = useCallback((chainId: number, txHash: string): void => {
     setLastTxHash(txHash);
     setLastCheckinChainId(chainId);
     setShowSuccessNotification(true);
-
     const chainConfig = SUPPORTED_CHAINS[chainId];
     setPendingAnimation({
       chainId: chainId,
@@ -264,16 +221,9 @@ const CheckinPageIntegration: React.FC = () => {
     });
   }, []);
 
-  const handleError = useCallback((errorMessage: string): void => {
-    setError(errorMessage);
-    setShowErrorNotification(true);
-  }, []);
-
-  // Get avatar URL
   const getAvatarUrl = (address: string): string => 
     `https://api.dicebear.com/6.x/identicon/svg?seed=${address}`;
 
-  // Copy address to clipboard
   const handleCopyAddress = useCallback(() => {
     if (web3State.address) {
       navigator.clipboard.writeText(web3State.address);
@@ -282,44 +232,26 @@ const CheckinPageIntegration: React.FC = () => {
     }
   }, [web3State.address]);
 
-  // Generate and copy referral link
   const handleCopyReferralLink = useCallback(() => {
     if (web3State.address) {
       const link = generateReferralLink(web3State.address);
       navigator.clipboard.writeText(link);
-      toast.success('Referral link copied!', {
-        duration: 2000,
-        icon: '✅',
-      });
+      toast.success('Referral link copied!');
     }
   }, [web3State.address]);
 
-  // Toggle sidebar
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  // Handle switch to Base network
   const handleSwitchToBase = async () => {
     if (web3State.provider) {
       try {
         await web3State.provider.send('wallet_switchEthereumChain', [
           { chainId: `0x${BASE_CHAIN_ID.toString(16)}` }
         ]);
-        toast.success('Switched to Base network!', {
-          duration: 2000,
-          icon: '✅',
-        });
+        toast.success('Switched to Base network!');
       } catch (error: any) {
-        console.error('Failed to switch to Base:', error);
         if (error.code === 4902) {
-          toast.error('Base network not found in wallet. Please add it first.', {
-            duration: 4000,
-          });
+          toast.error('Base network not found in wallet.');
         } else {
-          toast.error('Failed to switch network', {
-            duration: 3000,
-          });
+          toast.error('Failed to switch network');
         }
       }
     }
@@ -356,7 +288,6 @@ const CheckinPageIntegration: React.FC = () => {
         message={error || "An unknown error occurred. Please try again."}
       />
 
-      {/* Referral Dashboard Modal */}
       <ReferralModal
         isOpen={isReferralModalOpen}
         onClose={() => setIsReferralModalOpen(false)}
@@ -371,7 +302,6 @@ const CheckinPageIntegration: React.FC = () => {
         address={web3State.address}
       />
 
-      {/* Referral Register Modal - PENTING: Selalu render jika ada referral code */}
       {referralCodeFromUrl && (
         <ReferralRegisterModal
           isOpen={isRegisterModalOpen}
@@ -390,233 +320,94 @@ const CheckinPageIntegration: React.FC = () => {
         />
       )}
       
-      <div className="pt-24 pb-20 relative z-10">
-        {/* Quest Dashboard */}
-        <div className="max-w-7xl mx-auto px-4 mb-6">
-          <QuestDashboard address={web3State.address} />
-        </div>
-
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4">
-          {/* Network Tabs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex justify-center mb-6"
-          >
-            <div className="flex bg-white dark:bg-gray-800/80 px-2 py-1 rounded-full backdrop-blur-sm shadow-md">
-              <button
-                onClick={() => setNetworkTab('all')}
-                className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${
-                  networkTab === 'all' 
-                    ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-700/30'
-                }`}
-              >
-                <div className="flex items-center">
-                  <FaLayerGroup className="mr-2 h-4 w-4" />
-                  All
-                </div>
-              </button>
-              
-              <button
-                onClick={() => setNetworkTab('mainnet')}
-                className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${
-                  networkTab === 'mainnet' 
-                    ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-700/30'
-                }`}
-              >
-                <div className="flex items-center">
-                  <FaGlobe className="mr-2 h-4 w-4" />
-                  Mainnet
-                </div>
-              </button>
-              
-              <button
-                onClick={() => setNetworkTab('testnet')}
-                className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${
-                  networkTab === 'testnet' 
-                    ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-700/30'
-                }`}
-              >
-                <div className="flex items-center">
-                  <FaFlask className="mr-2 h-4 w-4" />
-                  Testnet
-                </div>
-              </button>
-            </div>
-          </motion.div>
+      {/* LAYOUT WRAPPER - Calculated center with sidebar */}
+      <div className="relative">
+        
+        {/* MAIN CONTENT - PERFECTLY CENTERED */}
+        <div className={`pt-24 pb-20 relative z-10 transition-all duration-300 ${
+          web3State.isConnected ? 'lg:mr-[40px] xl:mr-[4px]' : ''
+        }`}>
           
-          {/* Multi Chain Checkin Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <FixedMultiChainCheckinGrid
-              isConnected={web3State.isConnected}
-              currentChainId={web3State.chainId}
-              address={web3State.address}
-              signer={web3State.signer}
-              provider={web3State.provider}
-              onCheckinSuccess={handleCheckinSuccess}
-              networkType={networkTab}
-              triggerAnimation={animationTrigger}
-              onAnimationComplete={() => setAnimationTrigger(null)}
-            />
-          </motion.div>
-        </div>
-      </div>
+          <div className="max-w-7xl mx-auto px-4 mb-6">
+            <QuestDashboard address={web3State.address} />
+          </div>
 
-      {/* ============================================
-          FLOATING SIDEBAR - Right Side
-          ============================================ */}
-      {web3State.isConnected && web3State.address && (
-        <>
-          {/* Toggle Button - Sticks to right edge */}
-          <motion.button
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            onClick={toggleSidebar}
-            className={`fixed top-1/2 -translate-y-1/2 z-40 bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-3 rounded-l-xl shadow-xl hover:shadow-2xl transition-all duration-300 ${
-              isSidebarOpen ? 'right-[360px]' : 'right-0'
-            }`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <div className="relative">
-              {isSidebarOpen ? (
-                <FaChevronRight className="text-xl" />
-              ) : (
-                <div className="flex items-center gap-2">
-                  <FaChevronLeft className="text-xl" />
-                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white">
-                    <img 
-                      src={getAvatarUrl(web3State.address)} 
-                      alt="Avatar" 
-                      className="w-full h-full"
-                    />
+          <div className="max-w-7xl mx-auto px-4">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-center mb-6">
+              <div className="flex bg-white dark:bg-gray-800/80 px-2 py-1 rounded-full backdrop-blur-sm shadow-md">
+                <button onClick={() => setNetworkTab('all')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'all' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
+                  <div className="flex items-center"><FaLayerGroup className="mr-2 h-4 w-4" />All</div>
+                </button>
+                <button onClick={() => setNetworkTab('mainnet')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'mainnet' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
+                  <div className="flex items-center"><FaGlobe className="mr-2 h-4 w-4" />Mainnet</div>
+                </button>
+                <button onClick={() => setNetworkTab('testnet')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'testnet' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
+                  <div className="flex items-center"><FaFlask className="mr-2 h-4 w-4" />Testnet</div>
+                </button>
+              </div>
+            </motion.div>
+            
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+              <FixedMultiChainCheckinGrid
+                isConnected={web3State.isConnected}
+                currentChainId={web3State.chainId}
+                address={web3State.address}
+                signer={web3State.signer}
+                provider={web3State.provider}
+                onCheckinSuccess={handleCheckinSuccess}
+                networkType={networkTab}
+                triggerAnimation={animationTrigger}
+                onAnimationComplete={() => setAnimationTrigger(null)}
+              />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* RIGHT SIDEBAR - FIXED */}
+        {web3State.isConnected && web3State.address && (
+          <motion.aside initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="hidden lg:block fixed right-0 top-20 bottom-0 w-80 xl:w-80 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-xl border-l border-gray-200 dark:border-gray-800 overflow-y-auto z-20 rounded-l-lg">
+            <div className="p-4 xl:p-6 space-y-4 xl:space-y-6">
+              <div className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl border border-cyan-200 dark:border-cyan-800 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-cyan-400/30 flex-shrink-0">
+                    <img src={getAvatarUrl(web3State.address)} alt="Avatar" className="w-full h-full" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1">Your Address</p>
+                    <div onClick={handleCopyAddress} className="group flex items-center gap-1.5 cursor-pointer">
+                      <span className="font-mono text-xs text-gray-800 dark:text-gray-200 truncate">{web3State.address.substring(0, 6)}...{web3State.address.substring(38)}</span>
+                      <FaCopy className={`text-xs flex-shrink-0 transition-colors ${copySuccess ? 'text-green-500' : 'text-gray-400 group-hover:text-cyan-500'}`} />
+                    </div>
                   </div>
                 </div>
-              )}
+              </div>
+
+              <HeroStatsSection
+                currentChainId={web3State.chainId || null}
+                currentChainName={currentChainName}
+                currentChainCheckins={currentChainStats?.totalCheckins || 0}
+                currentChainStreak={currentChainStats?.currentStreak || 0}
+                totalCheckins={userStats?.totalCheckins || 0}
+                totalChains={userStats?.chains.length || 0}
+                maxStreak={userStats?.maxStreak || 0}
+                userRank={userRanking?.rank || 0}
+                totalUsers={userRanking?.totalUsers || 0}
+                loading={chainStatsLoading || userStatsLoading || rankingLoading}
+              />
+
+              {userStats && <ActivityHeatmap checkins={userCheckins || []} currentStreak={userStats.currentStreak} maxStreak={userStats.maxStreak} />}
+
+              <SidebarReferralCard canUseReferral={canUseReferral} myReferralsCount={myReferrals?.totalReferrals || 0} userReferredBy={userReferrerData?.referredBy?.id || null} onCopyLink={handleCopyReferralLink} onCardClick={() => setIsReferralModalOpen(true)} onSwitchToBase={handleSwitchToBase} formatAddress={formatAddress} /> 
             </div>
-          </motion.button>
+          </motion.aside>
+        )}
+      </div>
 
-          {/* Floating Sidebar */}
-          <AnimatePresence>
-            {isSidebarOpen && (
-              <motion.aside
-                initial={{ x: 360 }}
-                animate={{ x: 0 }}
-                exit={{ x: 360 }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="fixed right-0 top-24 bottom-0 w-[360px] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl z-30 overflow-y-auto"
-              >
-                <div className="p-6 space-y-6">
-                  {/* Profile Card with Avatar & Address */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-2xl border border-cyan-200 dark:border-cyan-800 shadow-lg p-6"
-                  >
-                    <div className="flex flex-col items-center text-center">
-                      {/* Avatar */}
-                      <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-4 ring-cyan-400/30 shadow-lg">
-                        <img 
-                          src={getAvatarUrl(web3State.address)} 
-                          alt="Avatar" 
-                          className="w-full h-full"
-                        />
-                      </div>
-                      
-                      {/* Address with Copy Button */}
-                      <div className="w-full">
-                        <div className="flex items-center justify-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-2">
-                          <FaUser className="text-xs" />
-                          <span>Your Address</span>
-                        </div>
-                        <div 
-                          onClick={handleCopyAddress}
-                          className="group relative font-mono text-sm bg-white dark:bg-gray-800 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
-                        >
-                          <div className="flex items-center justify-center gap-2">
-                            <span className="text-gray-800 dark:text-gray-200">
-                              {web3State.address.substring(0, 6)}...{web3State.address.substring(38)}
-                            </span>
-                            <FaCopy className={`text-xs transition-colors ${
-                              copySuccess 
-                                ? 'text-green-500' 
-                                : 'text-gray-400 group-hover:text-cyan-500'
-                            }`} />
-                          </div>
-                          
-                          {/* Tooltip */}
-                          {copySuccess ? (
-                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-green-500 text-white text-xs rounded whitespace-nowrap shadow-lg">
-                              Copied! ✓
-                            </div>
-                          ) : (
-                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
-                              Click to copy
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Hero Stats Section */}
-                  <HeroStatsSection
-                    currentChainId={web3State.chainId || null}
-                    currentChainName={currentChainName}
-                    currentChainCheckins={currentChainStats?.totalCheckins || 0}
-                    currentChainStreak={currentChainStats?.currentStreak || 0}
-                    totalCheckins={userStats?.totalCheckins || 0}
-                    totalChains={userStats?.chains.length || 0}
-                    maxStreak={userStats?.maxStreak || 0}
-                    userRank={userRanking?.rank || 0}
-                    totalUsers={userRanking?.totalUsers || 0}
-                    loading={chainStatsLoading || userStatsLoading || rankingLoading}
-                  />
-
-                  {/* Activity Heatmap */}
-                  {userStats && (
-                    <ActivityHeatmap
-                      checkins={userCheckins || []}
-                      currentStreak={userStats.currentStreak}
-                      maxStreak={userStats.maxStreak}
-                    />
-                  )}
-
-                  {/* Top Leaderboard Card */}
-                  {/* <SidebarLeaderboardCard
-                    address={web3State.address}
-                    onCardClick={() => setIsLeaderboardModalOpen(true)}
-                  /> */}
-
-                  {/* Referral Card */}
-                  <SidebarReferralCard
-                    canUseReferral={canUseReferral}
-                    myReferralsCount={myReferrals?.totalReferrals || 0}
-                    userReferredBy={userReferrerData?.referredBy?.id || null}
-                    onCopyLink={handleCopyReferralLink}
-                    onCardClick={() => setIsReferralModalOpen(true)}
-                    onSwitchToBase={handleSwitchToBase}
-                    formatAddress={formatAddress}
-                  /> 
-                </div>
-              </motion.aside>
-            )}
-            {/* Chat sidebar (GannetX) on the right - mutually exclusive with right/profile sidebar */}
-  <GannetXChatSidebar
-    isOpen={activeSidebar === 'chat'}
-    toggle={() => setActiveSidebar(prev => (prev === 'chat' ? null : 'chat'))}
-  />
-          </AnimatePresence>
-        </>
-      )}
+      {/* LEFT SIDEBAR - Chat Toggle (OVERLAY) */}
+      <GannetXChatSidebar
+        isOpen={isChatOpen}
+        toggle={() => setIsChatOpen(!isChatOpen)}
+      />
     </div>
   );
 };
