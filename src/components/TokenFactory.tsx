@@ -1225,7 +1225,7 @@ const Step5Success: React.FC<{ tokenAddress: string | null; config: TokenConfig 
           {tokenMetadata && <TokenBadge badge={tokenMetadata.badge} size="md" />}
         </div>
         <p className="text-gray-400 max-w-md mx-auto">
-          Your token has been successfully deployed to Base Sepolia and is ready to use.
+          Your token has been successfully deployed to Base and is ready to use.
         </p>
       </motion.div>
 

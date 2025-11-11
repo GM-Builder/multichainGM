@@ -55,7 +55,7 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
 
     const rpc = BASE_RPC;
     return new ethers.providers.JsonRpcProvider(rpc, { 
-      name: 'base-sepolia', 
+      name: 'base', 
       chainId: BASE_CHAIN_ID 
     });
   }, [web3State.provider, web3State.chainId]);
@@ -146,7 +146,7 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
     if (web3State.chainId !== BASE_CHAIN_ID) {
       const switched = await switchNetwork(BASE_CHAIN_ID);
       if (!switched) {
-        toast.error('Please switch to Base Sepolia to send message');
+        toast.error('Please switch to Base to send message');
         return;
       }
     }
@@ -288,7 +288,7 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
                         GannetX Chat
                       </h3>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        Community on Base Sepolia
+                        Community on Base
                       </p>
                     </div>
                   </div>
