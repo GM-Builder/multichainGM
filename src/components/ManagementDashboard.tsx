@@ -477,7 +477,7 @@ const TokenCard: React.FC<{
                 )}
               </button>
               <a
-                href={`https://sepolia.basescan.org/address/${token.address}`}
+                href={`https://basescan.org/address/${token.address}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-1.5 hover:bg-[var(--navy-depth)] rounded transition-all"
@@ -640,7 +640,7 @@ const QuickActionsPanel: React.FC<{ token: TokenInfo; onClose: () => void }> = (
       label: 'Update BaseScan',
       description: 'Update token info',
       color: 'cyan',
-      onClick: () => window.open(`https://sepolia.basescan.org/token/${token.address}#tokeninfo`, '_blank'),
+      onClick: () => window.open(`https://basescan.org/token/${token.address}#tokeninfo`, '_blank'),
     },
   ];
 

@@ -1268,7 +1268,7 @@ const Step5Success: React.FC<{ tokenAddress: string | null; config: TokenConfig 
         className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto"
       >
         <a
-          href={`https://sepolia.basescan.org/address/${tokenAddress}`}
+          href={`https://basescan.org/address/${tokenAddress}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-[var(--navy-light)] border-2 border-[var(--cyber-cyan)]/30 text-white rounded-xl hover:bg-[var(--navy-lighter)] hover:border-[var(--cyber-cyan)] transition-all font-medium"
