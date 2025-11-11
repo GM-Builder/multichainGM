@@ -320,90 +320,111 @@ const CheckinPageIntegration: React.FC = () => {
         />
       )}
       
-      {/* LAYOUT WRAPPER - Calculated center with sidebar */}
-      <div className="relative">
-        
-        {/* MAIN CONTENT - PERFECTLY CENTERED */}
-        <div className={`pt-24 pb-20 relative z-10 transition-all duration-300 ${
-          web3State.isConnected ? 'lg:mr-[40px] xl:mr-[4px]' : ''
-        }`}>
-          
-          <div className="max-w-7xl mx-auto px-4 mb-6">
+      {/* MAIN CONTENT CONTAINER */}
+      <div className="pt-24 pb-20 relative z-10">
+        <div className="max-w-screen mx-auto px-4 md:pl-6 lg:pl-80">
+          {/* CONTENT WITH SIDEBAR LAYOUT */}
+          <div className="flex gap-6"> 
+            {/* LEFT CONTENT - MAIN AREA */}
+          <div className="flex-1">
+        {/* QUEST BANNER - FULL WIDTH */}
+          <div className="mb-6">
             <QuestDashboard address={web3State.address} />
           </div>
+              
+              {/* NETWORK TABS */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-center mb-6">
+                <div className="flex bg-white dark:bg-gray-800/80 px-2 py-1 rounded-full backdrop-blur-sm shadow-md">
+                  <button onClick={() => setNetworkTab('all')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'all' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
+                    <div className="flex items-center"><FaLayerGroup className="mr-2 h-4 w-4" />All</div>
+                  </button>
+                  <button onClick={() => setNetworkTab('mainnet')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'mainnet' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
+                    <div className="flex items-center"><FaGlobe className="mr-2 h-4 w-4" />Mainnet</div>
+                  </button>
+                  <button onClick={() => setNetworkTab('testnet')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'testnet' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
+                    <div className="flex items-center"><FaFlask className="mr-2 h-4 w-4" />Testnet</div>
+                  </button>
+                </div>
+              </motion.div>
+              
+              {/* CHECKIN GRID */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                <FixedMultiChainCheckinGrid
+                  isConnected={web3State.isConnected}
+                  currentChainId={web3State.chainId}
+                  address={web3State.address}
+                  signer={web3State.signer}
+                  provider={web3State.provider}
+                  onCheckinSuccess={handleCheckinSuccess}
+                  networkType={networkTab}
+                  triggerAnimation={animationTrigger}
+                  onAnimationComplete={() => setAnimationTrigger(null)}
+                />
+              </motion.div>
+            </div>
 
-          <div className="max-w-7xl mx-auto px-4">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-center mb-6">
-              <div className="flex bg-white dark:bg-gray-800/80 px-2 py-1 rounded-full backdrop-blur-sm shadow-md">
-                <button onClick={() => setNetworkTab('all')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'all' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
-                  <div className="flex items-center"><FaLayerGroup className="mr-2 h-4 w-4" />All</div>
-                </button>
-                <button onClick={() => setNetworkTab('mainnet')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'mainnet' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
-                  <div className="flex items-center"><FaGlobe className="mr-2 h-4 w-4" />Mainnet</div>
-                </button>
-                <button onClick={() => setNetworkTab('testnet')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'testnet' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
-                  <div className="flex items-center"><FaFlask className="mr-2 h-4 w-4" />Testnet</div>
-                </button>
-              </div>
-            </motion.div>
-            
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-              <FixedMultiChainCheckinGrid
-                isConnected={web3State.isConnected}
-                currentChainId={web3State.chainId}
-                address={web3State.address}
-                signer={web3State.signer}
-                provider={web3State.provider}
-                onCheckinSuccess={handleCheckinSuccess}
-                networkType={networkTab}
-                triggerAnimation={animationTrigger}
-                onAnimationComplete={() => setAnimationTrigger(null)}
-              />
-            </motion.div>
-          </div>
-        </div>
-
-        {/* RIGHT SIDEBAR - FIXED */}
-        {web3State.isConnected && web3State.address && (
-          <motion.aside initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="hidden lg:block fixed right-0 top-20 bottom-0 w-80 xl:w-80 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-xl border-l border-gray-200 dark:border-gray-800 overflow-y-auto z-20 rounded-l-lg">
-            <div className="p-4 xl:p-6 space-y-4 xl:space-y-6">
-              <div className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl border border-cyan-200 dark:border-cyan-800 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-cyan-400/30 flex-shrink-0">
-                    <img src={getAvatarUrl(web3State.address)} alt="Avatar" className="w-full h-full" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1">Your Address</p>
-                    <div onClick={handleCopyAddress} className="group flex items-center gap-1.5 cursor-pointer">
-                      <span className="font-mono text-xs text-gray-800 dark:text-gray-200 truncate">{web3State.address.substring(0, 6)}...{web3State.address.substring(38)}</span>
-                      <FaCopy className={`text-xs flex-shrink-0 transition-colors ${copySuccess ? 'text-green-500' : 'text-gray-400 group-hover:text-cyan-500'}`} />
+            {/* RIGHT SIDEBAR - INSIDE CONTAINER */}
+            {web3State.isConnected && web3State.address && (
+              <motion.aside 
+                initial={{ opacity: 0, x: 20 }} 
+                animate={{ opacity: 1, x: 0 }} 
+                className="hidden lg:block w-80 xl:w-96 flex-shrink-0"
+              >
+                <div className="sticky top-24 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-xl border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+                  <div className="p-4 xl:p-6 space-y-4 xl:space-y-6 max-h-max overflow-y-auto">
+                    
+                    {/* USER INFO CARD */}
+                    <div className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl border border-cyan-200 dark:border-cyan-800 p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-cyan-400/30 flex-shrink-0">
+                          <img src={getAvatarUrl(web3State.address)} alt="Avatar" className="w-full h-full" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1">Your Address</p>
+                          <div onClick={handleCopyAddress} className="group flex items-center gap-1.5 cursor-pointer">
+                            <span className="font-mono text-xs text-gray-800 dark:text-gray-200 truncate">{web3State.address.substring(0, 6)}...{web3State.address.substring(38)}</span>
+                            <FaCopy className={`text-xs flex-shrink-0 transition-colors ${copySuccess ? 'text-green-500' : 'text-gray-400 group-hover:text-cyan-500'}`} />
+                          </div>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* STATS SECTION */}
+                    <HeroStatsSection
+                      currentChainId={web3State.chainId || null}
+                      currentChainName={currentChainName}
+                      currentChainCheckins={currentChainStats?.totalCheckins || 0}
+                      currentChainStreak={currentChainStats?.currentStreak || 0}
+                      totalCheckins={userStats?.totalCheckins || 0}
+                      totalChains={userStats?.chains.length || 0}
+                      maxStreak={userStats?.maxStreak || 0}
+                      userRank={userRanking?.rank || 0}
+                      totalUsers={userRanking?.totalUsers || 0}
+                      loading={chainStatsLoading || userStatsLoading || rankingLoading}
+                    />
+
+                    {/* ACTIVITY HEATMAP */}
+                    {userStats && <ActivityHeatmap checkins={userCheckins || []} currentStreak={userStats.currentStreak} maxStreak={userStats.maxStreak} />}
+
+                    {/* REFERRAL CARD */}
+                    <SidebarReferralCard 
+                      canUseReferral={canUseReferral} 
+                      myReferralsCount={myReferrals?.totalReferrals || 0} 
+                      userReferredBy={userReferrerData?.referredBy?.id || null} 
+                      onCopyLink={handleCopyReferralLink} 
+                      onCardClick={() => setIsReferralModalOpen(true)} 
+                      onSwitchToBase={handleSwitchToBase} 
+                      formatAddress={formatAddress} 
+                    /> 
                   </div>
                 </div>
-              </div>
-
-              <HeroStatsSection
-                currentChainId={web3State.chainId || null}
-                currentChainName={currentChainName}
-                currentChainCheckins={currentChainStats?.totalCheckins || 0}
-                currentChainStreak={currentChainStats?.currentStreak || 0}
-                totalCheckins={userStats?.totalCheckins || 0}
-                totalChains={userStats?.chains.length || 0}
-                maxStreak={userStats?.maxStreak || 0}
-                userRank={userRanking?.rank || 0}
-                totalUsers={userRanking?.totalUsers || 0}
-                loading={chainStatsLoading || userStatsLoading || rankingLoading}
-              />
-
-              {userStats && <ActivityHeatmap checkins={userCheckins || []} currentStreak={userStats.currentStreak} maxStreak={userStats.maxStreak} />}
-
-              <SidebarReferralCard canUseReferral={canUseReferral} myReferralsCount={myReferrals?.totalReferrals || 0} userReferredBy={userReferrerData?.referredBy?.id || null} onCopyLink={handleCopyReferralLink} onCardClick={() => setIsReferralModalOpen(true)} onSwitchToBase={handleSwitchToBase} formatAddress={formatAddress} /> 
-            </div>
-          </motion.aside>
-        )}
+              </motion.aside>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* LEFT SIDEBAR - Chat Toggle (OVERLAY) */}
+      {/* LEFT SIDEBAR - Chat Toggle */}
       <GannetXChatSidebar
         isOpen={isChatOpen}
         toggle={() => setIsChatOpen(!isChatOpen)}

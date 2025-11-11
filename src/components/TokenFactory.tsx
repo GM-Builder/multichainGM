@@ -64,17 +64,17 @@ const STEPS = [
 ];
 
 const FEATURE_FEES = {
-  BASE_FEE: '0.00001',
-  TAX_SYSTEM_FEE: '0.00003',
-  ANTI_BOT_FEE: '0.00002',
-  MAX_TX_LIMIT_FEE: '0.00001',
-  MAX_WALLET_FEE: '0.00001',
-  COOLDOWN_FEE: '0.00001',
-  BLACKLIST_FEE: '0.00002',
-  PAUSABLE_FEE: '0.00001',
-  BURN_FEE: '0.00002',
-  REFLECTION_FEE: '0.00003',
-  WHITELIST_FEE: '0.00001',
+  BASE_FEE: '0.0001',
+  TAX_SYSTEM_FEE: '0.0003',
+  ANTI_BOT_FEE: '0.0002',
+  MAX_TX_LIMIT_FEE: '0.0001',
+  MAX_WALLET_FEE: '0.0001',
+  COOLDOWN_FEE: '0.0001',
+  BLACKLIST_FEE: '0.0002',
+  PAUSABLE_FEE: '0.0001',
+  BURN_FEE: '0.0002',
+  REFLECTION_FEE: '0.0003',
+  WHITELIST_FEE: '0.0001',
 };
 
 // ==================== MAIN COMPONENT ====================
@@ -124,7 +124,7 @@ const TokenFactory: React.FC = () => {
     if (features.hasBurn) fee += parseFloat(FEATURE_FEES.BURN_FEE);
     if (features.hasReflection) fee += parseFloat(FEATURE_FEES.REFLECTION_FEE);
     if (features.hasWhitelist) fee += parseFloat(FEATURE_FEES.WHITELIST_FEE);
-    return fee.toFixed(5); 
+    return fee.toFixed(4); 
   }, [features]);
 
   const canProceed = useMemo(() => {
@@ -1416,7 +1416,7 @@ const FeeCalculator: React.FC<{
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-400">Features ({enabledCount})</span>
                 <span className="font-mono text-white">
-                  +{(parseFloat(totalFee) - parseFloat(FEATURE_FEES.BASE_FEE)).toFixed(5)} ETH
+                  +{(parseFloat(totalFee) - parseFloat(FEATURE_FEES.BASE_FEE)).toFixed(4)} ETH
                 </span>
               </div>
               <div className="h-px bg-gradient-to-r from-transparent via-[var(--cyber-cyan)]/30 to-transparent" />
