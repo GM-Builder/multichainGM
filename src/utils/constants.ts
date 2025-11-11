@@ -287,7 +287,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
 
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0xaF8471a2968a30a63Cdced851cDA2B7ce9e5dB90";
 export const TEA_SEPOLIA_RPC_URL = process.env.NEXT_PUBLIC_TEA_SEPOLIA_RPC_URL || "https://tea-sepolia.g.alchemy.com/public";
-export const GANNETX_CHAT_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_GANNETX_CHAT_CONTRACT_ADDRESS || "0x24cF04855f0F33f8aEBaDe075c80C24272aE1Fc5";
+export const GANNETX_CHAT_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_GANNETX_CHAT_CONTRACT_ADDRESS || "0x4Be81a2966d52F1d7c5A9170e57DB7A8604186E5";
 export const BASE_SEPOLIA_RPC = process.env.BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org";
 export const BASE_RPC = process.env.BASE_MAINNET_RPC_URL || "https://mainnet.base.org";
 export const GANNETX_TOKEN_FACTORY_ADDRESS = process.env.NEXT_PUBLIC_GANNETX_TOKEN_FACTORY_ADDRESS || "0x08B6E11A433fceF7b56bf9DDE331feA2f881AF3c";

@@ -13,7 +13,7 @@ import {
 import { useWalletState } from '@/hooks/useWalletState';
 import GannetXABI from '@/abis/GannetXInteractiveChat.json';
 import { ethers } from 'ethers';
-import { BASE_SEPOLIA_CHAIN_ID, GANNETX_CHAT_CONTRACT_ADDRESS, BASE_SEPOLIA_RPC } from '@/utils/constants';
+import { BASE_CHAIN_ID, GANNETX_CHAT_CONTRACT_ADDRESS, BASE_RPC } from '@/utils/constants';
 import toast from 'react-hot-toast';
 
 const CONTRACT_ADDRESS = GANNETX_CHAT_CONTRACT_ADDRESS;
@@ -46,17 +46,17 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
 
   const providerForReads = useCallback((): ethers.providers.Provider => {
     try {
-      if (web3State.provider && web3State.chainId === BASE_SEPOLIA_CHAIN_ID) {
+      if (web3State.provider && web3State.chainId === BASE_CHAIN_ID) {
         return web3State.provider;
       }
     } catch (e) {
       console.error('Provider error:', e);
     }
 
-    const rpc = BASE_SEPOLIA_RPC;
+    const rpc = BASE_RPC;
     return new ethers.providers.JsonRpcProvider(rpc, { 
       name: 'base-sepolia', 
-      chainId: BASE_SEPOLIA_CHAIN_ID 
+      chainId: BASE_CHAIN_ID 
     });
   }, [web3State.provider, web3State.chainId]);
 
@@ -143,8 +143,8 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
       if (!ok) return;
     }
 
-    if (web3State.chainId !== BASE_SEPOLIA_CHAIN_ID) {
-      const switched = await switchNetwork(BASE_SEPOLIA_CHAIN_ID);
+    if (web3State.chainId !== BASE_CHAIN_ID) {
+      const switched = await switchNetwork(BASE_CHAIN_ID);
       if (!switched) {
         toast.error('Please switch to Base Sepolia to send message');
         return;
