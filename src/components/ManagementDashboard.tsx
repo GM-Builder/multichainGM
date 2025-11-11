@@ -38,7 +38,7 @@ import {
 } from 'lucide-react';
 import FactoryABI from '@/abis/GannetXTokenFactory.json';
 import TokenABI from '@/abis/GannetXToken.json';
-import { GANNETX_TOKEN_FACTORY_ADDRESS, BASE_SEPOLIA_RPC } from '@/utils/constants';
+import { GANNETX_TOKEN_FACTORY_ADDRESS, BASE_RPC } from '@/utils/constants';
 import { useWalletState } from '@/hooks/useWalletState';
 import TokenBadge from '@/components/TokenBadge';
 import { getTokenMetadata, updateTokenSocialLinks } from '@/utils/tokenStorage';
@@ -74,7 +74,7 @@ const ManagementDashboard: React.FC = () => {
   const [expandedTokens, setExpandedTokens] = useState<Record<string, boolean>>({});
   const [selectedToken, setSelectedToken] = useState<string | null>(null);
 
-  const provider = useMemo(() => new ethers.providers.JsonRpcProvider(BASE_SEPOLIA_RPC), []);
+  const provider = useMemo(() => new ethers.providers.JsonRpcProvider(BASE_RPC), []);
   const factoryRead = useMemo(() => new ethers.Contract(GANNETX_TOKEN_FACTORY_ADDRESS, FactoryABI as any, provider), [provider]);
 
   const load = useCallback(async () => {

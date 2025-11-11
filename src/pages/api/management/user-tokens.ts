@@ -2,14 +2,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ethers } from 'ethers';
 import FactoryABI from '@/abis/GannetXTokenFactory.json';
 import TokenABI from '@/abis/GannetXToken.json';
-import { GANNETX_TOKEN_FACTORY_ADDRESS, BASE_SEPOLIA_RPC } from '@/utils/constants';
+import { GANNETX_TOKEN_FACTORY_ADDRESS, BASE_RPC } from '@/utils/constants';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { address } = req.query;
     if (!address || typeof address !== 'string') return res.status(400).json({ success: false, error: 'address required' });
 
-    const provider = new ethers.providers.JsonRpcProvider(BASE_SEPOLIA_RPC);
+    const provider = new ethers.providers.JsonRpcProvider(BASE_RPC);
     const factory = new ethers.Contract(GANNETX_TOKEN_FACTORY_ADDRESS, FactoryABI as any, provider);
 
     const tokens: string[] = await factory.getUserTokens(address);

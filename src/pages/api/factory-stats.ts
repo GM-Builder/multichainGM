@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ethers } from 'ethers';
 import FactoryABI from '@/abis/GannetXTokenFactory.json';
-import { GANNETX_TOKEN_FACTORY_ADDRESS, BASE_SEPOLIA_RPC } from '@/utils/constants';
+import { GANNETX_TOKEN_FACTORY_ADDRESS, BASE_RPC } from '@/utils/constants';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const provider = new ethers.providers.JsonRpcProvider(BASE_SEPOLIA_RPC, { name: 'base-sepolia', chainId: 84532 as any });
+    const provider = new ethers.providers.JsonRpcProvider(BASE_RPC, { name: 'base-sepolia', chainId: 84532 as any });
     const contract = new ethers.Contract(GANNETX_TOKEN_FACTORY_ADDRESS, FactoryABI as any, provider);
 
     // Read basic stats

@@ -20,7 +20,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import FactoryABI from '@/abis/GannetXTokenFactory.json';
-import { GANNETX_TOKEN_FACTORY_ADDRESS, BASE_SEPOLIA_CHAIN_ID } from '@/utils/constants';
+import { GANNETX_TOKEN_FACTORY_ADDRESS, BASE_CHAIN_ID } from '@/utils/constants';
 import { switchToChain, getProvider } from '@/utils/web3';
 import { useWalletState } from '@/hooks/useWalletState';
 import { saveTokenMetadata, getTokenMetadata } from '@/utils/tokenStorage';
@@ -148,15 +148,15 @@ const TokenFactory: React.FC = () => {
     const toastId = toast.loading('Preparing deployment...');
 
     try {
-      if (web3State.chainId !== BASE_SEPOLIA_CHAIN_ID) {
-        toast.loading('Switching to Base Sepolia...', { id: toastId });
+      if (web3State.chainId !== BASE_CHAIN_ID) {
+        toast.loading('Switching to Base...', { id: toastId });
         
         try {
-          await switchToChain(BASE_SEPOLIA_CHAIN_ID);
+          await switchToChain(BASE_CHAIN_ID);
           await new Promise(resolve => setTimeout(resolve, 1500));
         } catch (switchError: any) {
           console.error('Chain switch error:', switchError);
-          toast.error('Failed to switch network. Please switch to Base Sepolia manually.', { id: toastId });
+          toast.error('Failed to switch network. Please switch to Base manually.', { id: toastId });
           return;
         }
       }
@@ -224,7 +224,7 @@ const TokenFactory: React.FC = () => {
         totalSupply: config.totalSupply,
         deployer: web3State.address || '',
         deployedAt: Date.now(),
-        chainId: BASE_SEPOLIA_CHAIN_ID,
+        chainId: BASE_CHAIN_ID,
         txHash: receipt.transactionHash,
         verified: true,
         badge: 'standard',
