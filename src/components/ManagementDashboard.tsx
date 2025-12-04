@@ -234,7 +234,7 @@ const ManagementDashboard: React.FC = () => {
           <p className="text-gray-400 mb-6">Connect your wallet to manage your deployed tokens</p>
           <button
             onClick={connectWallet}
-            className="px-6 py-3 bg-gradient-to-r from-[var(--cyber-cyan)] to-blue-500 text-white rounded-xl font-semibold hover:shadow-[0_0_30px_var(--glow-color)] transition-all"
+            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-semibold hover:shadow-[0_0_30px_var(--glow-color)] transition-all"
           >
             Connect Wallet
           </button>
@@ -257,7 +257,7 @@ const ManagementDashboard: React.FC = () => {
           <button
             onClick={load}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-[var(--navy-light)] border border-[var(--cyber-cyan)]/30 rounded-lg hover:bg-[var(--navy-lighter)] hover:border-[var(--cyber-cyan)] transition-all disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-[#0B0E14]/60 backdrop-blur-xl border border-white/10 rounded-lg hover:bg-[#1A1D24] hover:border-cyan-500/30 transition-all disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -267,11 +267,11 @@ const ManagementDashboard: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="p-4 bg-gradient-to-br from-[var(--navy-light)] to-[var(--navy-depth)] border border-[var(--cyber-cyan)]/20 rounded-xl"
+            className="p-4 bg-[#0B0E14]/60 backdrop-blur-xl border border-white/5 rounded-xl"
           >
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-[var(--cyber-cyan)]/20 flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-[var(--cyber-cyan)]" />
+              <div className="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-cyan-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-400">Total Tokens</p>
@@ -282,15 +282,15 @@ const ManagementDashboard: React.FC = () => {
 
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="p-4 bg-gradient-to-br from-[var(--navy-light)] to-[var(--navy-depth)] border border-[var(--cyber-cyan)]/20 rounded-xl"
+            className="p-4 bg-[#0B0E14]/60 backdrop-blur-xl border border-white/5 rounded-xl"
           >
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-[var(--cyber-cyan)]/20 flex items-center justify-center">
-                <Shield className="w-6 h-6 text-[var(--cyber-cyan)]" />
+              <div className="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                <Shield className="w-6 h-6 text-cyan-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-400">Verified</p>
-                <p className="text-2xl font-bold text-[var(--cyber-cyan)]">
+                <p className="text-2xl font-bold text-cyan-400">
                   {tokens.filter(t => t.badge && t.badge !== 'none').length}
                 </p>
               </div>
@@ -299,10 +299,10 @@ const ManagementDashboard: React.FC = () => {
 
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="p-4 bg-gradient-to-br from-[var(--navy-light)] to-[var(--navy-depth)] border border-purple-500/20 rounded-xl"
+            className="p-4 bg-[#0B0E14]/60 backdrop-blur-xl border border-white/5 rounded-xl"
           >
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center">
                 <Zap className="w-6 h-6 text-purple-400" />
               </div>
               <div>
@@ -316,10 +316,10 @@ const ManagementDashboard: React.FC = () => {
 
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="p-4 bg-gradient-to-br from-[var(--navy-light)] to-[var(--navy-depth)] border border-green-500/20 rounded-xl"
+            className="p-4 bg-[#0B0E14]/60 backdrop-blur-xl border border-white/5 rounded-xl"
           >
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
                 <Activity className="w-6 h-6 text-green-400" />
               </div>
               <div>
@@ -364,7 +364,7 @@ const ManagementDashboard: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-16 px-6"
           >
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-[var(--navy-light)] to-[var(--navy-depth)] flex items-center justify-center border border-[var(--cyber-cyan)]/30">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#0B0E14]/60 backdrop-blur-xl flex items-center justify-center border border-white/10">
               <Wallet className="w-10 h-10 text-gray-400" />
             </div>
             <h3 className="text-xl font-bold text-white mb-3">No Tokens Deployed Yet</h3>
@@ -374,7 +374,7 @@ const ManagementDashboard: React.FC = () => {
             <div className="flex justify-center gap-3">
               <a
                 href="/deploy"
-                className="px-6 py-3 bg-gradient-to-r from-[var(--cyber-cyan)] to-blue-500 text-white rounded-xl font-semibold hover:shadow-[0_0_30px_var(--glow-color)] transition-all"
+                className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-semibold hover:shadow-[0_0_30px_var(--glow-color)] transition-all"
               >
                 Deploy Your First Token
               </a>
@@ -451,8 +451,8 @@ const TokenCard: React.FC<{
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className={`bg-gradient-to-br from-[var(--navy-light)] to-[var(--navy-depth)] border rounded-xl overflow-hidden transition-all ${
-        isSelected ? 'border-[var(--cyber-cyan)] shadow-[0_0_20px_var(--glow-color)]' : 'border-[var(--cyber-cyan)]/20 hover:border-[var(--cyber-cyan)]/40'
+      className={`bg-[#0B0E14]/60 backdrop-blur-xl border border-white/5 rounded-xl overflow-hidden transition-all ${
+        isSelected ? 'border-cyan-500/30 shadow-[0_0_20px_var(--glow-color)]' : 'border-white/5 hover:border-cyan-500/30/40'
       }`}
     >
       <div className="p-5">
@@ -463,12 +463,12 @@ const TokenCard: React.FC<{
               {token.badge && <TokenBadge badge={token.badge} size="sm" showLabel={false} />}
             </div>
             <div className="flex items-center gap-2 mb-2">
-              <p className="text-sm font-mono text-[var(--cyber-cyan)] truncate flex-1">
+              <p className="text-sm font-mono text-cyan-400 truncate flex-1">
                 {token.address}
               </p>
               <button
                 onClick={handleCopy}
-                className="p-1.5 hover:bg-[var(--navy-depth)] rounded transition-all"
+                className="p-1.5 hover:bg-[#0B0E14] rounded transition-all"
               >
                 {copied ? (
                   <CheckCircle2 className="w-4 h-4 text-green-400" />
@@ -480,7 +480,7 @@ const TokenCard: React.FC<{
                 href={`https://basescan.org/address/${token.address}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 hover:bg-[var(--navy-depth)] rounded transition-all"
+                className="p-1.5 hover:bg-[#0B0E14] rounded transition-all"
               >
                 <ExternalLink className="w-4 h-4 text-gray-400" />
               </a>
@@ -499,15 +499,15 @@ const TokenCard: React.FC<{
           <div className="flex gap-2">
             <button
               onClick={() => setShowQuickActions(!showQuickActions)}
-              className="p-2 bg-[var(--navy-depth)] hover:bg-[var(--navy-lighter)] rounded-lg transition-all"
+              className="p-2 bg-[#0B0E14] hover:bg-[#1A1D24] rounded-lg transition-all"
               title="Quick Actions"
             >
-              <Zap className="w-4 h-4 text-[var(--cyber-cyan)]" />
+              <Zap className="w-4 h-4 text-cyan-400" />
             </button>
             <button
               onClick={onToggleExpand}
               disabled={busy}
-              className="p-2 bg-[var(--navy-depth)] border border-[var(--cyber-cyan)]/30 rounded-lg hover:bg-[var(--navy-lighter)] hover:border-[var(--cyber-cyan)] transition-all disabled:opacity-50"
+              className="p-2 bg-[#0B0E14] border border-white/10 rounded-lg hover:bg-[#1A1D24] hover:border-cyan-500/30 transition-all disabled:opacity-50"
             >
               {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
@@ -515,7 +515,7 @@ const TokenCard: React.FC<{
         </div>
 
         {token.badge && token.badge !== 'standard' && (
-          <div className="mb-4 p-3 bg-gradient-to-r from-[var(--cyber-cyan)]/10 to-blue-500/10 border border-[var(--cyber-cyan)]/30 rounded-lg">
+          <div className="mb-4 p-3 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-white/10 rounded-lg">
             <div className="flex items-center gap-2">
               <TokenBadge badge={token.badge} size="sm" />
               <p className="text-xs text-gray-400">
@@ -526,25 +526,25 @@ const TokenCard: React.FC<{
         )}
 
         <div className="grid grid-cols-4 gap-3 mb-4">
-          <div className="p-3 bg-[var(--navy-depth)] rounded-lg">
+          <div className="p-3 bg-[#0B0E14] rounded-lg">
             <p className="text-xs text-gray-400 mb-1">Supply</p>
             <p className="text-sm font-semibold text-white truncate">
               {token.totalSupplyHuman || 'N/A'}
             </p>
           </div>
-          <div className="p-3 bg-[var(--navy-depth)] rounded-lg">
+          <div className="p-3 bg-[#0B0E14] rounded-lg">
             <p className="text-xs text-gray-400 mb-1">Symbol</p>
-            <p className="text-sm font-semibold text-[var(--cyber-cyan)]">
+            <p className="text-sm font-semibold text-cyan-400">
               ${token.symbol || 'N/A'}
             </p>
           </div>
-          <div className="p-3 bg-[var(--navy-depth)] rounded-lg">
+          <div className="p-3 bg-[#0B0E14] rounded-lg">
             <p className="text-xs text-gray-400 mb-1">Features</p>
             <p className="text-sm font-semibold text-white">
               {featureList.length}
             </p>
           </div>
-          <div className="p-3 bg-[var(--navy-depth)] rounded-lg">
+          <div className="p-3 bg-[#0B0E14] rounded-lg">
             <p className="text-xs text-gray-400 mb-1">Health</p>
             <p className={`text-sm font-semibold ${getHealthColor(healthScore)}`}>
               {healthScore}%
@@ -568,7 +568,7 @@ const TokenCard: React.FC<{
             {featureList.map((f) => (
               <span
                 key={f}
-                className="px-2 py-1 bg-[var(--navy-depth)] border border-[var(--cyber-cyan)]/20 rounded text-xs text-[var(--cyber-cyan)]"
+                className="px-2 py-1 bg-[#0B0E14] border border-white/5 rounded text-xs text-cyan-400"
               >
                 {f.replace('has', '').replace('is', '')}
               </span>
@@ -584,7 +584,7 @@ const TokenCard: React.FC<{
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="border-t border-[var(--cyber-cyan)]/20"
+            className="border-t border-white/5"
           >
             <ManagementPanel
               token={token}
@@ -645,7 +645,7 @@ const QuickActionsPanel: React.FC<{ token: TokenInfo; onClose: () => void }> = (
   ];
 
   return (
-    <div className="p-4 bg-[var(--navy-depth)]/50 rounded-lg">
+    <div className="p-4 bg-[#0B0E14]/50 rounded-lg">
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-semibold text-white">Quick Actions</h4>
       </div>
@@ -654,7 +654,7 @@ const QuickActionsPanel: React.FC<{ token: TokenInfo; onClose: () => void }> = (
           <button
             key={idx}
             onClick={action.onClick}
-            className="p-3 bg-[var(--navy-light)] hover:bg-[var(--navy-lighter)] border border-[var(--cyber-cyan)]/20 hover:border-[var(--cyber-cyan)]/50 rounded-lg transition-all text-left"
+            className="p-3 bg-[#0B0E14]/60 backdrop-blur-xl hover:bg-[#1A1D24] border border-white/5 hover:border-cyan-500/30/50 rounded-lg transition-all text-left"
           >
             <div className="flex items-start gap-2">
               <action.icon className={`w-4 h-4 text-${action.color}-400 flex-shrink-0 mt-0.5`} />
@@ -691,7 +691,7 @@ const ManagementPanel: React.FC<{
 }> = ({ token, features, buyTax, sellTax, setBuyTax, setSellTax, maxTx, setMaxTx, maxWallet, setMaxWallet, newOwner, setNewOwner, onUpdateTaxes, onUpdateLimits, onPauseToggle, onTransferOwnership, busy }) => {
   
   const ManagementSection: React.FC<{ icon: any; title: string; color: string; children: React.ReactNode }> = ({ icon: Icon, title, color, children }) => (
-    <div className="p-4 bg-[var(--navy-depth)]/30 rounded-lg">
+    <div className="p-4 bg-[#0B0E14]/30 rounded-lg">
       <div className="flex items-center gap-2 mb-3">
         <Icon className={`w-4 h-4 text-${color}-400`} />
         <h4 className="text-sm font-semibold text-white">{title}</h4>
@@ -714,7 +714,7 @@ const ManagementPanel: React.FC<{
                 min="0"
                 max="25"
                 step="0.1"
-                className="w-full px-3 py-2 bg-[var(--navy-depth)] border border-gray-700 rounded-lg focus:border-[var(--cyber-cyan)] outline-none text-white"
+                className="w-full px-3 py-2 bg-[#0B0E14] border border-white/10 rounded-lg focus:border-cyan-500/30 outline-none text-white"
               />
             </div>
             <div>
@@ -726,7 +726,7 @@ const ManagementPanel: React.FC<{
                 min="0"
                 max="25"
                 step="0.1"
-                className="w-full px-3 py-2 bg-[var(--navy-depth)] border border-gray-700 rounded-lg focus:border-[var(--cyber-cyan)] outline-none text-white"
+                className="w-full px-3 py-2 bg-[#0B0E14] border border-white/10 rounded-lg focus:border-cyan-500/30 outline-none text-white"
               />
             </div>
           </div>
@@ -751,7 +751,7 @@ const ManagementPanel: React.FC<{
                   value={maxTx}
                   onChange={(e) => setMaxTx(e.target.value)}
                   placeholder="0"
-                  className="w-full px-3 py-2 bg-[var(--navy-depth)] border border-gray-700 rounded-lg focus:border-[var(--cyber-cyan)] outline-none text-white"
+                  className="w-full px-3 py-2 bg-[#0B0E14] border border-white/10 rounded-lg focus:border-cyan-500/30 outline-none text-white"
                 />
               </div>
             )}
@@ -763,7 +763,7 @@ const ManagementPanel: React.FC<{
                   value={maxWallet}
                   onChange={(e) => setMaxWallet(e.target.value)}
                   placeholder="0"
-                  className="w-full px-3 py-2 bg-[var(--navy-depth)] border border-gray-700 rounded-lg focus:border-[var(--cyber-cyan)] outline-none text-white"
+                  className="w-full px-3 py-2 bg-[#0B0E14] border border-white/10 rounded-lg focus:border-cyan-500/30 outline-none text-white"
                 />
               </div>
             )}
@@ -780,7 +780,7 @@ const ManagementPanel: React.FC<{
 
       {features.isPausable && (
         <ManagementSection icon={features.isPausable ? Pause : Play} title="Trading Control" color="purple">
-          <div className="flex items-center justify-between p-3 bg-[var(--navy-depth)] rounded-lg mb-3">
+          <div className="flex items-center justify-between p-3 bg-[#0B0E14] rounded-lg mb-3">
             <span className="text-sm text-gray-400">Trading Status:</span>
             <span className={`text-sm font-semibold ${features.isPausable ? 'text-red-400' : 'text-green-400'}`}>
               {features.isPausable ? 'Paused' : 'Active'}
@@ -809,7 +809,7 @@ const ManagementPanel: React.FC<{
               value={newOwner}
               onChange={(e) => setNewOwner(e.target.value)}
               placeholder="0x..."
-              className="w-full px-3 py-2 bg-[var(--navy-depth)] border border-gray-700 rounded-lg focus:border-[var(--cyber-cyan)] outline-none text-white font-mono text-sm"
+              className="w-full px-3 py-2 bg-[#0B0E14] border border-white/10 rounded-lg focus:border-cyan-500/30 outline-none text-white font-mono text-sm"
             />
           </div>
           <div className="p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
@@ -823,7 +823,7 @@ const ManagementPanel: React.FC<{
           <button
             onClick={() => onTransferOwnership(newOwner)}
             disabled={busy || !newOwner}
-            className="w-full px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg font-medium hover:shadow-[0_0_20px_rgba(249,115,22,0.5)] transition-all disabled:opacity-50"
+            className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:shadow-[0_0_20px_rgba(249,115,22,0.5)] transition-all disabled:opacity-50"
           >
             {busy ? 'Processing...' : 'Transfer Ownership'}
           </button>

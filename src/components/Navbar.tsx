@@ -12,6 +12,7 @@ import {
   FaExchangeAlt,
   FaGem,
   FaRocket,
+  FaComments,
 } from "react-icons/fa"
 import ConnectWalletButton from "./ConnectWalletButton"
 import ChainLogo from "@/components/ChainLogo"
@@ -448,7 +449,7 @@ const Navbar: React.FC<NavbarProps> = ({
           >
             <div className="p-4 space-y-6">
               {/* Main Actions Grid */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <Link href="/deploy" onClick={() => setMobileMenuOpen(false)}>
                   <motion.div
                     whileTap={{ scale: 0.98 }}
@@ -459,7 +460,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   </motion.div>
                 </Link>
 
-                <Link href="/mint" onClick={() => setMobileMenuOpen(false)}>
+                {/* <Link href="/mint" onClick={() => setMobileMenuOpen(false)}>
                   <motion.div
                     whileTap={{ scale: 0.98 }}
                     className="flex flex-col items-center justify-center gap-2 p-4 bg-[#0B0E14] border border-white/5 rounded-xl text-center"
@@ -467,7 +468,21 @@ const Navbar: React.FC<NavbarProps> = ({
                     <FaGem className="text-purple-400 text-xl" />
                     <span className="text-sm font-semibold text-white">Mint NFT</span>
                   </motion.div>
-                </Link>
+                </Link> */}
+
+                {address && (
+                  <motion.div
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setIsChatOpen(true)
+                      setMobileMenuOpen(false)
+                    }}
+                    className="flex flex-col items-center justify-center gap-2 p-4 bg-[#0B0E14] border border-white/5 rounded-xl text-center cursor-pointer"
+                  >
+                    <FaComments className="text-green-400 text-xl" />
+                    <span className="text-sm font-semibold text-white">Chat</span>
+                  </motion.div>
+                )}
               </div>
 
               {/* Network Switcher - Collapsible */}
@@ -606,9 +621,9 @@ const Navbar: React.FC<NavbarProps> = ({
       )}
 
       {/* Chat Modal */}
-      <GannetXChatModal 
-        isOpen={isChatOpen} 
-        onClose={() => setIsChatOpen(false)} 
+      <GannetXChatModal
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
       />
     </>
   )

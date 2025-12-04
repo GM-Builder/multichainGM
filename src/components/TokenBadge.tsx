@@ -8,10 +8,10 @@ interface TokenBadgeProps {
   showLabel?: boolean;
 }
 
-const TokenBadge: React.FC<TokenBadgeProps> = ({ 
-  badge, 
+const TokenBadge: React.FC<TokenBadgeProps> = ({
+  badge,
   size = 'md',
-  showLabel = true 
+  showLabel = true
 }) => {
   if (badge === 'none') return null;
 
@@ -20,25 +20,25 @@ const TokenBadge: React.FC<TokenBadgeProps> = ({
       icon: Sparkles,
       label: 'Premium Verified',
       gradient: 'from-purple-500 to-pink-500',
-      bgColor: 'bg-purple-500/20',
-      textColor: 'text-purple-300',
-      borderColor: 'border-purple-500/50',
+      bgColor: 'bg-purple-500/10',
+      textColor: 'text-purple-400',
+      borderColor: 'border-purple-500/20',
     },
     verified: {
       icon: Shield,
       label: 'GannetX Verified',
       gradient: 'from-cyan-500 to-blue-500',
-      bgColor: 'bg-cyan-500/20',
-      textColor: 'text-cyan-300',
-      borderColor: 'border-cyan-500/50',
+      bgColor: 'bg-cyan-500/10',
+      textColor: 'text-cyan-400',
+      borderColor: 'border-cyan-500/20',
     },
     standard: {
       icon: CheckCircle,
       label: 'Deployed via GannetX',
       gradient: 'from-gray-500 to-gray-600',
-      bgColor: 'bg-gray-500/20',
-      textColor: 'text-gray-300',
-      borderColor: 'border-gray-500/50',
+      bgColor: 'bg-white/5',
+      textColor: 'text-gray-400',
+      borderColor: 'border-white/10',
     },
   };
 
@@ -54,7 +54,7 @@ const TokenBadge: React.FC<TokenBadgeProps> = ({
   const classes = sizeClasses[size];
 
   return (
-    <div 
+    <div
       className={`
         inline-flex items-center gap-1.5 
         ${classes.container} 
