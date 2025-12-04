@@ -1,5 +1,6 @@
+"use client"
 import React, { useState } from 'react';
-import { FaTimes, FaEnvelope, FaPhone, FaDiscord, FaSun, FaMoon, FaWallet } from 'react-icons/fa';
+import { FaTimes, FaEnvelope, FaPhone, FaDiscord, FaWallet } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createWallet, inAppWallet } from "thirdweb/wallets";
@@ -9,91 +10,6 @@ import { RiFingerprintFill } from "react-icons/ri";
 import { FcGoogle } from "react-icons/fc";
 import { SiFarcaster } from "react-icons/si";
 
-
-interface ThemeToggleProps {
-  className?: string;
-  onThemeChange?: (theme: 'light' | 'dark') => void;
-  forceTheme?: 'light' | 'dark' | null;
-}
-
-const ThemeToggle: React.FC<ThemeToggleProps> = ({ 
-  className = '',
-  onThemeChange,
-  forceTheme = null
-}) => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      return forceTheme 
-        ? forceTheme === 'dark'
-        : savedTheme === 'dark' || (!savedTheme && prefersDark);
-    }
-    return false;
-  });
-
-  React.useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDarkMode);
-  }, [isDarkMode]);
-
-  React.useEffect(() => {
-    if (forceTheme !== null) {
-      const newDarkMode = forceTheme === 'dark';
-      if (isDarkMode !== newDarkMode) {
-        setIsDarkMode(newDarkMode);
-        document.documentElement.classList.toggle('dark', newDarkMode);
-      }
-    }
-  }, [forceTheme, isDarkMode]);
-
-  const toggleTheme = () => {
-    const newTheme = !isDarkMode;
-    setIsDarkMode(newTheme);
-    
-    document.documentElement.classList.toggle('dark', newTheme);
-    
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('theme', newTheme ? 'dark' : 'light');
-    }
-    
-    if (onThemeChange) {
-      onThemeChange(newTheme ? 'dark' : 'light');
-    }
-  };
-
-  return (
-    <button
-      onClick={toggleTheme}
-      className={`relative p-2 rounded-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm ${className}`}
-      title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-      aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-    >
-      <div className="relative w-5 h-5">
-        <FaSun
-          className={`absolute inset-0 w-5 h-5 text-yellow-500 transition-all duration-300 ${
-            isDarkMode 
-              ? 'opacity-0 rotate-90 scale-75' 
-              : 'opacity-100 rotate-0 scale-100'
-          }`}
-        />
-        
-        <FaMoon
-          className={`absolute inset-0 w-5 h-5 text-gray-600 dark:text-gray-300 transition-all duration-300 ${
-            isDarkMode 
-              ? 'opacity-100 rotate-0 scale-100' 
-              : 'opacity-0 -rotate-90 scale-75'
-          }`}
-        />
-      </div>
-      
-      <div className={`absolute inset-0 rounded-lg transition-all duration-300 ${
-        isDarkMode 
-          ? 'bg-blue-500/10 shadow-inner' 
-          : 'bg-yellow-500/10'
-      }`} />
-    </button>
-  );
-};
 
 interface CustomConnectModalProps {
   isOpen: boolean;
@@ -109,7 +25,7 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
   const [isConnecting, setIsConnecting] = useState(false);
   const [selectedWalletType, setSelectedWalletType] = useState<string | null>(null);
   const [showWalletOptions, setShowWalletOptions] = useState(false);
-  
+
   const socialIconsRow = [
     {
       id: "google",
@@ -147,7 +63,7 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
     {
       id: "passkey",
       name: "Continue with Passkey",
-      icon: <RiFingerprintFill className="text-2xl text-blue-500"/>
+      icon: <RiFingerprintFill className="text-2xl text-blue-500" />
     }
   ];
 
@@ -194,7 +110,7 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
       options: [
         "google",
         "email",
-        "passkey", 
+        "passkey",
         "phone",
         "discord",
         "farcaster",
@@ -202,7 +118,7 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
       ],
     },
   });
-  
+
   const handleConnectWalletClick = () => {
     setShowWalletOptions(true);
   };
@@ -211,12 +127,12 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
     try {
       setIsConnecting(true);
       setSelectedWalletType(`inapp-${authType}`);
-      
-      await inAppWalletInstance.connect({ 
+
+      await inAppWalletInstance.connect({
         client,
         strategy: authType as any
       });
-      
+
       await connectWallet();
       onClose();
     } catch (error) {
@@ -226,27 +142,27 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
       setSelectedWalletType(null);
     }
   };
-  
+
   const handleExternalWalletClick = async (walletType: string) => {
     try {
       setIsConnecting(true);
       setSelectedWalletType(walletType);
-      
+
       const selectedWallet = externalWallets.find(w => w.id === walletType);
       if (!selectedWallet) return;
-      
+
       if (walletType === "metamask" && window.ethereum) {
         try {
           await window.ethereum.request({
             method: 'wallet_requestPermissions',
             params: [{ eth_accounts: {} }],
           });
-          
-          const accountsResult = await window.ethereum.request({ 
-            method: 'eth_requestAccounts' 
+
+          const accountsResult = await window.ethereum.request({
+            method: 'eth_requestAccounts'
           });
           const accounts = accountsResult as string[];
-          
+
           if (accounts && accounts.length > 0) {
             console.log("Connected account:", accounts[0]);
           }
@@ -254,7 +170,7 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
           console.error("Error using direct ethereum request:", error);
         }
       }
-      
+
       await selectedWallet.wallet.connect({ client });
       await connectWallet();
       onClose();
@@ -269,30 +185,27 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
   const handleBack = () => {
     setShowWalletOptions(false);
   };
-  
+
   if (!isOpen) return null;
-  
+
   return (
     <AnimatePresence>
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
         onClick={onClose}
       >
-        <motion.div 
+        <motion.div
           initial={{ scale: 0.8, opacity: 0, rotateX: 15 }}
           animate={{ scale: 1, opacity: 1, rotateX: 0 }}
           exit={{ scale: 0.8, opacity: 0, rotateX: 15 }}
           transition={{ type: "spring", damping: 20, stiffness: 300 }}
-          className="relative bg-white dark:bg-gradient-to-br dark:from-slate-900/95 dark:via-gray-900/95 dark:to-slate-800/95 backdrop-blur-2xl rounded-3xl border border-gray-200 dark:border-cyan-500/20 shadow-2xl shadow-gray-500/10 dark:shadow-cyan-500/5 w-full max-w-sm max-h-[90vh] overflow-y-auto"
+          className="relative bg-[#0B0E14]/60 backdrop-blur-xl rounded-2xl border border-white/5 shadow-lg w-full max-w-sm max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent dark:from-cyan-500/5 dark:via-transparent dark:to-cyan-500/5"></div>
-          <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-transparent to-transparent dark:from-cyan-400/10 dark:to-transparent rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-transparent to-transparent dark:from-cyan-400/10 dark:to-transparent rounded-full blur-2xl"></div>
-          
+
           <div className="relative flex items-center justify-between p-6 pb-4">
             <div className="flex items-center gap-3">
               {showWalletOptions && (
@@ -300,31 +213,31 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   onClick={handleBack}
-                  className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/50 hover:bg-gray-200 dark:hover:bg-slate-700/60 transition-all duration-200"
+                  className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-200"
                 >
-                  <svg className="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                 </motion.button>
               )}
               <div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-cyan-300 dark:to-cyan-300 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold text-white">
                   {showWalletOptions ? "Select Wallet" : "Connect"}
                 </h2>
-                <div className="h-0.5 w-12 bg-gradient-to-r from-gray-400 to-gray-600 dark:from-cyan-400 dark:to-cyan-400 rounded-full mt-1"></div>
+                <div className="h-0.5 w-12 bg-gradient-to-r from-cyan-400 to-cyan-400 rounded-full mt-1"></div>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <button 
+              <button
                 onClick={onClose}
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/50 hover:bg-red-50 dark:hover:bg-red-500/20 hover:border-red-200 dark:hover:border-red-500/30 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-300 transition-all duration-200"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-red-500/20 hover:border-red-500/30 text-gray-400 hover:text-red-300 transition-all duration-200"
               >
                 <FaTimes className="text-sm" />
               </button>
             </div>
           </div>
-          
+
           <div className="relative px-6 pb-6">
             <AnimatePresence mode="wait">
               {showWalletOptions ? (
@@ -346,16 +259,16 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                       whileTap={{ scale: 0.98 }}
                       disabled={isConnecting}
                       onClick={() => handleExternalWalletClick(wallet.id)}
-                      className="w-full flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700/30 hover:border-gray-300 dark:hover:border-slate-600/50 hover:bg-gray-100 dark:hover:bg-slate-700/40 transition-all duration-200 group"
+                      className="w-full flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 hover:bg-white/10 transition-all duration-200 group"
                     >
-                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/50 group-hover:bg-gray-50 dark:group-hover:bg-slate-700/60">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10 group-hover:bg-white/10">
                         {isConnecting && wallet.id === selectedWalletType ? (
-                          <svg className="animate-spin h-5 w-5 text-blue-500 dark:text-cyan-400" fill="none" viewBox="0 0 24 24">
+                          <svg className="animate-spin h-5 w-5 text-cyan-400" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
                         ) : (
-                          <WalletLogo 
+                          <WalletLogo
                             logoUrl={wallet.logoUrl}
                             altText={wallet.name}
                             size="md"
@@ -363,10 +276,10 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                           />
                         )}
                       </div>
-                      
-                      <span className="flex-1 text-left font-medium text-gray-800 dark:text-gray-200 text-sm">{wallet.name}</span>
-                      
-                      <svg className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                      <span className="flex-1 text-left font-medium text-white text-sm">{wallet.name}</span>
+
+                      <svg className="w-4 h-4 text-gray-400 group-hover:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </motion.button>
@@ -392,10 +305,10 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                         whileTap={{ scale: 0.95 }}
                         disabled={isConnecting}
                         onClick={() => handleInAppAuthClick(social.id)}
-                        className="aspect-square rounded-2xl bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700/30 hover:border-gray-300 dark:hover:border-slate-600/50 hover:bg-gray-100 dark:hover:bg-slate-700/40 transition-all duration-200 flex items-center justify-center group"
+                        className="aspect-square rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 hover:bg-white/10 transition-all duration-200 flex items-center justify-center group"
                       >
                         {isConnecting && `inapp-${social.id}` === selectedWalletType ? (
-                          <svg className="animate-spin h-5 w-5 text-blue-500 dark:text-cyan-400" fill="none" viewBox="0 0 24 24">
+                          <svg className="animate-spin h-5 w-5 text-cyan-400" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
@@ -417,23 +330,23 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                         whileTap={{ scale: 0.98 }}
                         disabled={isConnecting}
                         onClick={() => handleInAppAuthClick(auth.id)}
-                        className="w-full flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700/30 hover:border-gray-300 dark:hover:border-slate-600/50 hover:bg-gray-100 dark:hover:bg-slate-700/40 transition-all duration-200 group"
+                        className="w-full flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 hover:bg-white/10 transition-all duration-200 group"
                       >
-                        <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/50 group-hover:bg-gray-50 dark:group-hover:bg-slate-700/60">
+                        <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white/5 border border-white/10 group-hover:bg-white/10">
                           {auth.icon}
                         </div>
-                        
-                        <span className="flex-1 text-left font-medium text-gray-800 dark:text-gray-200 text-sm">{auth.name}</span>
-                        
+
+                        <span className="flex-1 text-left font-medium text-white text-sm">{auth.name}</span>
+
                         {isConnecting && `inapp-${auth.id}` === selectedWalletType ? (
                           <div className="w-5 h-5">
-                            <svg className="animate-spin h-5 w-5 text-blue-500 dark:text-cyan-400" fill="none" viewBox="0 0 24 24">
+                            <svg className="animate-spin h-5 w-5 text-cyan-400" fill="none" viewBox="0 0 24 24">
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                           </div>
                         ) : (
-                          <svg className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 text-gray-400 group-hover:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         )}
@@ -442,9 +355,9 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                   </div>
 
                   <div className="flex items-center gap-3 my-6">
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-slate-600 to-transparent"></div>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/30 rounded-full">or</span>
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-slate-600 to-transparent"></div>
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                    <span className="text-xs text-gray-400 px-2 py-1 bg-white/5 border border-white/10 rounded-full">or</span>
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
                   </div>
 
                   <motion.button
@@ -454,18 +367,18 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleConnectWalletClick}
-                    className="w-full group relative overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-50 to-cyan-50 dark:from-cyan-500/10 dark:via-cyan-500/10 dark:to-cyan-500/10 border border-cyan-200 dark:border-cyan-500/20 hover:border-blue-300 dark:hover:border-cyan-400/30 p-4 transition-all duration-300"
+                    className="w-full group relative overflow-hidden rounded-xl bg-cyan-500/10 border border-cyan-500/20 hover:border-cyan-400/30 p-4 transition-all duration-300"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 dark:from-cyan-500/0 dark:via-cyan-500/5 dark:to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/5 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div className="relative flex items-center gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-100 to-blue-100 dark:from-cyan-500/20 dark:to-cyan-500/20 border border-blue-200 dark:border-cyan-500/30">
-                        <FaWallet className="w-5 h-5 text-cyan-600 dark:text-cyan-300" />
+                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/30">
+                        <FaWallet className="w-5 h-5 text-cyan-300" />
                       </div>
                       <div className="flex-1 text-left">
-                        <div className="font-semibold text-cyan-800 dark:text-cyan-300 text-sm">Connect a Wallet</div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">Use your crypto wallet</div>
+                        <div className="font-semibold text-cyan-300 text-sm">Connect a Wallet</div>
+                        <div className="text-xs text-gray-400">Use your crypto wallet</div>
                       </div>
-                      <svg className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-cyan-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-gray-400 group-hover:text-cyan-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </div>
@@ -474,18 +387,18 @@ const CustomConnectModal: React.FC<CustomConnectModalProps> = ({
               )}
             </AnimatePresence>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="mt-6 pt-4 border-t border-gray-200 dark:border-slate-700/30"
+              className="mt-6 pt-4 border-t border-white/5"
             >
               <div className="flex items-center justify-center gap-1 mb-2">
-                <div className="w-1 h-1 rounded-full bg-blue-400 dark:bg-cyan-400"></div>
-                <div className="w-1 h-1 rounded-full bg-purple-400 dark:bg-cyan-400"></div>
-                <div className="w-1 h-1 rounded-full bg-blue-400 dark:bg-cyan-400"></div>
+                <div className="w-1 h-1 rounded-full bg-cyan-400"></div>
+                <div className="w-1 h-1 rounded-full bg-cyan-400"></div>
+                <div className="w-1 h-1 rounded-full bg-cyan-400"></div>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 text-center leading-relaxed">
+              <p className="text-xs text-gray-400 text-center leading-relaxed">
                 Secure connection via Web3 standards
               </p>
             </motion.div>

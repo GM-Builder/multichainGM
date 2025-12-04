@@ -32,9 +32,7 @@ import { SidebarReferralCard } from '@/components/SidebarReferralCard';
 import LeaderboardModal from '@/components/LeaderboardModal';
 import GannetXChatSidebar from '@/components/GannetXChatSidebar';
 
-type NetworkTabType = 'all' | 'mainnet' | 'testnet';
-
-const CheckinPageIntegration: React.FC = () => {
+const CheckinPageIntegration: React.FC = () => {  
   const {
     web3State,
     connectWallet: rawConnectWallet,
@@ -374,7 +372,7 @@ const CheckinPageIntegration: React.FC = () => {
       {/* LEFT SIDEBAR - Chat Toggle */}
       <GannetXChatSidebar
         isOpen={isChatOpen}
-        toggle={() => setIsChatOpen(!isChatOpen)}
+        onClose={() => setIsChatOpen(false)}
       />
     </div>
   );

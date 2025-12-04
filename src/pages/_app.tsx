@@ -10,7 +10,7 @@ import Footer from "@/components/Footer"
 import WalletRequired from "@/components/WalletRequired"
 import { useWalletState } from "@/hooks/useWalletState"
 import Navbar from "@/components/Navbar"
-import { getChainConfig } from "@/utils/constants" 
+import { getChainConfig } from "@/utils/constants"
 import { Toaster } from 'react-hot-toast';
 import { SuccessAnimationProvider } from "@/components/SuccessAnimationContext"
 
@@ -25,26 +25,26 @@ function GMApp({ Component, pageProps }: AppProps) {
   const { address, isConnected, isLoading: isWalletConnecting, chainId } = web3State
   const showLayout = !NO_LAYOUT_PATHS.includes(router.pathname);
   const leaderboardRef = useRef<HTMLDivElement>(null)
-  
+
   const scrollToLeaderboard = useCallback(() => {
-    leaderboardRef.current?.scrollIntoView({ 
+    leaderboardRef.current?.scrollIntoView({
       behavior: 'smooth',
       block: 'start'
     })
   }, [])
-  
+
   const adaptedConnectWallet = async (): Promise<void> => {
     await connectWallet()
   }
-  
+
   const currentNetwork = chainId ? getChainConfig(chainId) : null
   const networkInfo = currentNetwork ? {
     name: currentNetwork.chainName,
     logoUrl: currentNetwork.logoUrl
   } : null
-  
+
   const shouldRequireWallet = !router.pathname.includes("/auth") && !router.pathname.includes("/landing") && !router.pathname.includes("/mint")
-  
+
   return (
     <>
       <Head>
@@ -59,7 +59,7 @@ function GMApp({ Component, pageProps }: AppProps) {
           rel="stylesheet"
         />
       </Head>
-      
+
       <Script
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=G-LCY12CWTZ4`}
@@ -76,7 +76,7 @@ function GMApp({ Component, pageProps }: AppProps) {
           `,
         }}
       />
-     
+
       <ThirdwebProvider>
         <Toaster
           position="top-center"
@@ -85,24 +85,24 @@ function GMApp({ Component, pageProps }: AppProps) {
             className: 'custom-toast',
             style: {
               background: 'rgba(255, 255, 255, 0.9)',
-              color: '#1f2937',
+              color: '#0B0E14',
               backdropFilter: 'blur(8px)',
             },
             duration: 5000,
           }}
         />
-        {showLayout && <Navbar 
+        {showLayout && <Navbar
           address={address}
           connectWallet={adaptedConnectWallet}
           disconnectWallet={disconnectWallet}
           isConnecting={isWalletConnecting}
           networkInfo={networkInfo}
           scrollToLeaderboard={scrollToLeaderboard}
-        /> }
-        
+        />}
+
         <main>
 
-         {shouldRequireWallet ? ( <WalletRequired
+          {shouldRequireWallet ? (<WalletRequired
             isConnected={isConnected}
             connectWallet={adaptedConnectWallet}
             isConnecting={isWalletConnecting}
@@ -110,17 +110,17 @@ function GMApp({ Component, pageProps }: AppProps) {
             <SuccessAnimationProvider>
               <Component {...pageProps} leaderboardRef={leaderboardRef} />
             </SuccessAnimationProvider>
-          </WalletRequired>  
-            ) : (
-              <SuccessAnimationProvider>
+          </WalletRequired>
+          ) : (
+            <SuccessAnimationProvider>
               <Component {...pageProps} leaderboardRef={leaderboardRef} />
             </SuccessAnimationProvider>
-            )}
-            {showLayout && <Footer /> }
-          
+          )}
+          {showLayout && isConnected && <Footer />}
+
         </main>
       </ThirdwebProvider>
-      
+
     </>
   )
 }

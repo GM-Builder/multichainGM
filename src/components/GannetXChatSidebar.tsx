@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FaComments, 
-  FaPaperPlane, 
-  FaClock, 
-  FaChevronRight,
+import {
+  FaComments,
+  FaPaperPlane,
+  FaClock,
+  FaTimes,
   FaWallet,
   FaCheckCircle,
-  FaSpinner,
-  FaChevronLeft
+  FaSpinner
 } from 'react-icons/fa';
 import { useWalletState } from '@/hooks/useWalletState';
 import GannetXABI from '@/abis/GannetXInteractiveChat.json';
@@ -27,12 +26,12 @@ interface GMMessage {
 
 const shortAddr = (a?: string) => (a ? `${a.substring(0, 6)}...${a.substring(a.length - 4)}` : '');
 
-interface GannetXChatSidebarProps {
+interface GannetXChatModalProps {
   isOpen: boolean;
-  toggle: () => void;
+  onClose: () => void;
 }
 
-const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle }) => {
+const GannetXChatModal: React.FC<GannetXChatModalProps> = ({ isOpen, onClose }) => {
   const { web3State, connectWallet, switchNetwork } = useWalletState();
   const [recentGMs, setRecentGMs] = useState<GMMessage[]>([]);
   const [input, setInput] = useState('');
@@ -40,7 +39,7 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
   const [colorMap, setColorMap] = useState<Record<string, string>>({});
-  
+
   const listRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -54,9 +53,9 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
     }
 
     const rpc = BASE_RPC;
-    return new ethers.providers.JsonRpcProvider(rpc, { 
-      name: 'base', 
-      chainId: BASE_CHAIN_ID 
+    return new ethers.providers.JsonRpcProvider(rpc, {
+      name: 'base',
+      chainId: BASE_CHAIN_ID
     });
   }, [web3State.provider, web3State.chainId]);
 
@@ -113,14 +112,16 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
   }, [web3State.address, providerForReads]);
 
   useEffect(() => {
-    loadRecent();
-    refreshCooldown();
-    const iv = setInterval(() => {
+    if (isOpen) {
+      loadRecent();
       refreshCooldown();
-    }, 5000);
+      const iv = setInterval(() => {
+        refreshCooldown();
+      }, 5000);
 
-    return () => clearInterval(iv);
-  }, [loadRecent, refreshCooldown]);
+      return () => clearInterval(iv);
+    }
+  }, [isOpen, loadRecent, refreshCooldown]);
 
   useEffect(() => {
     if (timeLeft <= 0) return;
@@ -128,7 +129,6 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
     return () => clearInterval(t);
   }, [timeLeft]);
 
-  // Focus input when sidebar opens
   useEffect(() => {
     if (isOpen && inputRef.current) {
       setTimeout(() => inputRef.current?.focus(), 300);
@@ -137,7 +137,7 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
 
   const handleSend = async () => {
     if (busy || !input.trim()) return;
-    
+
     if (!web3State.isConnected || !web3State.address) {
       const ok = await connectWallet();
       if (!ok) return;
@@ -206,7 +206,7 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
@@ -223,10 +223,10 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
 
   const getFullDateTime = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
-    const dateStr = date.toLocaleDateString('id-ID', { 
-      day: '2-digit', 
-      month: 'short', 
-      year: 'numeric' 
+    const dateStr = date.toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
     });
     const timeStr = getExactTime(timestamp);
     return `${dateStr} at ${timeStr}`;
@@ -243,225 +243,221 @@ const GannetXChatSidebar: React.FC<GannetXChatSidebarProps> = ({ isOpen, toggle 
     return web3State.address?.toLowerCase() === address.toLowerCase();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <>
-      {/* Toggle Button - right side */}
-      <motion.button
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        onClick={toggle}
-        className="fixed z-40 bg-gradient-to-br from-cyan-500 to-[#0B0E14] text-white p-3 rounded-r-xl shadow-xl hover:shadow-2xl transition-all duration-300"
-        style={{ 
-          top: 'calc(50% + 72px)', 
-          left: isOpen ? '320px' : '0', 
-          width: '48px', 
-          height: '48px' 
-        }}
-      >
-        <div className="relative flex items-center justify-center">
-          {isOpen ? (
-            <FaChevronLeft className="text-xl" />
-          ) : (
-            <div className="flex items-center justify-center">
-              <FaComments className="w-5 h-5" />
-            </div>
-          )}
-        </div>
-      </motion.button>
-
-      {/* Sidebar Panel */}
+    <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, x: -320 }}
-        animate={{ opacity: 1, x: isOpen ? 0 : -320 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="fixed left-0 top-50 bottom-0 z-30 w-80 bg-white dark:bg-[#0B0E14] shadow-2xl flex flex-col rounded-r-xl"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
+        onClick={onClose}
       >
-              {/* Header */}
-              <div className="flex-shrink-0 px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-cyan-50 to-[#0B0E14] dark:from-gray-800 dark:to-gray-900">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30">
-                      <FaComments className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg text-gray-900 dark:text-white">
-                        GannetX Chat
-                      </h3>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                        Community on Base
-                      </p>
-                    </div>
-                  </div>
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+          className="relative bg-[#0B0E14]/60 backdrop-blur-xl rounded-2xl border border-white/5 shadow-2xl w-full max-w-2xl h-[600px] flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex-shrink-0 px-6 py-4 border-b border-white/5 bg-[#0B0E14]/40">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 shadow-lg shadow-cyan-500/20">
+                  <FaComments className="w-5 h-5" />
                 </div>
-
-                {/* Wallet Status */}
-                {web3State.isConnected && web3State.address ? (
-                  <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                    <FaCheckCircle className="text-green-500 text-sm" />
-                    <span className="text-xs font-mono text-gray-700 dark:text-gray-300">
-                      {shortAddr(web3State.address)}
-                    </span>
-                  </div>
-                ) : (
-                  <button
-                    onClick={connectWallet}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 text-sm font-medium"
-                  >
-                    <FaWallet className="text-sm" />
-                    Connect Wallet
-                  </button>
-                )}
+                <div>
+                  <h3 className="font-bold text-lg text-white">
+                    GannetX Chat
+                  </h3>
+                  <p className="text-xs text-gray-400">
+                    Community on Base • {recentGMs.length} messages
+                  </p>
+                </div>
               </div>
 
-              {/* Messages Area */}
-              <div 
-                ref={listRef} 
-                className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
-                style={{ 
-                  scrollBehavior: 'smooth',
-                  overscrollBehavior: 'contain'
-                }}
+              <button
+                onClick={onClose}
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-red-500/20 hover:border-red-500/30 text-gray-400 hover:text-red-300 transition-all duration-200"
               >
-                {isLoadingMessages ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-center">
-                      <FaSpinner className="w-8 h-8 text-cyan-500 animate-spin mx-auto mb-2" />
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Loading messages...</p>
-                    </div>
+                <FaTimes className="text-sm" />
+              </button>
+            </div>
+
+            {/* Wallet Status */}
+            <div className="mt-3">
+              {web3State.isConnected && web3State.address ? (
+                <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg shadow-sm">
+                  <FaCheckCircle className="text-cyan-400 text-sm" />
+                  <span className="text-xs font-mono text-gray-300">
+                    {shortAddr(web3State.address)}
+                  </span>
+                </div>
+              ) : (
+                <button
+                  onClick={connectWallet}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 hover:border-cyan-400/30 text-cyan-400 rounded-lg hover:shadow-lg transition-all duration-200 text-sm font-medium"
+                >
+                  <FaWallet className="text-sm" />
+                  Connect Wallet to Chat
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Messages Area */}
+          <div
+            ref={listRef}
+            className="flex-1 overflow-y-auto px-6 py-4 space-y-4"
+            style={{
+              scrollBehavior: 'smooth',
+              overscrollBehavior: 'contain'
+            }}
+          >
+            {isLoadingMessages ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <FaSpinner className="w-8 h-8 text-cyan-400 animate-spin mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">Loading messages...</p>
+                </div>
+              </div>
+            ) : recentGMs.length === 0 ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center px-4">
+                  <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <FaComments className="w-8 h-8 text-gray-400" />
                   </div>
-                ) : recentGMs.length === 0 ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-center px-4">
-                      <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <FaComments className="w-8 h-8 text-gray-400" />
+                  <p className="text-sm font-medium text-white mb-1">
+                    No messages yet
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Be the first to say hello!
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <AnimatePresence initial={false}>
+                {recentGMs.map((m, i) => {
+                  const isOwn = isOwnMessage(m.user);
+                  return (
+                    <motion.div
+                      key={`${m.user}-${m.timestamp}-${i}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: i * 0.02 }}
+                      className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}
+                    >
+                      {/* Sender Address */}
+                      <div className={`mb-1.5 px-1 ${isOwn ? 'text-right' : 'text-left'}`}>
+                        <span className="text-[11px] font-mono text-gray-400">
+                          {isOwn ? 'You' : shortAddr(m.user)}
+                        </span>
                       </div>
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        No messages yet
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Be the first to say hello!
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <AnimatePresence initial={false}>
-                    {recentGMs.map((m, i) => {
-                      const isOwn = isOwnMessage(m.user);
-                      return (
-                        <motion.div
-                          key={`${m.user}-${m.timestamp}-${i}`}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3, delay: i * 0.02 }}
-                          className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}
-                        >
-                          {/* Sender Address */}
-                          <div className={`mb-1.5 px-1 ${isOwn ? 'text-right' : 'text-left'}`}>
-                            <span className="text-[11px] font-mono text-gray-500 dark:text-gray-400">
-                              {isOwn ? 'You' : shortAddr(m.user)}
+
+                      {/* Message Bubble */}
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                        style={{
+                          background: isOwn
+                            ? 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)'
+                            : colorForAddress(m.user)
+                        }}
+                        className={`rounded-2xl px-4 py-2.5 shadow-md max-w-[75%] ${isOwn ? 'rounded-tr-sm' : 'rounded-tl-sm'
+                          } group relative`}
+                        title={getFullDateTime(m.timestamp)}
+                      >
+                        <p className="text-sm text-white leading-relaxed break-words">
+                          {m.message || 'GM'}
+                        </p>
+                        <div className={`flex items-center gap-2 mt-1.5 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                          <div className="flex items-center gap-1">
+                            <FaClock className="w-2.5 h-2.5 text-white/70" />
+                            <span className="text-[10px] text-white/70">
+                              {getExactTime(m.timestamp)}
                             </span>
                           </div>
+                          <span className="text-[10px] text-white/60">
+                            • {formatTime(m.timestamp)}
+                          </span>
+                        </div>
 
-                          {/* Message Bubble */}
-                          <motion.div
-                            whileHover={{ scale: 1.02 }}
-                            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                            style={{ 
-                              background: isOwn 
-                                ? 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)'
-                                : colorForAddress(m.user)
-                            }}
-                            className={`rounded-2xl px-4 py-2.5 shadow-md max-w-[85%] ${
-                              isOwn ? 'rounded-tr-sm' : 'rounded-tl-sm'
-                            } group relative`}
-                            title={getFullDateTime(m.timestamp)}
-                          >
-                            <p className="text-sm text-white leading-relaxed break-words">
-                              {m.message || 'GM'}
-                            </p>
-                            <div className={`flex items-center gap-2 mt-1.5 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                              <div className="flex items-center gap-1">
-                                <FaClock className="w-2.5 h-2.5 text-white/70" />
-                                <span className="text-[10px] text-white/70">
-                                  {getExactTime(m.timestamp)}
-                                </span>
-                              </div>
-                              <span className="text-[10px] text-white/60">
-                                • {formatTime(m.timestamp)}
-                              </span>
-                            </div>
+                        {/* Tooltip on hover */}
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-[10px] rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                          {getFullDateTime(m.timestamp)}
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            )}
+          </div>
 
-                            {/* Tooltip on hover - shows full date time */}
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 dark:bg-gray-700 text-white text-[10px] rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-                              {getFullDateTime(m.timestamp)}
-                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
-                            </div>
-                          </motion.div>
-                        </motion.div>
-                      );
-                    })}
-                  </AnimatePresence>
-                )}
-              </div>
-
-              {/* Input Area */}
-              <div className="flex-shrink-0 px-4 py-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
-                {/* Cooldown Status */}
-                {timeLeft > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-3 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg"
-                  >
-                    <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
-                      <FaClock className="text-sm animate-pulse" />
-                      <span className="text-xs font-medium">
-                        Cooldown: {formatCooldown(timeLeft)}
-                      </span>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Input Form */}
-                <div className="flex items-end gap-2">
-                  <div className="flex-1 relative">
-                    <input
-                      ref={inputRef}
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Type your message..."
-                      maxLength={120}
-                      disabled={busy || timeLeft > 0}
-                      className="w-full px-4 py-3 pr-12 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                    />
-                    <span className="absolute right-3 bottom-3 text-[10px] text-gray-400 dark:text-gray-500 font-mono">
-                      {input.length}/120
-                    </span>
-                  </div>
-
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleSend}
-                    disabled={busy || timeLeft > 0 || !input.trim()}
-                    className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:shadow-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                  >
-                    {busy ? (
-                      <FaSpinner className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <FaPaperPlane className="w-4 h-4" />
-                    )}
-                  </motion.button>
+          {/* Input Area */}
+          <div className="flex-shrink-0 px-6 py-4 border-t border-white/5 bg-[#0B0E14]/40">
+            {/* Cooldown Status */}
+            {timeLeft > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-3 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg"
+              >
+                <div className="flex items-center gap-2 text-amber-400">
+                  <FaClock className="text-sm animate-pulse" />
+                  <span className="text-xs font-medium">
+                    Cooldown: {formatCooldown(timeLeft)}
+                  </span>
                 </div>
+              </motion.div>
+            )}
 
-                {/* Helper Text */}
-                <p className="mt-2 text-[10px] text-gray-500 dark:text-gray-400 text-center">
-                  Fee: {ethers.utils.formatEther(CHECKIN_FEE)} ETH • Press Enter to send
-                </p>
+            {/* Input Form */}
+            <div className="flex items-end gap-2">
+              <div className="flex-1 relative">
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Type your message..."
+                  maxLength={120}
+                  disabled={busy || timeLeft > 0}
+                  className="w-full px-4 py-3 pr-12 rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                />
+                <span className="absolute right-3 bottom-3 text-[10px] text-gray-500 font-mono">
+                  {input.length}/120
+                </span>
               </div>
-            </motion.div>
-          </>
-        )}
 
-export default GannetXChatSidebar;
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleSend}
+                disabled={busy || timeLeft > 0 || !input.trim()}
+                className="flex items-center justify-center w-12 h-12 bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-400/50 text-cyan-400 rounded-xl shadow-lg hover:shadow-xl hover:shadow-cyan-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                {busy ? (
+                  <FaSpinner className="w-5 h-5 animate-spin" />
+                ) : (
+                  <FaPaperPlane className="w-4 h-4" />
+                )}
+              </motion.button>
+            </div>
+
+            {/* Helper Text */}
+            <p className="mt-2 text-[10px] text-gray-400 text-center">
+              Fee: {ethers.utils.formatEther(CHECKIN_FEE)} ETH • Press Enter to send
+            </p>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+export default GannetXChatModal;

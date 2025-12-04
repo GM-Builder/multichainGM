@@ -21,15 +21,15 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
   position = 'card',
   soundEnabled = true
 }) => {
-  const [confettiPieces, setConfettiPieces] = useState<Array<{ 
-    id: number; 
-    x: number; 
+  const [confettiPieces, setConfettiPieces] = useState<Array<{
+    id: number;
+    x: number;
     y: number;
-    delay: number; 
+    delay: number;
     color: string;
     size: number;
   }>>([]);
-  
+
   // ✅ FIX: Prevent sound loop with ref
   const hasPlayedSound = useRef(false);
   const animationTimer = useRef<NodeJS.Timeout | null>(null);
@@ -57,7 +57,7 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
       y: Math.random() * -20, // Start from different heights
       delay: Math.random() * 0.4,
       color: [
-        '#06b6d4', '#0891b2', '#22d3ee', '#67e8f9', 
+        '#06b6d4', '#0891b2', '#22d3ee', '#67e8f9',
         '#fbbf24', '#f59e0b', '#a855f7', '#ec4899'
       ][Math.floor(Math.random() * 8)],
       size: Math.random() * 6 + 4 // Varied sizes 4-10px
@@ -98,21 +98,21 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
         {confettiPieces.map((piece) => (
           <motion.div
             key={piece.id}
-            initial={{ 
-              y: piece.y, 
-              x: 0, 
+            initial={{
+              y: piece.y,
+              x: 0,
               opacity: 1,
               scale: 1,
               rotate: 0
             }}
-            animate={{ 
+            animate={{
               y: [piece.y, piece.y - 100, 150],
               x: [0, piece.x * 1.5, piece.x * 2],
               opacity: [0, 1, 1, 0],
               scale: [0.8, 1.2, 1, 0.6],
               rotate: [0, Math.random() * 360, Math.random() * 720]
             }}
-            transition={{ 
+            transition={{
               duration: 2.5,
               delay: piece.delay,
               ease: [0.34, 1.56, 0.64, 1] // Bouncy easing
@@ -133,9 +133,9 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
           initial={{ scale: 0, opacity: 0, y: 30 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: -10 }}
-          transition={{ 
-            type: "spring", 
-            stiffness: 260, 
+          transition={{
+            type: "spring",
+            stiffness: 260,
             damping: 20,
             delay: 0.1
           }}
@@ -159,7 +159,7 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
           />
 
           {/* Main Card with Glass Morphism */}
-          <div className="relative bg-gradient-to-br from-slate-900/95 via-cyan-900/90 to-blue-900/95 backdrop-blur-xl rounded-2xl border border-cyan-400/30 shadow-2xl overflow-hidden">
+          <div className="relative bg-[#0B0E14]/60 backdrop-blur-xl rounded-2xl border border-white/5 shadow-2xl overflow-hidden">
             {/* Animated Grid Background */}
             <div className="absolute inset-0 opacity-10">
               <motion.div
@@ -210,9 +210,9 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
                     repeat: Infinity,
                     ease: "linear"
                   }}
-                  className="absolute w-20 h-20 border border-cyan-400/30 rounded-full"
+                  className="absolute w-20 h-20 border border-cyan-500/30 rounded-full"
                 />
-                
+
                 {/* Main Icon */}
                 <motion.div
                   animate={{
@@ -224,12 +224,12 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
                     repeat: 2,
                     ease: "easeInOut"
                   }}
-                  className="relative z-10 w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/50"
+                  className="relative z-10 w-16 h-16 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center shadow-lg shadow-cyan-500/30"
                 >
                   {isStreakMilestone ? (
-                    <FaTrophy className="text-2xl text-yellow-300 drop-shadow-lg" />
+                    <FaTrophy className="text-2xl text-yellow-400 drop-shadow-lg" />
                   ) : (
-                    <FaCheckCircle className="text-2xl text-white drop-shadow-lg" />
+                    <FaCheckCircle className="text-2xl text-cyan-400 drop-shadow-lg" />
                   )}
                 </motion.div>
 
@@ -271,8 +271,8 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
                 </h2>
 
                 {chainName && (
-                  <p className="text-xs text-cyan-300/80 font-medium">
-                    on <span className="text-cyan-200">{chainName}</span>
+                  <p className="text-xs text-cyan-400/80 font-medium">
+                    on <span className="text-cyan-300">{chainName}</span>
                   </p>
                 )}
               </motion.div>
@@ -285,18 +285,18 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
                 className="flex justify-center gap-2 mt-4"
               >
                 {/* Check-in Badge */}
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 backdrop-blur-sm">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 backdrop-blur-sm">
                   <FaRocket className="text-cyan-400 text-xs" />
                   <span className="text-sm font-bold text-white">+{checkinCount}</span>
-                  <span className="text-[10px] text-cyan-300/70">GM</span>
+                  <span className="text-[10px] text-cyan-400/70">GM</span>
                 </div>
 
                 {/* Streak Badge */}
                 {streak > 0 && (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-400/30 backdrop-blur-sm">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 backdrop-blur-sm">
                     <FaFire className="text-orange-400 text-xs" />
                     <span className="text-sm font-bold text-white">{streak}</span>
-                    <span className="text-[10px] text-orange-300/70">days</span>
+                    <span className="text-[10px] text-orange-400/70">days</span>
                   </div>
                 )}
               </motion.div>
@@ -304,13 +304,13 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
               {/* Floating +1 Indicator */}
               <motion.div
                 initial={{ y: 0, opacity: 0, scale: 0.5 }}
-                animate={{ 
-                  y: -80, 
-                  opacity: [0, 1, 1, 0], 
-                  scale: [0.5, 1.3, 1.3, 0.9] 
+                animate={{
+                  y: -80,
+                  opacity: [0, 1, 1, 0],
+                  scale: [0.5, 1.3, 1.3, 0.9]
                 }}
-                transition={{ 
-                  duration: 2.5, 
+                transition={{
+                  duration: 2.5,
                   ease: [0.34, 1.56, 0.64, 1]
                 }}
                 className="absolute -top-20 left-1/2 -translate-x-1/2 pointer-events-none"
@@ -361,8 +361,8 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
                     opacity: [1, 0],
                     scale: [0.5, 1]
                   }}
-                  transition={{ 
-                    duration: 1.2, 
+                  transition={{
+                    duration: 1.2,
                     delay: 0.3 + i * 0.05,
                     ease: "easeOut"
                   }}

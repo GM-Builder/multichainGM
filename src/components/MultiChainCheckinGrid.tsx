@@ -531,8 +531,8 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
             <button
               onClick={() => setNetworkType('all')}
               className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-300 ${networkType === 'all'
-                  ? 'bg-[#1A1D24] text-white shadow-sm'
-                  : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-[#1A1D24] text-white shadow-sm'
+                : 'text-gray-400 hover:text-gray-200'
                 }`}
             >
               <div className="flex items-center">
@@ -543,8 +543,8 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
             <button
               onClick={() => setNetworkType('mainnet')}
               className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-300 ${networkType === 'mainnet'
-                  ? 'bg-[#1A1D24] text-white shadow-sm'
-                  : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-[#1A1D24] text-white shadow-sm'
+                : 'text-gray-400 hover:text-gray-200'
                 }`}
             >
               <div className="flex items-center">
@@ -555,8 +555,8 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
             <button
               onClick={() => setNetworkType('testnet')}
               className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-300 ${networkType === 'testnet'
-                  ? 'bg-[#1A1D24] text-white shadow-sm'
-                  : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-[#1A1D24] text-white shadow-sm'
+                : 'text-gray-400 hover:text-gray-200'
                 }`}
             >
               <div className="flex items-center">
@@ -604,8 +604,8 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                           setIsFilterMenuOpen(false);
                         }}
                         className={`group relative block w-full text-left px-3 py-2 text-xs font-medium transition-all duration-200 ${filter === option
-                            ? 'bg-cyan-500/20 text-cyan-300 border-l-2 border-cyan-400'
-                            : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
+                          ? 'bg-cyan-500/20 text-cyan-300 border-l-2 border-cyan-400'
+                          : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
                           }`}
                       >
                         <span className="relative z-10">
@@ -644,8 +644,8 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                       setIsSortDropdownOpen(false);
                     }}
                     className={`px-3 py-2 text-xs cursor-pointer transition-all duration-200 ${sortOption === option.value
-                        ? 'bg-cyan-500/20 text-cyan-300 border-l-2 border-cyan-400 font-medium'
-                        : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
+                      ? 'bg-cyan-500/20 text-cyan-300 border-l-2 border-cyan-400 font-medium'
+                      : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
                       }`}
                   >
                     {option.label}
@@ -659,10 +659,10 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
             onClick={checkAllChainsStatus}
             disabled={isLoading || !isConnected}
             className={`group relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 overflow-hidden ${isLoading
-                ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/30 cursor-wait'
-                : !isConnected
-                  ? 'bg-white/5 text-gray-500 border border-white/5 cursor-not-allowed'
-                  : 'bg-[#0B0E14]/60 text-gray-300 border border-white/5 hover:border-white/10 hover:text-white active:scale-95'
+              ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/30 cursor-wait'
+              : !isConnected
+                ? 'bg-white/5 text-gray-500 border border-white/5 cursor-not-allowed'
+                : 'bg-[#0B0E14]/60 text-gray-300 border border-white/5 hover:border-white/10 hover:text-white active:scale-95'
               }`}
           >
             <div className="relative z-10 flex items-center gap-1.5">
@@ -821,7 +821,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                   }}
                   className={`w-full mt-3 py-3 px-4 text-sm font-medium flex items-center justify-center transition-all duration-300 rounded-xl ${!isConnected || !canActivateNow || processingChainId !== null || isLoading
                     ? 'bg-[#0B0E14]/60 border border-white/10 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                    : 'bg-[#0B0E14]/60 border border-white/20 hover:bg-white/20 text-white hover:border-white/30'
+                    : 'bg-[#0B0E14]/60 border border-white/20 hover:bg-cyan-500/20 text-white hover:border-cyan-500/30'
                     }`}
                   disabled={!isConnected || !canActivateNow || processingChainId !== null || isLoading}
                 >

@@ -3,7 +3,6 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { formatAddress } from "@/utils/web3"
-import ThemeToggle from "./ThemeToggle"
 import {
   FaSignOutAlt,
   FaChevronDown,
@@ -19,6 +18,7 @@ import ChainLogo from "@/components/ChainLogo"
 import { getMainnetChainIds, SUPPORTED_CHAINS } from '@/utils/constants'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import GannetXChatModal from './GannetXChatSidebar'
 
 const LOGO_PATH = "/logo.png"
 
@@ -59,6 +59,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false)
   const [isSwitchingChain, setIsSwitchingChain] = useState(false)
   const [showDeployTooltip, setShowDeployTooltip] = useState(false)
+  const [isChatOpen, setIsChatOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const chainDropdownRef = useRef<HTMLDivElement>(null)
@@ -201,13 +202,13 @@ const Navbar: React.FC<NavbarProps> = ({
               <div ref={deployButtonRef} className="relative" onMouseEnter={() => setShowDeployTooltip(true)} onMouseLeave={() => setShowDeployTooltip(false)}>
                 <Link href="/deploy">
                   <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-2 px-4 py-2 bg-[#0B0E14] text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300">
-                    <span>Deploy</span>
+                    <span className="text-sm">Deploy</span>
                   </motion.button>
                 </Link>
               </div>
 
               {/* Mint NFT Button */}
-              <Link href="/mint">
+              {/* <Link href="/mint">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -215,7 +216,19 @@ const Navbar: React.FC<NavbarProps> = ({
                 >
                   <span>Mint NFT</span>
                 </motion.button>
-              </Link>
+              </Link> */}
+
+              {/* Chat Button */}
+              {address && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsChatOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0B0E14] text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
+                >
+                  <span className="text-sm">Chat</span>
+                </motion.button>
+              )}
 
               {/* Chain Switcher Dropdown */}
               {networkInfo && address && (
@@ -591,6 +604,12 @@ const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
       )}
+
+      {/* Chat Modal */}
+      <GannetXChatModal 
+        isOpen={isChatOpen} 
+        onClose={() => setIsChatOpen(false)} 
+      />
     </>
   )
 }
