@@ -33,27 +33,27 @@ export const SidebarReferralCard: React.FC<SidebarReferralCardProps> = ({
           {/* Main Card - Clickable */}
           <div
             onClick={onCardClick}
-            className="p-6 bg-gradient-to-br from-blue-50/80 to-cyan-50/80 dark:from-blue-900/30 dark:to-cyan-900/30 border border-blue-200/60 dark:border-blue-700/60 cursor-pointer hover:shadow-lg transition-all group"
+            className="p-6 bg-[#0B0E14]/60 backdrop-blur-xl border border-white/5 cursor-pointer hover:bg-[#0B0E14]/80 transition-all group rounded-t-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg group-hover:shadow-xl transition-shadow">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg group-hover:shadow-cyan-500/20 transition-shadow">
                   <FaGift className="text-xl text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white">Referral Program</h3>
+                  <h3 className="font-bold text-white">Referral Program</h3>
                   {myReferralsCount > 0 && (
-                    <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                    <p className="text-xs text-cyan-400 font-medium">
                       {myReferralsCount} {myReferralsCount === 1 ? 'Referral' : 'Referrals'}
                     </p>
                   )}
                 </div>
               </div>
-              
+
               {/* Click indicator */}
               <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
@@ -61,21 +61,21 @@ export const SidebarReferralCard: React.FC<SidebarReferralCardProps> = ({
 
             {/* Referred By Info */}
             {userReferredBy && (
-              <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                <p className="text-xs text-green-600 dark:text-green-400 font-medium mb-1">
+              <div className="mb-4 p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                <p className="text-xs text-emerald-400 font-medium mb-1">
                   Referred by
                 </p>
-                <code className="text-xs font-mono text-gray-900 dark:text-white">
+                <code className="text-xs font-mono text-gray-300">
                   {formatAddress(userReferredBy)}
                 </code>
               </div>
             )}
 
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-sm text-gray-400 mb-4">
               Invite friends and secure your exclusive spot for future rewards!
             </p>
 
-            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+            <p className="text-xs text-cyan-400 font-medium group-hover:text-cyan-300 transition-colors">
               Click to view dashboard →
             </p>
           </div>
@@ -86,25 +86,25 @@ export const SidebarReferralCard: React.FC<SidebarReferralCardProps> = ({
               e.stopPropagation();
               onCopyLink();
             }}
-            className="w-full px-4 py-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-x border-b border-blue-200/60 dark:border-blue-700/60 rounded-b-2xl font-medium text-gray-900 dark:text-white flex items-center justify-center gap-2 transition-all"
+            className="w-full px-4 py-3 bg-[#0B0E14]/80 hover:bg-[#0B0E14] border-x border-b border-white/5 rounded-b-2xl font-medium text-white flex items-center justify-center gap-2 transition-all"
           >
-            <FaCopy className="text-blue-500" />
+            <FaCopy className="text-cyan-500" />
             Copy Referral Link
           </button>
         </>
       ) : (
-        <div className="p-6 bg-gradient-to-br from-amber-50/80 to-orange-50/80 dark:from-amber-900/30 dark:to-orange-900/30 border border-amber-200/60 dark:border-amber-700/60 rounded-2xl">
+        <div className="p-6 bg-[#0B0E14]/60 backdrop-blur-xl border border-white/5 rounded-2xl">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg">
               <FaGift className="text-xl text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 dark:text-white">Referral System</h3>
-              <p className="text-xs text-amber-600 dark:text-amber-400">Base Network Required</p>
+              <h3 className="font-bold text-white">Referral System</h3>
+              <p className="text-xs text-amber-400">Base Network Required</p>
             </div>
           </div>
 
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-sm text-gray-400 mb-4">
             Switch to Base network to access referral features
           </p>
 

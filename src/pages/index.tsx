@@ -3,9 +3,10 @@ import { useWalletState } from '@/hooks/useWalletState';
 import FixedMultiChainCheckinGrid from '@/components/MultiChainCheckinGrid';
 import Notification from '@/components/Notification';
 import HeroStatsSection from '@/components/HeroStatsSection';
+import HeroSection from '@/components/HeroSection';
 import ReferralModal from '@/components/ReferralModal';
 import ReferralRegisterModal from '@/components/ReferralRegisterModal';
-import { 
+import {
   FaGlobe,
   FaFlask,
   FaLayerGroup,
@@ -18,83 +19,37 @@ import { useUserStats, useUserCheckins } from '@/hooks/useSubgraph';
 import { useUserChainStats } from '@/hooks/useUserChainStats';
 import { useUserRanking } from '@/hooks/useUserRangking';
 import { useReferrerInfo, useUserReferrer } from '@/hooks/useReferral';
-import QuestDashboard from '@/components/QuestDashboard';
 import ActivityHeatmap from '@/components/ActivityHeatmap';
-import { 
-  isOnReferralChain, 
-  generateReferralLink, 
-  extractReferralCode, 
+import {
+  isOnReferralChain,
+  generateReferralLink,
+  extractReferralCode,
   validateReferralCode,
   formatAddress
 } from '@/utils/web3';
 import toast from 'react-hot-toast';
-import { SidebarReferralCard} from '@/components/SidebarReferralCard';
+import { SidebarReferralCard } from '@/components/SidebarReferralCard';
 import LeaderboardModal from '@/components/LeaderboardModal';
 import GannetXChatSidebar from '@/components/GannetXChatSidebar';
 
 type NetworkTabType = 'all' | 'mainnet' | 'testnet';
 
-const BlobPatternBottomLeft: React.FC = () => (
-  <div className="fixed bottom-0 left-0 w-64 h-64 -mb-32 -ml-32 opacity-10 dark:opacity-5 pointer-events-none z-0">
-    <motion.svg 
-      viewBox="0 0 200 200"
-      xmlns="http://www.w3.org/2000/svg"
-      initial={{ scale: 0.8, rotate: 0 }}
-      animate={{ 
-        scale: [0.8, 1.1, 0.8], 
-        rotate: [0, 10, 0] 
-      }}
-      transition={{ 
-        duration: 20, 
-        repeat: Infinity, 
-        ease: "easeInOut" 
-      }}
-    >
-      <path fill="#00E5FF" d="M44.5,-76.3C56.9,-69.1,65.8,-55.3,71.3,-41.1C76.8,-26.9,78.9,-12.1,76.5,1.4C74.1,14.9,67.1,27.2,58.1,37.8C49.1,48.4,38.2,57.2,25.8,63.5C13.5,69.8,-0.3,73.5,-14.2,71.5C-28.1,69.5,-42.1,61.8,-52.9,50.8C-63.8,39.9,-71.4,25.7,-75.6,9.7C-79.8,-6.3,-80.5,-24.1,-73.6,-38.4C-66.6,-52.6,-52,-63.4,-37.2,-69.7C-22.4,-76,-11.2,-78,2.9,-82.6C17,-87.2,32.1,-83.5,44.5,-76.3Z" transform="translate(100 100)" />
-    </motion.svg>
-  </div>
-);
-
-const SquigglyPatternTopRight: React.FC = () => (
-  <div className="fixed top-0 right-0 w-96 h-96 -mt-16 -mr-16 opacity-10 dark:opacity-5 pointer-events-none z-0 overflow-hidden">
-    <motion.svg 
-      viewBox="0 0 200 200" 
-      xmlns="http://www.w3.org/2000/svg"
-      initial={{ scale: 0.9, rotate: -10, y: -20 }}
-      animate={{ 
-        scale: [0.9, 1.2, 0.9], 
-        rotate: [-10, 5, -10],
-        y: [-20, 10, -20] 
-      }}
-      transition={{ 
-        duration: 25, 
-        repeat: Infinity, 
-        ease: "easeInOut",
-        times: [0, 0.5, 1]
-      }}
-    >
-      <path fill="#06b6d4" d="M31.9,-52.2C45.3,-45.7,62.3,-43.2,70.8,-33.5C79.2,-23.8,79.1,-6.9,75.3,8.5C71.5,23.9,64.1,37.9,53.3,47.8C42.4,57.8,28.2,63.7,13.2,68.3C-1.7,72.9,-17.4,76.1,-28.9,70.8C-40.4,65.6,-47.7,51.9,-54,38.6C-60.4,25.3,-65.8,12.7,-67.6,-1.1C-69.5,-14.8,-67.7,-29.7,-59.7,-40C-51.7,-50.2,-37.4,-56,-24.9,-62.2C-12.5,-68.4,-1.2,-75.1,7.4,-72.3C16,-69.5,18.6,-58.8,31.9,-52.2Z" transform="translate(100 100)" />
-    </motion.svg>
-  </div>
-);
-
 const CheckinPageIntegration: React.FC = () => {
-  const { 
-    web3State, 
-    connectWallet: rawConnectWallet, 
+  const {
+    web3State,
+    connectWallet: rawConnectWallet,
     refreshReferralStatus,
   } = useWalletState();
-  
+
   const connectWallet = useCallback(async (): Promise<void> => {
     await rawConnectWallet();
   }, [rawConnectWallet]);
-  
+
   const [lastTxHash, setLastTxHash] = useState<string | null>(null);
   const [lastCheckinChainId, setLastCheckinChainId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showSuccessNotification, setShowSuccessNotification] = useState<boolean>(false);
   const [showErrorNotification, setShowErrorNotification] = useState<boolean>(false);
-  const [networkTab, setNetworkTab] = useState<NetworkTabType>('all');
   const [pendingAnimation, setPendingAnimation] = useState<{
     chainId: number;
     chainName: string;
@@ -110,20 +65,20 @@ const CheckinPageIntegration: React.FC = () => {
   const [referralCodeFromUrl, setReferralCodeFromUrl] = useState<string | null>(null);
   const [canUseReferral, setCanUseReferral] = useState(false);
   const [isLeaderboardModalOpen, setIsLeaderboardModalOpen] = useState(false);
-  
+
   // Subgraph integration
   const { data: userCheckins } = useUserCheckins(web3State.address || undefined, 365);
   const { data: userStats, loading: userStatsLoading } = useUserStats(web3State.address || undefined);
   const { data: currentChainStats, loading: chainStatsLoading } = useUserChainStats(
-    web3State.chainId || null, 
+    web3State.chainId || null,
     web3State.address || null
   );
   const { data: userRanking, loading: rankingLoading } = useUserRanking(web3State.address || null);
   const { data: myReferrals } = useReferrerInfo(web3State.address || undefined);
   const { data: userReferrerData } = useUserReferrer(web3State.address || undefined);
-  
-  const currentChainName = web3State.chainId 
-    ? (SUPPORTED_CHAINS[web3State.chainId]?.chainName || 'Unknown') 
+
+  const currentChainName = web3State.chainId
+    ? (SUPPORTED_CHAINS[web3State.chainId]?.chainName || 'Unknown')
     : 'No Chain';
 
   useEffect(() => {
@@ -136,7 +91,7 @@ const CheckinPageIntegration: React.FC = () => {
         setCanUseReferral(false);
       }
     };
-    
+
     if (web3State.isConnected) {
       checkReferralChain();
     }
@@ -145,10 +100,10 @@ const CheckinPageIntegration: React.FC = () => {
   useEffect(() => {
     try {
       const refCode = extractReferralCode();
-      
+
       if (refCode) {
         const validation = validateReferralCode(refCode);
-        
+
         if (validation.valid && validation.address) {
           setReferralCodeFromUrl(validation.address);
         } else {
@@ -202,11 +157,11 @@ const CheckinPageIntegration: React.FC = () => {
     url.searchParams.delete('ref');
     window.history.replaceState({}, document.title, url.pathname + url.search);
     setReferralCodeFromUrl(null);
-    
+
     if (refreshReferralStatus) {
       await refreshReferralStatus();
     }
-    
+
     setTimeout(() => window.location.reload(), 2000);
   };
 
@@ -221,7 +176,7 @@ const CheckinPageIntegration: React.FC = () => {
     });
   }, []);
 
-  const getAvatarUrl = (address: string): string => 
+  const getAvatarUrl = (address: string): string =>
     `https://api.dicebear.com/6.x/identicon/svg?seed=${address}`;
 
   const handleCopyAddress = useCallback(() => {
@@ -258,11 +213,9 @@ const CheckinPageIntegration: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-cyan-100 dark:from-black dark:via-gray-900 dark:to-cyan-800 relative overflow-hidden">
-      <BlobPatternBottomLeft />
-      <SquigglyPatternTopRight />
+    <div className="min-h-screen bg-[#050608] relative overflow-x-hidden text-white">
       <AudioPlayer />
-      
+
       <Notification
         isOpen={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
@@ -279,7 +232,7 @@ const CheckinPageIntegration: React.FC = () => {
         txHash={lastTxHash}
         chainId={lastCheckinChainId}
       />
-      
+
       <Notification
         isOpen={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
@@ -319,34 +272,17 @@ const CheckinPageIntegration: React.FC = () => {
           onSuccess={handleReferralSuccess}
         />
       )}
-      
+
       {/* MAIN CONTENT CONTAINER */}
-      <div className="pt-24 pb-20 relative z-10">
-        <div className="max-w-screen mx-auto px-4 md:pl-6 lg:pl-80">
-          {/* CONTENT WITH SIDEBAR LAYOUT */}
-          <div className="flex gap-6"> 
+      <div className="pt-40 pb-20 relative z-10">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-6">
+          <div className="flex flex-col xl:flex-row gap-8">
+
             {/* LEFT CONTENT - MAIN AREA */}
-          <div className="flex-1">
-        {/* QUEST BANNER - FULL WIDTH */}
-          <div className="mb-6">
-            <QuestDashboard address={web3State.address} />
-          </div>
-              
-              {/* NETWORK TABS */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-center mb-6">
-                <div className="flex bg-white dark:bg-gray-800/80 px-2 py-1 rounded-full backdrop-blur-sm shadow-md">
-                  <button onClick={() => setNetworkTab('all')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'all' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
-                    <div className="flex items-center"><FaLayerGroup className="mr-2 h-4 w-4" />All</div>
-                  </button>
-                  <button onClick={() => setNetworkTab('mainnet')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'mainnet' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
-                    <div className="flex items-center"><FaGlobe className="mr-2 h-4 w-4" />Mainnet</div>
-                  </button>
-                  <button onClick={() => setNetworkTab('testnet')} className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${networkTab === 'testnet' ? 'bg-cyan-100/70 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 shadow-sm transform scale-105' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}>
-                    <div className="flex items-center"><FaFlask className="mr-2 h-4 w-4" />Testnet</div>
-                  </button>
-                </div>
-              </motion.div>
-              
+            <div className="flex-1 min-w-0">
+              {/* HERO SECTION */}
+              <HeroSection address={web3State.address} />
+
               {/* CHECKIN GRID */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
                 <FixedMultiChainCheckinGrid
@@ -356,70 +292,81 @@ const CheckinPageIntegration: React.FC = () => {
                   signer={web3State.signer}
                   provider={web3State.provider}
                   onCheckinSuccess={handleCheckinSuccess}
-                  networkType={networkTab}
                   triggerAnimation={animationTrigger}
                   onAnimationComplete={() => setAnimationTrigger(null)}
                 />
               </motion.div>
             </div>
 
-            {/* RIGHT SIDEBAR - INSIDE CONTAINER */}
-            {web3State.isConnected && web3State.address && (
-              <motion.aside 
-                initial={{ opacity: 0, x: 20 }} 
-                animate={{ opacity: 1, x: 0 }} 
-                className="hidden lg:block w-80 xl:w-96 flex-shrink-0"
-              >
-                <div className="sticky top-24 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-xl border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
-                  <div className="p-4 xl:p-6 space-y-4 xl:space-y-6 max-h-max overflow-y-auto">
-                    
-                    {/* USER INFO CARD */}
-                    <div className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl border border-cyan-200 dark:border-cyan-800 p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-cyan-400/30 flex-shrink-0">
-                          <img src={getAvatarUrl(web3State.address)} alt="Avatar" className="w-full h-full" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1">Your Address</p>
-                          <div onClick={handleCopyAddress} className="group flex items-center gap-1.5 cursor-pointer">
-                            <span className="font-mono text-xs text-gray-800 dark:text-gray-200 truncate">{web3State.address.substring(0, 6)}...{web3State.address.substring(38)}</span>
-                            <FaCopy className={`text-xs flex-shrink-0 transition-colors ${copySuccess ? 'text-green-500' : 'text-gray-400 group-hover:text-cyan-500'}`} />
-                          </div>
+            {/* RIGHT SIDEBAR */}
+            <motion.aside
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="w-full xl:w-80 flex-shrink-0 space-y-6"
+            >
+              {web3State.isConnected && web3State.address ? (
+                <>
+                  {/* USER INFO CARD */}
+                  <div className="bg-[#0B0E14]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white/10 flex-shrink-0">
+                        <img src={getAvatarUrl(web3State.address)} alt="Avatar" className="w-full h-full" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Connected As</p>
+                        <div onClick={handleCopyAddress} className="group flex items-center gap-2 cursor-pointer">
+                          <span className="font-mono text-sm text-white truncate">{web3State.address.substring(0, 6)}...{web3State.address.substring(38)}</span>
+                          <FaCopy className={`text-xs flex-shrink-0 transition-colors ${copySuccess ? 'text-green-500' : 'text-gray-500 group-hover:text-cyan-400'}`} />
                         </div>
                       </div>
                     </div>
-
-                    {/* STATS SECTION */}
-                    <HeroStatsSection
-                      currentChainId={web3State.chainId || null}
-                      currentChainName={currentChainName}
-                      currentChainCheckins={currentChainStats?.totalCheckins || 0}
-                      currentChainStreak={currentChainStats?.currentStreak || 0}
-                      totalCheckins={userStats?.totalCheckins || 0}
-                      totalChains={userStats?.chains.length || 0}
-                      maxStreak={userStats?.maxStreak || 0}
-                      userRank={userRanking?.rank || 0}
-                      totalUsers={userRanking?.totalUsers || 0}
-                      loading={chainStatsLoading || userStatsLoading || rankingLoading}
-                    />
-
-                    {/* ACTIVITY HEATMAP */}
-                    {userStats && <ActivityHeatmap checkins={userCheckins || []} currentStreak={userStats.currentStreak} maxStreak={userStats.maxStreak} />}
-
-                    {/* REFERRAL CARD */}
-                    <SidebarReferralCard 
-                      canUseReferral={canUseReferral} 
-                      myReferralsCount={myReferrals?.totalReferrals || 0} 
-                      userReferredBy={userReferrerData?.referredBy?.id || null} 
-                      onCopyLink={handleCopyReferralLink} 
-                      onCardClick={() => setIsReferralModalOpen(true)} 
-                      onSwitchToBase={handleSwitchToBase} 
-                      formatAddress={formatAddress} 
-                    /> 
                   </div>
+
+                  {/* STATS SECTION */}
+                  <HeroStatsSection
+                    currentChainId={web3State.chainId || null}
+                    currentChainName={currentChainName}
+                    currentChainCheckins={currentChainStats?.totalCheckins || 0}
+                    currentChainStreak={currentChainStats?.currentStreak || 0}
+                    totalCheckins={userStats?.totalCheckins || 0}
+                    totalChains={userStats?.chains.length || 0}
+                    maxStreak={userStats?.maxStreak || 0}
+                    userRank={userRanking?.rank || 0}
+                    totalUsers={userRanking?.totalUsers || 0}
+                    loading={chainStatsLoading || userStatsLoading || rankingLoading}
+                  />
+
+                  {/* ACTIVITY HEATMAP */}
+                  {userStats && (
+                    <div className="bg-[#0B0E14]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-4 overflow-hidden">
+                      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Activity</h3>
+                      <ActivityHeatmap checkins={userCheckins || []} currentStreak={userStats.currentStreak} maxStreak={userStats.maxStreak} />
+                    </div>
+                  )}
+
+                  {/* REFERRAL CARD */}
+                  <SidebarReferralCard
+                    canUseReferral={canUseReferral}
+                    myReferralsCount={myReferrals?.totalReferrals || 0}
+                    userReferredBy={userReferrerData?.referredBy?.id || null}
+                    onCopyLink={handleCopyReferralLink}
+                    onCardClick={() => setIsReferralModalOpen(true)}
+                    onSwitchToBase={handleSwitchToBase}
+                    formatAddress={formatAddress}
+                  />
+                </>
+              ) : (
+                <div className="bg-[#0B0E14]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-6 text-center">
+                  <p className="text-gray-400 mb-4">Connect your wallet to view your stats and activity.</p>
+                  <button
+                    onClick={connectWallet}
+                    className="px-6 py-2 bg-white text-black rounded-full font-bold hover:bg-gray-200 transition-colors"
+                  >
+                    Connect Wallet
+                  </button>
                 </div>
-              </motion.aside>
-            )}
+              )}
+            </motion.aside>
           </div>
         </div>
       </div>

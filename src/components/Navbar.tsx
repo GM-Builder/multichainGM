@@ -135,22 +135,22 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const handleChainSwitch = async (chainId: number) => {
     if (isSwitchingChain || currentChainId === chainId) return
-    
+
     setIsSwitchingChain(true)
     setIsChainDropdownOpen(false)
-    
+
     try {
       const { switchToChain } = await import('@/utils/web3')
       await switchToChain(chainId)
-      
+
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       if (onSwitchChain) {
         await onSwitchChain(chainId)
       }
     } catch (error: any) {
       console.error('Failed to switch chain:', error)
-      
+
       const errorMessage = error.message || 'Failed to switch network'
       console.error(errorMessage)
     } finally {
@@ -167,31 +167,29 @@ const Navbar: React.FC<NavbarProps> = ({
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-20 transition-all duration-500 ${
-          scrolled 
-            ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-md shadow-cyan-500/30" 
-            : "bg-transparent"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-20 transition-all duration-500 ${scrolled
+          ? "bg-[#0B0E14]/90 backdrop-blur-md"
+          : "bg-transparent"
+          }`}
       >
-        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-6">
           <div className={`flex justify-between items-center transition-all duration-500
-              ${scrolled ? 'h-16 md:h-20' : 'h-20 md:h-28'}` 
-            }
+              ${scrolled ? 'h-16 md:h-20' : 'h-20 md:h-28'}`
+          }
           >
             {/* Logo */}
             <Link href="/" className="flex items-center">
               <div className="flex items-center gap-2 cursor-pointer">
-                <div 
-                  className={`flex-shrink-0 relative transition-all duration-500 ${
-                    scrolled 
-                      ? "h-14 md:h-16 w-32 md:w-40"
-                      : "h-16 md:h-24 w-48 md:w-64"
-                  }`}
+                <div
+                  className={`flex-shrink-0 relative transition-all duration-500 ${scrolled
+                    ? "h-12 md:h-16 w-24 md:w-28"
+                    : "h-16 md:h-24 w-48 md:w-64"
+                    }`}
                 >
-                  <img 
+                  <img
                     src={LOGO_PATH}
                     alt="GannetX Logo"
-                    className="h-full w-full object-contain" 
+                    className="h-full w-full object-contain"
                   />
                 </div>
               </div>
@@ -202,8 +200,7 @@ const Navbar: React.FC<NavbarProps> = ({
               {/* Deploy Button with Tooltip */}
               <div ref={deployButtonRef} className="relative" onMouseEnter={() => setShowDeployTooltip(true)} onMouseLeave={() => setShowDeployTooltip(false)}>
                 <Link href="/deploy">
-                  <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300">
-                    <FaRocket className="text-sm" />
+                  <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-2 px-4 py-2 bg-[#0B0E14] text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300">
                     <span>Deploy</span>
                   </motion.button>
                 </Link>
@@ -214,27 +211,23 @@ const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00FFFF] to-cyan-400 text-[#0A1929] rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0B0E14] text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
                 >
-                  <FaGem className="text-sm" />
                   <span>Mint NFT</span>
                 </motion.button>
               </Link>
 
-              <ThemeToggle />
-              
               {/* Chain Switcher Dropdown */}
               {networkInfo && address && (
                 <div className="relative" ref={chainDropdownRef}>
                   <button
                     onClick={() => setIsChainDropdownOpen(!isChainDropdownOpen)}
                     disabled={isSwitchingChain}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-sm text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-700/50 shadow-inner backdrop-blur-sm hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-all duration-200 ${
-                      isSwitchingChain ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                    }`}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0B0E14] text-sm text-white border border-white/5 shadow-inner backdrop-blur-sm hover:bg-[#252830] transition-all duration-200 ${isSwitchingChain ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                      }`}
                   >
                     <div className="text-lg">
-                      <ChainLogo 
+                      <ChainLogo
                         logoUrl={networkInfo.logoUrl}
                         altText={networkInfo.name}
                         size="md"
@@ -256,50 +249,49 @@ const Navbar: React.FC<NavbarProps> = ({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-64 rounded-xl shadow-xl bg-white dark:bg-gray-900 backdrop-blur-md border border-gray-200 dark:border-cyan-500/20 z-50 overflow-hidden max-h-[400px] overflow-y-auto"
+                        className="absolute right-0 mt-2 w-64 rounded-xl shadow-xl bg-[#0B0E14] backdrop-blur-md border border-white/10 z-50 overflow-hidden max-h-[400px] overflow-y-auto"
                       >
-                        <div className="px-4 py-3 border-b border-gray-200 dark:border-cyan-500/20 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20">
-                          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                        <div className="px-4 py-3 border-b border-white/5 bg-white/5">
+                          <h3 className="text-sm font-semibold text-white">
                             Switch Network
                           </h3>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-gray-400 mt-1">
                             Select mainnet chain
                           </p>
                         </div>
-                        
+
                         <div className="py-2">
                           {mainnetChains.map((chain) => {
                             const isCurrentChain = currentChainId === chain.id
-                            
+
                             return (
                               <button
                                 key={chain.id}
                                 onClick={() => handleChainSwitch(chain.id)}
                                 disabled={isCurrentChain || isSwitchingChain}
-                                className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 ${
-                                  isCurrentChain
-                                    ? 'bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30 cursor-default'
-                                    : 'hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer'
-                                } ${isSwitchingChain ? 'opacity-50' : ''}`}
+                                className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 ${isCurrentChain
+                                  ? 'bg-white/10 cursor-default'
+                                  : 'hover:bg-white/5 cursor-pointer'
+                                  } ${isSwitchingChain ? 'opacity-50' : ''}`}
                               >
-                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700/50">
-                                  <ChainLogo 
+                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-black/20">
+                                  <ChainLogo
                                     logoUrl={chain.logoUrl}
                                     altText={chain.chainName}
                                     size="md"
                                     fallbackIcon="🔗"
                                   />
                                 </div>
-                                
+
                                 <div className="flex-1 text-left">
-                                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                  <div className="text-sm font-medium text-white">
                                     {chain.chainName}
                                   </div>
-                                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  <div className="text-xs text-gray-400">
                                     {chain.nativeCurrency.symbol}
                                   </div>
                                 </div>
-                                
+
                                 {isCurrentChain && (
                                   <div className="flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500/20">
                                     <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
@@ -317,9 +309,9 @@ const Navbar: React.FC<NavbarProps> = ({
 
               {/* Show simple network info when not connected */}
               {networkInfo && !address && (
-                <div className="flex items-center px-3 py-1.5 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-sm text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-700/50 shadow-inner backdrop-blur-sm">
+                <div className="flex items-center px-3 py-1.5 rounded-full bg-[#0B0E14] text-sm text-white border border-white/5 shadow-inner backdrop-blur-sm">
                   <div className="mr-2 text-lg">
-                    <ChainLogo 
+                    <ChainLogo
                       logoUrl={networkInfo.logoUrl}
                       altText={networkInfo.name}
                       size="md"
@@ -339,43 +331,43 @@ const Navbar: React.FC<NavbarProps> = ({
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <button className="flex items-center gap-2 bg-white dark:bg-black/60 backdrop-blur-md px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-cyan-900/10 transition-colors border border-gray-200 dark:border-cyan-500/20 shadow-sm">
+                  <button className="flex items-center gap-2 bg-[#0B0E14] backdrop-blur-md px-4 py-2 rounded-lg hover:bg-[#252830] transition-colors border border-white/5 shadow-sm">
                     <div className="h-5 w-5 rounded-full overflow-hidden flex-shrink-0">
                       {address && (
-                        <img 
-                          src={getAvatarUrl(address)} 
-                          alt="Avatar" 
+                        <img
+                          src={getAvatarUrl(address)}
+                          alt="Avatar"
                           className="h-full w-full"
                         />
                       )}
                     </div>
-                    <span className="text-sm font-medium text-gray-800 dark:text-cyan-300">
+                    <span className="text-sm font-medium text-white">
                       {formatAddress(address)}
                     </span>
                     <FaChevronDown
-                      className={`h-3 w-3 text-cyan-500 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
+                      className={`h-3 w-3 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
                     />
                   </button>
 
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-xl bg-white dark:bg-black/80 backdrop-blur-md border border-gray-200 dark:border-cyan-500/20 z-50 overflow-hidden">
-                      <div className="px-4 py-3 border-b border-gray-200 dark:border-cyan-500/20 bg-gray-50 dark:bg-cyan-900/10">
+                    <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-xl bg-[#0B0E14] backdrop-blur-md border border-white/10 z-50 overflow-hidden">
+                      <div className="px-4 py-3 border-b border-white/5 bg-white/5">
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full overflow-hidden">
                             {address && (
-                              <img 
-                                src={getAvatarUrl(address)} 
-                                alt="Avatar" 
+                              <img
+                                src={getAvatarUrl(address)}
+                                alt="Avatar"
                                 className="h-full w-full"
                               />
                             )}
                           </div>
                           <div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400 flex items-center">
+                            <div className="text-xs text-gray-300 flex items-center">
                               {formatAddress(address)}
                               <button
                                 onClick={copyAddressToClipboard}
-                                className="ml-1 text-gray-500 hover:text-cyan-600 dark:hover:text-cyan-400"
+                                className="ml-1 text-gray-400 hover:text-white"
                               >
                                 <FaCopy size={10} />
                               </button>
@@ -387,10 +379,10 @@ const Navbar: React.FC<NavbarProps> = ({
                       <div className="py-1">
                         <button
                           onClick={disconnectWallet}
-                          className="px-4 py-3 w-full flex items-center gap-2 hover:bg-red-50 dark:hover:bg-cyan-900/10 transition-colors text-left"
+                          className="px-4 py-3 w-full flex items-center gap-2 hover:bg-red-500/10 transition-colors text-left"
                         >
                           <FaSignOutAlt className="text-red-500" size={14} />
-                          <span className="text-sm text-red-500 hover:text-red-800">Disconnect</span>
+                          <span className="text-sm text-red-500 hover:text-red-400">Disconnect</span>
                         </button>
                       </div>
                     </div>
@@ -402,23 +394,21 @@ const Navbar: React.FC<NavbarProps> = ({
             {/* Mobile Menu Button */}
             <div className="flex md:hidden items-center space-x-3">
               {networkInfo && (
-                <div className="flex items-center px-2 py-1 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-xs text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-700/50 shadow-inner backdrop-blur-sm">
+                <div className="flex items-center px-2 py-1 rounded-full bg-[#0B0E14] text-xs text-white border border-white/5 shadow-inner backdrop-blur-sm">
                   <div className="mr-1 text-sm">
-                    <ChainLogo 
+                    <ChainLogo
                       logoUrl={networkInfo.logoUrl}
                       altText={networkInfo.name}
-                      size="md" 
+                      size="md"
                       fallbackIcon="🔗"
                     />
                   </div>
                   <span className="max-w-[60px] truncate">{networkInfo.name}</span>
                 </div>
               )}
-              
-              <ThemeToggle />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-md text-cyan-600 dark:text-cyan-400 hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors"
+                className="p-2 rounded-md text-white hover:bg-white/5 transition-colors"
                 aria-expanded={mobileMenuOpen}
               >
                 <span className="sr-only">Open main menu</span>
@@ -434,121 +424,150 @@ const Navbar: React.FC<NavbarProps> = ({
       </nav>
 
       {/* Mobile Menu */}
-      <div
-        ref={mobileMenuRef}
-        className={`fixed inset-0 top-20 bg-white dark:bg-gray-900 z-40 transform transition-transform duration-300 ease-in-out md:hidden ${
-          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="px-4 pt-4 pb-6 space-y-4">
-          {/* Deploy Button - Mobile */}
-          <div className="flex items-center justify-between mb-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-semibold shadow-lg opacity-75">
-            <div className="flex items-center gap-2">
-              <FaRocket className="text-base" />
-              <span>Deploy</span>
-            </div>
-            <span className="text-xs bg-white/20 px-2 py-1 rounded-full">Coming Soon</span>
-          </div>
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed inset-0 top-[64px] md:top-[80px] bg-[#0B0E14]/95 backdrop-blur-xl z-40 md:hidden overflow-y-auto border-t border-white/5"
+          >
+            <div className="p-4 space-y-6">
+              {/* Main Actions Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <Link href="/deploy" onClick={() => setMobileMenuOpen(false)}>
+                  <motion.div
+                    whileTap={{ scale: 0.98 }}
+                    className="flex flex-col items-center justify-center gap-2 p-4 bg-[#0B0E14] border border-white/5 rounded-xl text-center"
+                  >
+                    <FaRocket className="text-cyan-400 text-xl" />
+                    <span className="text-sm font-semibold text-white">Deploy</span>
+                  </motion.div>
+                </Link>
 
-          {/* Mint NFT Button - Mobile */}
-          <Link href="/mint" onClick={() => setMobileMenuOpen(false)}>
-            <motion.div
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#00FFFF] to-cyan-400 text-[#0A1929] rounded-lg font-semibold shadow-lg"
-            >
-              <FaGem className="text-base" />
-              <span>Mint NFT</span>
-            </motion.div>
-          </Link>
+                <Link href="/mint" onClick={() => setMobileMenuOpen(false)}>
+                  <motion.div
+                    whileTap={{ scale: 0.98 }}
+                    className="flex flex-col items-center justify-center gap-2 p-4 bg-[#0B0E14] border border-white/5 rounded-xl text-center"
+                  >
+                    <FaGem className="text-purple-400 text-xl" />
+                    <span className="text-sm font-semibold text-white">Mint NFT</span>
+                  </motion.div>
+                </Link>
+              </div>
 
-          {/* Mobile Chain Switcher */}
-          {address && networkInfo && (
-            <div className="px-2 py-2">
-              <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">
-                Switch Network
-              </h3>
-              <div className="space-y-2">
-                {mainnetChains.map((chain) => {
-                  const isCurrentChain = currentChainId === chain.id
-                  
-                  return (
-                    <button
-                      key={chain.id}
-                      onClick={() => {
-                        handleChainSwitch(chain.id)
-                        setMobileMenuOpen(false)
-                      }}
-                      disabled={isCurrentChain || isSwitchingChain}
-                      className={`w-full px-4 py-3 flex items-center gap-3 rounded-lg transition-all duration-200 ${
-                        isCurrentChain
-                          ? 'bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30 cursor-default'
-                          : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer'
-                      } ${isSwitchingChain ? 'opacity-50' : ''}`}
-                    >
-                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700/50">
-                        <ChainLogo 
-                          logoUrl={chain.logoUrl}
-                          altText={chain.chainName}
-                          size="md"
+              {/* Network Switcher - Collapsible */}
+              {address && networkInfo && (
+                <div className="rounded-xl bg-white/5 border border-white/5 overflow-hidden">
+                  <button
+                    onClick={() => setIsChainDropdownOpen(!isChainDropdownOpen)}
+                    className="w-full flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 bg-black/30 rounded-lg">
+                        <ChainLogo
+                          logoUrl={networkInfo.logoUrl}
+                          altText={networkInfo.name}
+                          size="sm"
                           fallbackIcon="🔗"
                         />
                       </div>
-                      
-                      <div className="flex-1 text-left">
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                          {chain.chainName}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {chain.nativeCurrency.symbol}
-                        </div>
+                      <div className="text-left">
+                        <div className="text-xs text-gray-400">Current Network</div>
+                        <div className="text-sm font-semibold text-white">{networkInfo.name}</div>
                       </div>
-                      
-                      {isCurrentChain && (
-                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500/20">
-                          <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
-                        </div>
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )}
+                    </div>
+                    <FaChevronDown
+                      className={`text-gray-400 transition-transform duration-300 ${isChainDropdownOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
 
-          <div className="flex flex-col space-y-4">
-            {!address ? (
-              <div className="px-2 py-2">
-                <ConnectWalletButton connectWallet={connectWallet} />
-              </div>
-            ) : (
-              <div className="px-2 py-2 flex flex-col space-y-4">
-                <div className="flex items-center justify-between bg-cyan-50 dark:bg-cyan-900/30 px-4 py-3 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <div className="h-6 w-6 rounded-full overflow-hidden">
-                      {address && (
-                        <img 
-                          src={getAvatarUrl(address)} 
-                          alt="Avatar" 
+                  <AnimatePresence>
+                    {isChainDropdownOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="border-t border-white/5"
+                      >
+                        <div className="p-2 space-y-1 bg-black/20">
+                          {mainnetChains.map((chain) => {
+                            const isCurrentChain = currentChainId === chain.id
+                            return (
+                              <button
+                                key={chain.id}
+                                onClick={() => {
+                                  handleChainSwitch(chain.id)
+                                  setMobileMenuOpen(false)
+                                }}
+                                disabled={isCurrentChain || isSwitchingChain}
+                                className={`w-full p-3 flex items-center gap-3 rounded-lg transition-all ${isCurrentChain
+                                  ? 'bg-cyan-500/10 border border-cyan-500/20'
+                                  : 'hover:bg-white/5'
+                                  } ${isSwitchingChain ? 'opacity-50' : ''}`}
+                              >
+                                <ChainLogo
+                                  logoUrl={chain.logoUrl}
+                                  altText={chain.chainName}
+                                  size="sm"
+                                  fallbackIcon="🔗"
+                                />
+                                <span className={`text-sm flex-1 text-left ${isCurrentChain ? 'text-cyan-400 font-medium' : 'text-gray-300'}`}>
+                                  {chain.chainName}
+                                </span>
+                                {isCurrentChain && <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+
+              {/* User Profile / Connect */}
+              <div className="pt-4 border-t border-white/5">
+                {!address ? (
+                  <div className="w-full">
+                    <ConnectWalletButton connectWallet={connectWallet} />
+                  </div>
+                ) : (
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/5">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="h-10 w-10 rounded-full overflow-hidden border border-white/10">
+                        <img
+                          src={getAvatarUrl(address)}
+                          alt="Avatar"
                           className="h-full w-full"
                         />
-                      )}
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-white">
+                          {formatAddress(address)}
+                        </div>
+                        <div className="text-xs text-green-400 flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                          Connected
+                        </div>
+                      </div>
                     </div>
-                    <span className="text-sm font-medium text-cyan-800 dark:text-cyan-300">
-                      {formatAddress(address)}
-                    </span>
+                    <button
+                      onClick={disconnectWallet}
+                      className="w-full flex items-center justify-center gap-2 p-3 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors text-sm font-medium"
+                    >
+                      <FaSignOutAlt />
+                      Disconnect Wallet
+                    </button>
                   </div>
-                  <button
-                    onClick={disconnectWallet}
-                    className="ml-4 p-1 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                  >
-                    <FaSignOutAlt className="h-4 w-4" />
-                  </button>
-                </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-      </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Copy Toast */}
       {showCopyToast && (
