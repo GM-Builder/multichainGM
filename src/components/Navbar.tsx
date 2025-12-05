@@ -200,6 +200,7 @@ const Navbar: React.FC<NavbarProps> = ({
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-4">
               {/* Deploy Button with Tooltip */}
+              {address && (
               <div ref={deployButtonRef} className="relative" onMouseEnter={() => setShowDeployTooltip(true)} onMouseLeave={() => setShowDeployTooltip(false)}>
                 <Link href="/deploy">
                   <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-2 px-4 py-2 bg-[#0B0E14] text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300">
@@ -207,6 +208,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   </motion.button>
                 </Link>
               </div>
+              )}
 
               {/* Mint NFT Button */}
               {/* <Link href="/mint">

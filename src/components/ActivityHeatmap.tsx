@@ -38,8 +38,13 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
     // Create map of dayIndex to count
     const checkinMap = new Map<number, number>();
     checkins.forEach(checkin => {
-      const count = checkinMap.get(checkin.dayIndex) || 0;
-      checkinMap.set(checkin.dayIndex, count + 1);
+      // Calculate local day index from timestamp to ensure it matches user's timezone
+      const date = new Date(checkin.timestamp * 1000);
+      const localMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const localDayIndex = Math.floor(localMidnight.getTime() / (1000 * 60 * 60 * 24));
+
+      const count = checkinMap.get(localDayIndex) || 0;
+      checkinMap.set(localDayIndex, count + 1);
     });
 
     const days: ActivityDay[] = [];
@@ -198,8 +203,8 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
                   >
                     {/* Day number */}
                     <span className={`text-[10px] font-medium ${day.count > 0
-                        ? 'text-white'
-                        : 'text-gray-600'
+                      ? 'text-white'
+                      : 'text-gray-600'
                       }`}>
                       {day.date.getDate()}
                     </span>
