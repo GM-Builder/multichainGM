@@ -15,10 +15,13 @@ export const ABSTRACT_TESTNET_CHAIN_ID = 11124;
 export const LISK_SEPOLIA_CHAIN_ID = 4202;
 export const HUMANITY_TESTNET_CHAIN_ID = 1942999413;
 export const CHAINBASE_TESTNET_CHAIN_ID = 8453;
+export const INCENTIV_TESTNET_CHAIN_ID = 28802;
+
+//Mainnet
 export const BASE_CHAIN_ID = 8453;
 export const SONEIUM_CHAIN_ID = 1868;
-export const INK_CHAIN_ID= 57073;
-export const INCENTIV_TESTNET_CHAIN_ID = 28802;
+export const INK_CHAIN_ID = 57073;
+export const OP_CHAIN_ID = 10;
 
 export interface ChainConfig {
   chainId: string;
@@ -283,6 +286,23 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     abi: GMMainnetABI, 
   },
 
+  [OP_CHAIN_ID]: {
+    chainId: `0x${OP_CHAIN_ID.toString(16)}`,
+    chainName: "Optimism",
+    nativeCurrency: {
+      name: "Ethereum",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: [process.env.OP_MAINNET_RPC_URL || "https://mainnet.optimism.io"],
+    blockExplorerUrls: ["https://optimistic.etherscan.io"],
+    contractAddress: process.env.OP_MAINNET_CONTRACT_ADDRESS || "0xa1Aa620CEb55448cd871c381457b87eFbFd34eA7",
+    logoUrl: "/assets/chains/optimism.png",
+    status: "Ready!",
+    isTestnet: false,
+    abi: GMMainnetABI, 
+  },
+
 };
 
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0xaF8471a2968a30a63Cdced851cDA2B7ce9e5dB90";
@@ -370,6 +390,7 @@ export const SUBGRAPH_ENDPOINTS = {
   base: 'https://api.studio.thegraph.com/query/106565/gannet-x-base/version/latest',
   ink: 'https://api.studio.thegraph.com/query/106565/gannetx-ink/version/latest',
   soneium: 'https://api.studio.thegraph.com/query/106565/gannet-x-soneium/version/latest',
+  op: 'https://api.studio.thegraph.com/query/110002/gannet-x-op/version/latest'
 } as const;
 
 export const REFERRAL_CONTRACT_CONFIG = {

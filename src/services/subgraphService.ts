@@ -7,21 +7,20 @@ import {
   GET_USER_STATS,
   GET_USER_CHECKINS,
   GET_DAILY_STATS,
-  GET_RECENT_CHECKINS,
+  GET_USER_RANKING,
 } from '@/graphql/queries';
 import { ChainName, SUPPORTED_CHAINS } from '@/utils/subgraph';
-import { 
-  RawDailyStatsResponse, 
-  RawGlobalStatsResponse, 
-  RawLeaderboardResponse, 
-  RawUserStatsResponse, 
+import {
+  RawDailyStatsResponse,
+  RawGlobalStatsResponse,
+  RawLeaderboardResponse,
+  RawUserStatsResponse,
   RawNavigatorEntry,
   RawCheckin,
   RawUserCheckinsResponse,
   RawUserRankingResponse,
 } from '@/types';
 
-// Tipe hasil yang di-parse dari getUserStatsOnChain
 export interface ChainNavigatorStats {
   chain: ChainName;
   address: string;
@@ -33,7 +32,6 @@ export interface ChainNavigatorStats {
   lastBeaconTimestamp: number;
 }
 
-// Tipe data yang di-map dari Leaderboard entry raw
 interface AggregationInput {
   chain: ChainName;
   address: string;
@@ -43,7 +41,6 @@ interface AggregationInput {
   totalTaxPaid: number;
 }
 
-// Definisikan ulang tipe yang diperlukan dari types/index.ts (untuk referensi cepat)
 export interface GlobalStats {
   totalNavigators: number;
   totalCheckins: number;
@@ -105,7 +102,6 @@ export async function getChainGlobalStats(chain: ChainName) {
       fetchPolicy: 'network-only',
     });
 
-    // 1. Perbaikan: Handle data undefined dari Apollo client
     if (!data || !data.globalStats) return null;
 
     return {
@@ -129,11 +125,9 @@ export async function getChainLeaderboard(chain: ChainName, limit: number = 10):
       fetchPolicy: 'network-only',
     });
 
-    // 1. Perbaikan: Handle data undefined
     if (!data || !data.leaderboardEntries) return [];
 
-    // 2. Perbaikan: Ganti 'any' dengan tipe eksplisit
-    return data.leaderboardEntries.map((entry: { navigator: RawNavigatorEntry }) => ({
+    return data.leaderboardEntries.map((entry) => ({
       chain,
       address: entry.navigator.address,
       totalCheckins: parseInt(entry.navigator.totalCheckins || '0'),
@@ -156,10 +150,8 @@ export async function getUserStatsOnChain(chain: ChainName, address: string): Pr
       fetchPolicy: 'network-only',
     });
 
-    // 1. Perbaikan: Handle data undefined
     if (!data || !data.navigator) return null;
 
-    // Karena data.navigator sudah dipastikan ada
     return {
       chain,
       address: data.navigator.address,
@@ -183,16 +175,14 @@ export async function getUserCheckinsOnChain(
 ): Promise<UserCheckin[]> {
   try {
     const client = createSubgraphClient(chain);
-    const { data } = await client.query<RawUserCheckinsResponse>({ // Menggunakan tipe RawUserCheckinsResponse
+    const { data } = await client.query<RawUserCheckinsResponse>({
       query: GET_USER_CHECKINS,
       variables: { address: address.toLowerCase(), first: limit },
       fetchPolicy: 'network-only',
     });
 
-    // 1. Perbaikan: Handle data undefined
     if (!data || !data.navigator || !data.navigator.checkins) return [];
 
-    // 2. Perbaikan: Ganti 'any' dengan tipe eksplisit
     return data.navigator.checkins.map((checkin: RawCheckin) => ({
       ...checkin,
       chain,
@@ -201,7 +191,7 @@ export async function getUserCheckinsOnChain(
       timestamp: parseInt(checkin.timestamp),
       dayIndex: parseInt(checkin.dayIndex),
       streak: parseInt(checkin.streak),
-      tribute: parseFloat(checkin.tribute), // Konversi tribute ke number/float
+      tribute: parseFloat(checkin.tribute),
     }));
   } catch (error) {
     console.error(`Error fetching user checkins for ${chain}:`, error);
@@ -218,19 +208,16 @@ export async function getChainDailyStats(chain: ChainName, days: number = 7): Pr
       fetchPolicy: 'network-only',
     });
 
-    // 1. Perbaikan: Handle data undefined
     if (!data || !data.dailyStats) return [];
 
-    // Tipe untuk item raw daily stat
     interface RawDailyStatItem {
-        dayIndex: string;
-        beaconCount: string;
-        taxCollected: string;
-        uniqueNavigators: string;
-        date: string;
+      dayIndex: string;
+      beaconCount: string;
+      taxCollected: string;
+      uniqueNavigators: string;
+      date: string;
     }
 
-    // 2. Perbaikan: Ganti 'any' dengan tipe eksplisit
     return data.dailyStats.map((stat: RawDailyStatItem) => ({
       chain,
       dayIndex: parseInt(stat.dayIndex),
@@ -254,23 +241,14 @@ export async function getGlobalStatsAllChains(): Promise<GlobalStats> {
     SUPPORTED_CHAINS.map((chain) => getChainGlobalStats(chain))
   );
 
-  // Filter yang memastikan hanya hasil non-null yang tersisa.
-  // TypeScript tahu bahwa array ini hanya berisi objek dari getChainGlobalStats, bukan null.
   const validResults = results.filter((r): r is Exclude<typeof r, null> => r !== null);
 
   return validResults.reduce(
     (acc, result) => {
-      // Tidak perlu lagi if (result) karena validResults sudah difilter
       acc.totalNavigators += result.totalNavigators;
       acc.totalCheckins += result.totalCheckins;
       acc.totalTaxCollected += result.totalTaxCollected;
-      // Perhatikan bahwa tipe result di sini sudah dijamin non-null
-      acc.chains.push(result as {
-        chain: ChainName;
-        totalNavigators: number;
-        totalCheckins: number;
-        totalTaxCollected: number;
-      });
+      acc.chains.push(result);
       return acc;
     },
     {
@@ -287,13 +265,11 @@ export async function getTop10LeaderboardAllChains(): Promise<LeaderboardEntry[]
     SUPPORTED_CHAINS.map((chain) => getChainLeaderboard(chain, 100))
   );
 
-  // Perbaikan: Assert results.flat() sebagai AggregationInput[]
-  const allNavigators = results.flat() as AggregationInput[];
+  const allNavigators = results.flat();
 
-  // Aggregate by address
   const navigatorMap = new Map<string, LeaderboardEntry>();
 
-  allNavigators.forEach((nav: AggregationInput) => { // Perbaikan: Ganti 'any' menjadi AggregationInput
+  allNavigators.forEach((nav) => {
     const key = nav.address.toLowerCase();
 
     if (navigatorMap.has(key)) {
@@ -302,9 +278,8 @@ export async function getTop10LeaderboardAllChains(): Promise<LeaderboardEntry[]
       existing.totalTaxPaid += nav.totalTaxPaid;
       existing.maxStreak = Math.max(existing.maxStreak, nav.maxStreak);
       existing.currentStreak = Math.max(existing.currentStreak, nav.currentStreak);
-      // 'chains' adalah ChainName[], jadi kita pastikan nav.chain adalah ChainName
-      if (!existing.chains.includes(nav.chain as ChainName)) { 
-        existing.chains.push(nav.chain as ChainName);
+      if (!existing.chains.includes(nav.chain)) {
+        existing.chains.push(nav.chain);
       }
     } else {
       navigatorMap.set(key, {
@@ -313,15 +288,13 @@ export async function getTop10LeaderboardAllChains(): Promise<LeaderboardEntry[]
         currentStreak: nav.currentStreak,
         maxStreak: nav.maxStreak,
         totalTaxPaid: nav.totalTaxPaid,
-        chains: [nav.chain as ChainName],
+        chains: [nav.chain],
       });
     }
   });
 
-  // Convert to array and sort
   const aggregated = Array.from(navigatorMap.values());
-  // Perbaikan: Tipe eksplisit pada sort callback
-  aggregated.sort((a: LeaderboardEntry, b: LeaderboardEntry) => b.totalCheckins - a.totalCheckins);
+  aggregated.sort((a, b) => b.totalCheckins - a.totalCheckins);
 
   return aggregated.slice(0, 10);
 }
@@ -331,14 +304,12 @@ export async function getUserStatsAllChains(address: string): Promise<Navigator 
     SUPPORTED_CHAINS.map((chain) => getUserStatsOnChain(chain, address))
   );
 
-  // 2. Perbaikan: Menggunakan Type Predicate untuk memfilter null
   const validResults = results.filter((r): r is ChainNavigatorStats => r !== null);
 
   if (validResults.length === 0) return null;
 
   const aggregated = validResults.reduce(
-    (acc, result) => { // Tipe 'result' sekarang dijamin ChainNavigatorStats (non-null)
-      // Tidak perlu lagi if (result) karena validResults sudah difilter
+    (acc, result) => {
       acc.totalCheckins += result.totalCheckins;
       acc.totalTaxPaid += result.totalTaxPaid;
       acc.maxStreak = Math.max(acc.maxStreak, result.maxStreak);
@@ -369,8 +340,7 @@ export async function getUserCheckinsAllChains(
 
   const allCheckins = results.flat();
 
-  // Sort by timestamp descending
-  allCheckins.sort((a: UserCheckin, b: UserCheckin) => b.timestamp - a.timestamp); // Perbaikan: Tipe eksplisit
+  allCheckins.sort((a, b) => b.timestamp - a.timestamp);
 
   return allCheckins.slice(0, limit);
 }
@@ -387,27 +357,22 @@ export async function getDailyStatsAllChains(days: number = 7): Promise<DailySta
 // USER RANKING
 // ========================================
 
-import { GET_USER_RANKING } from '@/graphql/queries';
-
 export async function getUserRanking(chainName: ChainName, address: string): Promise<{
   rank: number;
   totalUsers: number;
 } | null> {
   try {
     const client = createSubgraphClient(chainName);
-    // ✅ PERBAIKAN 1: Tambahkan <RawUserRankingResponse>
     const { data } = await client.query<RawUserRankingResponse>({
       query: GET_USER_RANKING,
       variables: { address: address.toLowerCase() },
       fetchPolicy: 'network-only',
     });
 
-    // ✅ PERBAIKAN 2: Handle data undefined dengan benar
     if (!data) {
       return { rank: 0, totalUsers: 0 };
     }
 
-    // ✅ PERBAIKAN 3: Handle navigator null
     if (!data.navigator) {
       const totalUsers = parseInt(data.globalStats?.totalNavigators || '0');
       return { rank: 0, totalUsers };
@@ -415,7 +380,7 @@ export async function getUserRanking(chainName: ChainName, address: string): Pro
 
     const userCheckins = parseInt(data.navigator.totalCheckins || '0');
     const leaderboard = data.leaderboardEntries || [];
-    
+
     let rank = 0;
     for (let i = 0; i < leaderboard.length; i++) {
       if (leaderboard[i].navigator.address.toLowerCase() === address.toLowerCase()) {
@@ -423,11 +388,10 @@ export async function getUserRanking(chainName: ChainName, address: string): Pro
         break;
       }
     }
-    
+
     if (rank === 0 && userCheckins > 0) {
-      // ✅ PERBAIKAN 4: Hapus type 'any', gunakan type inference
       const usersAbove = leaderboard.filter(
-        (entry: { navigator: { totalCheckins: any; }; }) => parseInt(entry.navigator.totalCheckins || '0') > userCheckins
+        (entry) => parseInt(entry.navigator.totalCheckins || '0') > userCheckins
       ).length;
       rank = usersAbove + 1;
     }
@@ -450,16 +414,14 @@ export async function getUserRankingAllChains(address: string): Promise<{
       SUPPORTED_CHAINS.map((chain) => getUserRanking(chain, address))
     );
 
-    // ✅ PERBAIKAN: Gunakan type predicate untuk filter yang lebih aman
     const validResults = results.filter(
       (r): r is NonNullable<typeof r> => r !== null && r.rank > 0
     );
-    
+
     if (validResults.length === 0) {
       return { rank: 0, totalUsers: 0 };
     }
 
-    // ✅ Sekarang TypeScript tahu r tidak null, tidak perlu r!
     const bestRank = Math.min(...validResults.map(r => r.rank));
     const maxTotalUsers = Math.max(...validResults.map(r => r.totalUsers));
 
