@@ -7,14 +7,16 @@ interface ChainLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   fallbackIcon?: React.ReactNode;
+  fill?: boolean;
 }
 
-const ChainLogo: React.FC<ChainLogoProps> = ({ 
-  logoUrl, 
-  altText, 
-  size = 'md', 
+const ChainLogo: React.FC<ChainLogoProps> = ({
+  logoUrl,
+  altText,
+  size = 'md',
   className = '',
-  fallbackIcon = '🔗'
+  fallbackIcon = '🔗',
+  fill = false
 }) => {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,8 +41,8 @@ const ChainLogo: React.FC<ChainLogoProps> = ({
 
   if (imageError) {
     return (
-      <div 
-        className={`${config.className} ${className} flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded text-gray-500 dark:text-gray-400`}
+      <div
+        className={`${fill ? 'w-full h-full' : config.className} ${className} flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded text-gray-500 dark:text-gray-400`}
         title={altText}
       >
         {typeof fallbackIcon === 'string' ? (
@@ -53,24 +55,24 @@ const ChainLogo: React.FC<ChainLogoProps> = ({
   }
 
   return (
-    <div className={`${config.className} ${className} relative overflow-hidden rounded`}>
+    <div className={`${fill ? 'w-full h-full' : config.className} ${className} relative overflow-hidden rounded`}>
       {isLoading && (
         <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
       )}
       <Image
         src={logoUrl}
         alt={altText}
-        width={config.width}
-        height={config.height}
-        className={`object-contain rounded transition-opacity duration-200 ${
-          isLoading ? 'opacity-0' : 'opacity-100'
-        }`}
+        fill={fill}
+        width={!fill ? config.width : undefined}
+        height={!fill ? config.height : undefined}
+        className={`object-contain rounded transition-opacity duration-200 ${isLoading ? 'opacity-0' : 'opacity-100'
+          }`}
         onError={handleImageError}
         onLoad={handleImageLoad}
-        priority={false} 
-        placeholder="blur" 
+        priority={false}
+        placeholder="blur"
         blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8A0aQoFgpA/9k="
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        sizes={fill ? "(max-width: 768px) 100px, 50px" : undefined}
       />
     </div>
   );

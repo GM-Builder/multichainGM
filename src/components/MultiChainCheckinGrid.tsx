@@ -776,7 +776,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                         <ChainLogo
                           logoUrl={chain.logoUrl}
                           altText={chain.chainName}
-                          size="lg"
+                          fill={true}
                           fallbackIcon="🔗"
                         />
                       </div>

@@ -98,7 +98,7 @@ const HeroStatsSection: React.FC<HeroStatsSectionProps> = ({
                 <ChainLogo
                   logoUrl={chainConfig.logoUrl}
                   altText={chainConfig.chainName}
-                  size="sm"
+                  fill={true}
                   fallbackIcon="🔗"
                 />
               </div>
