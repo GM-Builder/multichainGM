@@ -32,7 +32,7 @@ import { SidebarReferralCard } from '@/components/SidebarReferralCard';
 import LeaderboardModal from '@/components/LeaderboardModal';
 import GannetXChatSidebar from '@/components/GannetXChatSidebar';
 
-const CheckinPageIntegration: React.FC = () => {  
+const CheckinPageIntegration: React.FC = () => {
   const {
     web3State,
     connectWallet: rawConnectWallet,
@@ -332,6 +332,7 @@ const CheckinPageIntegration: React.FC = () => {
                     userRank={userRanking?.rank || 0}
                     totalUsers={userRanking?.totalUsers || 0}
                     loading={chainStatsLoading || userStatsLoading || rankingLoading}
+                    onRankClick={() => setIsLeaderboardModalOpen(true)}
                   />
 
                   {/* ACTIVITY HEATMAP */}

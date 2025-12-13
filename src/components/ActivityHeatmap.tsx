@@ -127,9 +127,9 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <FaCalendarAlt className="text-cyan-400" />
-            <h3 className="font-bold text-white">
+            <div className="font-bold text-white">
               {months[heatmapData.month]}
-            </h3>
+            </div>
           </div>
           <div className="text-xs text-gray-400">
             {heatmapData.year}

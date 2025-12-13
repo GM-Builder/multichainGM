@@ -26,93 +26,97 @@ export const SidebarReferralCard: React.FC<SidebarReferralCardProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="overflow-hidden rounded-2xl"
+      className="overflow-hidden rounded-2xl border border-white/5 bg-[#0B0E14]/60 backdrop-blur-xl"
     >
       {canUseReferral ? (
         <>
           {/* Main Card - Clickable */}
           <div
             onClick={onCardClick}
-            className="p-6 bg-[#0B0E14]/60 backdrop-blur-xl border border-white/5 cursor-pointer hover:bg-[#0B0E14]/80 transition-all group rounded-t-2xl"
+            className="p-5 cursor-pointer hover:bg-white/5 transition-all group"
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg group-hover:shadow-cyan-500/20 transition-shadow">
-                  <FaGift className="text-xl text-white" />
+                <div className="p-2.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 group-hover:border-cyan-500/40 transition-colors">
+                  <FaGift className="text-lg text-cyan-400" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white">Referral Program</h3>
-                  {myReferralsCount > 0 && (
-                    <p className="text-xs text-cyan-400 font-medium">
-                      {myReferralsCount} {myReferralsCount === 1 ? 'Referral' : 'Referrals'}
-                    </p>
-                  )}
+                  <div className="font-bold text-white text-base leading-tight">Referral</div>
+                  <div className="text-[11px] text-gray-400 mt-0.5 font-medium">
+                    Program
+                  </div>
                 </div>
               </div>
 
-              {/* Click indicator */}
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <svg className="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              {/* Counter Badge */}
+              {myReferralsCount > 0 && (
+                <div className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-bold text-white">
+                  {myReferralsCount}
+                </div>
+              )}
+            </div>
+
+            {/* Content */}
+            <div className="space-y-3">
+              {/* Referred By Info */}
+              {userReferredBy && (
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <p className="text-[10px] text-gray-400">
+                    Invited by <span className="font-mono text-emerald-400 ml-1">{formatAddress(userReferredBy)}</span>
+                  </p>
+                </div>
+              )}
+
+              <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">
+                Invite friends to start their journey. Secure your spot for future rewards.
+              </p>
+
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-cyan-400 group-hover:text-cyan-300 transition-colors mt-2">
+                <span>VIEW DASHBOARD</span>
+                <svg className="w-3 h-3 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </div>
             </div>
-
-            {/* Referred By Info */}
-            {userReferredBy && (
-              <div className="mb-4 p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-                <p className="text-xs text-emerald-400 font-medium mb-1">
-                  Referred by
-                </p>
-                <code className="text-xs font-mono text-gray-300">
-                  {formatAddress(userReferredBy)}
-                </code>
-              </div>
-            )}
-
-            <p className="text-sm text-gray-400 mb-4">
-              Invite friends and secure your exclusive spot for future rewards!
-            </p>
-
-            <p className="text-xs text-cyan-400 font-medium group-hover:text-cyan-300 transition-colors">
-              Click to view dashboard →
-            </p>
           </div>
 
-          {/* Copy Link Button - Separate */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onCopyLink();
-            }}
-            className="w-full px-4 py-3 bg-[#0B0E14]/80 hover:bg-[#0B0E14] border-x border-b border-white/5 rounded-b-2xl font-medium text-white flex items-center justify-center gap-2 transition-all"
-          >
-            <FaCopy className="text-cyan-500" />
-            Copy Referral Link
-          </button>
+          {/* Action Button */}
+          <div className="px-5 pb-5 pt-0">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onCopyLink();
+              }}
+              className="w-full py-2.5 bg-white/5 hover:bg-white/10 active:scale-[0.98] border border-white/5 hover:border-white/10 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-2 transition-all group/btn"
+            >
+              <FaCopy className="text-gray-400 group-hover/btn:text-white transition-colors" />
+              <span>COPY LINK</span>
+            </button>
+          </div>
         </>
       ) : (
-        <div className="p-6 bg-[#0B0E14]/60 backdrop-blur-xl border border-white/5 rounded-2xl">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg">
-              <FaGift className="text-xl text-white" />
+        <div className="p-5">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <FaGift className="text-lg text-amber-500" />
             </div>
             <div>
-              <h3 className="font-bold text-white">Referral System</h3>
-              <p className="text-xs text-amber-400">Base Network Required</p>
+              <div className="font-bold text-white text-base">Referrals</div>
+              <p className="text-[10px] text-amber-500 mt-0.5 font-medium">Base Chain Required</p>
             </div>
           </div>
 
-          <p className="text-sm text-gray-400 mb-4">
-            Switch to Base network to access referral features
+          <p className="text-xs text-gray-400 mb-4 leading-relaxed">
+            Switch your network to Base to unlock the referral system and start earning.
           </p>
 
           <button
             onClick={onSwitchToBase}
-            className="w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-xl font-semibold transition-all shadow-lg"
+            className="w-full py-2.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 hover:border-amber-500/40 text-amber-500 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
           >
-            Switch to Base
+            SWITCH TO BASE
           </button>
         </div>
       )}

@@ -21,6 +21,7 @@ interface HeroStatsSectionProps {
   totalUsers?: number;
 
   loading: boolean;
+  onRankClick?: () => void;
 }
 
 // CountUp Animation Component
@@ -64,6 +65,7 @@ const HeroStatsSection: React.FC<HeroStatsSectionProps> = ({
   userRank = 0,
   totalUsers = 0,
   loading,
+  onRankClick,
 }) => {
   const chainConfig: ChainConfig | undefined = currentChainId ? SUPPORTED_CHAINS[currentChainId] : undefined;
 
@@ -107,9 +109,9 @@ const HeroStatsSection: React.FC<HeroStatsSectionProps> = ({
               <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">
                 Current Chain
               </p>
-              <h3 className="text-sm font-bold text-white truncate mt-0.5">
+              <div className="text-sm font-bold text-white truncate mt-0.5">
                 {currentChainName || 'No Chain'}
-              </h3>
+              </div>
             </div>
           </div>
 
@@ -117,7 +119,7 @@ const HeroStatsSection: React.FC<HeroStatsSectionProps> = ({
             <div className="h-8 w-12 bg-white/5 animate-pulse rounded"></div>
           ) : (
             <div className="text-right">
-              <div className="text-xl font-black text-white">
+              <div className="text-xl font-extrabold text-white">
                 <CountUpNumber value={currentChainCheckins} />
               </div>
               <div className="flex items-center justify-end gap-1 text-[10px] text-orange-400 font-bold">
@@ -155,7 +157,7 @@ const HeroStatsSection: React.FC<HeroStatsSectionProps> = ({
                 initial={{ scale: 1.2, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.3 }}
-                className="text-2xl font-black text-white mb-1"
+                className="text-2xl font-extrabold text-white mb-1"
               >
                 <CountUpNumber value={totalCheckins} duration={800} />
               </motion.div>
@@ -180,7 +182,8 @@ const HeroStatsSection: React.FC<HeroStatsSectionProps> = ({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className={`bg-[#0B0E14]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-4 relative overflow-hidden group`}
+          onClick={onRankClick}
+          className={`bg-[#0B0E14]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-4 relative overflow-hidden group ${onRankClick ? 'cursor-pointer hover:bg-white/5 transition-colors' : ''}`}
         >
           <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${rankTier.gradient} rounded-full blur-2xl translate-x-1/2 -translate-y-1/2 opacity-50 group-hover:opacity-70 transition-all duration-500`} />
 
@@ -204,7 +207,7 @@ const HeroStatsSection: React.FC<HeroStatsSectionProps> = ({
                   initial={{ scale: 1.2, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.3 }}
-                  className="text-2xl font-black text-white mb-1"
+                  className="text-2xl font-extrabold text-white mb-1"
                 >
                   #{<CountUpNumber value={userRank} duration={800} />}
                 </motion.div>

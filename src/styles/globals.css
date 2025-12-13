@@ -1,21 +1,23 @@
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&f[]=satoshi@300,400,500,700,900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
---navy-light: #162847;
---cyber-cyan: #00E5FF;
---navy-depth: #0B1B3C;
---navy-deeper: #0a1628;
- --glow-color: rgba(0, 229, 255, 0.3);
+  --navy-light: #162847;
+  --cyber-cyan: #00E5FF;
+  --navy-depth: #0B1B3C;
+  --navy-deeper: #0a1628;
+   --glow-color: rgba(0, 229, 255, 0.3);
 }
 
 .dark {
---navy-light: #162847;
---cyber-cyan: #00E5FF;
---navy-lighter: #1f3554;
---cyber-cyan-bright: #00ffff;
---glow-color: rgba(0, 229, 255, 0.4);
+  --navy-light: #162847;
+  --cyber-cyan: #00E5FF;
+  --navy-lighter: #1f3554;
+  --cyber-cyan-bright: #00ffff;
+  --glow-color: rgba(0, 229, 255, 0.4);
 }
 
 body {
@@ -23,7 +25,11 @@ body {
   background-image: 
     radial-gradient(circle at 20% 30%, rgba(0, 229, 255, 0.05) 0%, transparent 200px),
     radial-gradient(circle at 80% 70%, rgba(0, 229, 255, 0.07) 0%, transparent 200px);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Satoshi', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Clash Display', sans-serif;
 }
 
 .dark body {

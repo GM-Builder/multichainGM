@@ -410,6 +410,64 @@ export async function getUserRankingAllChains(address: string): Promise<{
   totalUsers: number;
 } | null> {
   try {
+    const addressLower = address.toLowerCase();
+
+    // 1. Get Top 1000 Leaderboard from ALL chains to calculate Global Rank
+    const [globalStats, leaderboardEntries] = await Promise.all([
+      getGlobalStatsAllChains(),
+      // Fetch more than 10 to increase chance of finding user in global list
+      Promise.all(SUPPORTED_CHAINS.map((chain) => getChainLeaderboard(chain, 1000)))
+    ]);
+
+    // Flatten and Aggregate Leaderboard
+    const allNavigators = leaderboardEntries.flat();
+    const navigatorMap = new Map<string, LeaderboardEntry>();
+
+    allNavigators.forEach((nav) => {
+      const key = nav.address.toLowerCase();
+      if (navigatorMap.has(key)) {
+        const existing = navigatorMap.get(key)!;
+        existing.totalCheckins += nav.totalCheckins;
+        existing.totalTaxPaid += nav.totalTaxPaid;
+        existing.maxStreak = Math.max(existing.maxStreak, nav.maxStreak);
+        existing.currentStreak = Math.max(existing.currentStreak, nav.currentStreak);
+        if (!existing.chains.includes(nav.chain)) {
+          existing.chains.push(nav.chain);
+        }
+      } else {
+        // Fix: Explicitly map properties and add 'chains' array
+        navigatorMap.set(key, {
+          address: nav.address,
+          totalCheckins: nav.totalCheckins,
+          currentStreak: nav.currentStreak,
+          maxStreak: nav.maxStreak,
+          totalTaxPaid: nav.totalTaxPaid,
+          chains: [nav.chain],
+        });
+      }
+    });
+
+    const globalLeaderboard = Array.from(navigatorMap.values());
+    globalLeaderboard.sort((a, b) => b.totalCheckins - a.totalCheckins);
+
+    // Calculate Total Global Users from unique addresses found
+    // This is more accurate than summing globalStats.totalNavigators which counts duplicates
+    const totalGlobalUsers = navigatorMap.size;
+
+    // 2. Check if user is in Global Leaderboard
+    const globalRankIndex = globalLeaderboard.findIndex(
+      (entry) => entry.address.toLowerCase() === addressLower
+    );
+
+    if (globalRankIndex !== -1) {
+      return {
+        rank: globalRankIndex + 1,
+        totalUsers: totalGlobalUsers,
+      };
+    }
+
+    // 3. Fallback: If not in global top list, use the "Best Chain Rank" logic
+    // This ensures users who are good on one chain but not global top still see a rank
     const results = await Promise.all(
       SUPPORTED_CHAINS.map((chain) => getUserRanking(chain, address))
     );
@@ -419,16 +477,24 @@ export async function getUserRankingAllChains(address: string): Promise<{
     );
 
     if (validResults.length === 0) {
-      return { rank: 0, totalUsers: 0 };
+      return { rank: 0, totalUsers: totalGlobalUsers };
     }
 
-    const bestRank = Math.min(...validResults.map(r => r.rank));
-    const maxTotalUsers = Math.max(...validResults.map(r => r.totalUsers));
+    // Sort by rank (asc), then totalUsers (desc)
+    validResults.sort((a, b) => {
+      if (a.rank !== b.rank) {
+        return a.rank - b.rank;
+      }
+      return b.totalUsers - a.totalUsers;
+    });
+
+    const bestResult = validResults[0];
 
     return {
-      rank: bestRank,
-      totalUsers: maxTotalUsers,
+      rank: bestResult.rank,
+      totalUsers: bestResult.totalUsers,
     };
+
   } catch (error) {
     console.error('Error fetching user ranking across all chains:', error);
     return null;

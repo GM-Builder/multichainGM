@@ -781,7 +781,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                         />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-tight">{chain.chainName}</h3>
+                        <div className="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-tight">{chain.chainName}</div>
                         <div className="flex items-center mt-1">
                           {chainStatus.timeUntilNextCheckin > 0 ? (
                             <span className="text-xs px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border border-amber-200/50 dark:border-amber-700/30 flex items-center gap-1">

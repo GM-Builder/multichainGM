@@ -270,9 +270,9 @@ const GannetXChatModal: React.FC<GannetXChatModalProps> = ({ isOpen, onClose }) 
                   <FaComments className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-white">
+                  <div className="font-bold text-lg text-white">
                     GannetX Chat
-                  </h3>
+                  </div>
                   <p className="text-xs text-gray-400">
                     Community on Base • {recentGMs.length} messages
                   </p>

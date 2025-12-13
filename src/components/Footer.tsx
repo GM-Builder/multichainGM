@@ -26,7 +26,7 @@ const Footer: React.FC<FooterProps> = ({
   const router = useRouter();
 
   return (
-    <footer className="relative bg-[#050608] border-t border-white/5 overflow-hidden py-8 md:py-16 z-20">
+    <footer className="relative bg-[#050608] border-t border-white/5 overflow-hidden py-6 md:py-16 z-20">
       {/* Background elements - Hidden on mobile */}
       <div className="hidden md:block absolute inset-0 bg-[url('/grid-pattern.svg')] bg-repeat opacity-5 pointer-events-none"></div>
 
@@ -35,7 +35,15 @@ const Footer: React.FC<FooterProps> = ({
       <div className="hidden md:block absolute bottom-40 left-20 w-80 h-80 rounded-full bg-cyan-600/5 blur-xl animate-pulse pointer-events-none"></div>
 
       {/* Footer top border */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent">
+        <div
+          className="absolute top-0 h-px w-20 animate-gradient-x"
+          style={{
+            boxShadow: '0 0 8px 1px rgba(0, 229, 255, 0.3)',
+            background: 'linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.5), transparent)'
+          }}
+        />
+      </div>
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Mobile/Tablet Minimalist Layout */}
@@ -94,18 +102,8 @@ const Footer: React.FC<FooterProps> = ({
         </div>
 
         {/* Desktop Footer Bottom - Hidden on mobile */}
-        <div className="hidden md:block mt-16 relative">
-          {/* Separator with animation */}
-          <div className="flex-1 relative h-px w-full mb-8">
-            <div className="h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent opacity-70"></div>
-            <div
-              className="absolute top-0 h-px w-20 animate-gradient-x"
-              style={{
-                boxShadow: '0 0 8px 1px rgba(0, 229, 255, 0.3)',
-                background: 'linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.5), transparent)'
-              }}
-            />
-          </div>
+        <div className="hidden md:block mt-12 relative">
+
 
           {/* Desktop content grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center py-4">
