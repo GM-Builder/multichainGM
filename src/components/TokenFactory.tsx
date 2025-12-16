@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Rocket,
+  Disc,
   Settings,
   Shield,
   Zap,
@@ -17,7 +17,16 @@ import {
   ExternalLink,
   AlertTriangle,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  Wallet,
+  Bot,
+  BarChart3,
+  Clock,
+  Ban,
+  PauseCircle,
+  Flame,
+  Gem,
+  FileCheck,
 } from 'lucide-react';
 import FactoryABI from '@/abis/GannetXTokenFactory.json';
 import { GANNETX_TOKEN_FACTORY_ADDRESS, BASE_CHAIN_ID } from '@/utils/constants';
@@ -57,7 +66,7 @@ interface Features {
 }
 
 const STEPS = [
-  { id: 1, name: 'Basic Info', icon: Rocket },
+  { id: 1, name: 'Basic Info', icon: Disc },
   { id: 2, name: 'Features', icon: Settings },
   { id: 3, name: 'Advanced', icon: Shield },
   { id: 4, name: 'Review', icon: CheckCircle2 },
@@ -357,7 +366,7 @@ const TokenFactory: React.FC = () => {
                     'Connect Wallet to Deploy'
                   ) : (
                     <>
-                      <Rocket className="w-4 h-4" />
+                      <Disc className="w-4 h-4" />
                       Deploy Token
                     </>
                   )}
@@ -441,7 +450,10 @@ const Step1BasicInfo: React.FC<{
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-cyan-400 mb-2">Token Basics</h2>
+        <div className="flex items-center gap-2 mb-2">
+          <Disc className="text-cyan-400" />
+          <div className="font-bold text-white">Token Basics</div>
+        </div>
         <p className="text-gray-400 text-sm">Let's start with the fundamental details of your token</p>
       </div>
 
@@ -628,16 +640,16 @@ const Step2Features: React.FC<{
   const [taxRecipientError, setTaxRecipientError] = useState('');
 
   const featuresList = [
-    { key: 'hasTaxSystem', name: 'Tax System', desc: 'Charge fees on buys/sells', icon: '💰', fee: FEATURE_FEES.TAX_SYSTEM_FEE },
-    { key: 'hasAntiBot', name: 'Anti-Bot', desc: 'Prevent bot sniping', icon: '🤖', fee: FEATURE_FEES.ANTI_BOT_FEE },
-    { key: 'hasMaxTxLimit', name: 'Max Transaction', desc: 'Limit per transaction', icon: '📊', fee: FEATURE_FEES.MAX_TX_LIMIT_FEE },
-    { key: 'hasMaxWallet', name: 'Max Wallet', desc: 'Limit per wallet', icon: '👛', fee: FEATURE_FEES.MAX_WALLET_FEE },
-    { key: 'hasCooldown', name: 'Cooldown', desc: 'Time between trades', icon: '⏱️', fee: FEATURE_FEES.COOLDOWN_FEE },
-    { key: 'hasBlacklist', name: 'Blacklist', desc: 'Block addresses', icon: '🚫', fee: FEATURE_FEES.BLACKLIST_FEE },
-    { key: 'isPausable', name: 'Pausable', desc: 'Pause trading', icon: '⏸️', fee: FEATURE_FEES.PAUSABLE_FEE },
-    { key: 'hasBurn', name: 'Burn', desc: 'Auto-burn tokens', icon: '🔥', fee: FEATURE_FEES.BURN_FEE },
-    { key: 'hasReflection', name: 'Reflection', desc: 'Reward holders', icon: '💎', fee: FEATURE_FEES.REFLECTION_FEE },
-    { key: 'hasWhitelist', name: 'Whitelist', desc: 'Early buyer list', icon: '✅', fee: FEATURE_FEES.WHITELIST_FEE },
+    { key: 'hasTaxSystem', name: 'Tax System', desc: 'Charge fees on buys/sells', icon: Wallet, fee: FEATURE_FEES.TAX_SYSTEM_FEE },
+    { key: 'hasAntiBot', name: 'Anti-Bot', desc: 'Prevent bot sniping', icon: Bot, fee: FEATURE_FEES.ANTI_BOT_FEE },
+    { key: 'hasMaxTxLimit', name: 'Max Transaction', desc: 'Limit per transaction', icon: BarChart3, fee: FEATURE_FEES.MAX_TX_LIMIT_FEE },
+    { key: 'hasMaxWallet', name: 'Max Wallet', desc: 'Limit per wallet', icon: Wallet, fee: FEATURE_FEES.MAX_WALLET_FEE },
+    { key: 'hasCooldown', name: 'Cooldown', desc: 'Time between trades', icon: Clock, fee: FEATURE_FEES.COOLDOWN_FEE },
+    { key: 'hasBlacklist', name: 'Blacklist', desc: 'Block addresses', icon: Ban, fee: FEATURE_FEES.BLACKLIST_FEE },
+    { key: 'isPausable', name: 'Pausable', desc: 'Pause trading', icon: PauseCircle, fee: FEATURE_FEES.PAUSABLE_FEE },
+    { key: 'hasBurn', name: 'Burn', desc: 'Auto-burn tokens', icon: Flame, fee: FEATURE_FEES.BURN_FEE },
+    { key: 'hasReflection', name: 'Reflection', desc: 'Reward holders', icon: Gem, fee: FEATURE_FEES.REFLECTION_FEE },
+    { key: 'hasWhitelist', name: 'Whitelist', desc: 'Early buyer list', icon: FileCheck, fee: FEATURE_FEES.WHITELIST_FEE },
   ];
 
   const validateTaxRecipient = (value: string) => {
@@ -668,7 +680,10 @@ const Step2Features: React.FC<{
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-cyan-400 mb-2">Token Features</h2>
+        <div className="flex items-center gap-2 mb-2">
+          <Settings className="text-cyan-400" />
+          <div className="font-bold text-white">Token Features</div>
+        </div>
         <p className="text-gray-400 text-sm">Select advanced features for your token</p>
       </div>
 
@@ -684,7 +699,9 @@ const Step2Features: React.FC<{
           >
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-3">
-                <span className="text-2xl">{feature.icon}</span>
+                <div className={`p-2 rounded-lg ${features[feature.key as keyof Features] ? 'bg-cyan-500/20 text-cyan-400' : 'bg-gray-800 text-gray-400'}`}>
+                  <feature.icon className="w-5 h-5" />
+                </div>
                 <div>
                   <h3 className="font-semibold text-white">{feature.name}</h3>
                   <p className="text-xs text-gray-400 mt-0.5">{feature.desc}</p>
@@ -791,7 +808,10 @@ const Step3Advanced: React.FC<{
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-cyan-400 mb-2">Advanced Settings</h2>
+        <div className="flex items-center gap-2 mb-2">
+          <Shield className="text-cyan-400" />
+          <div className="font-bold text-white">Advanced Settings</div>
+        </div>
         <p className="text-gray-400 text-sm">Fine-tune your token parameters</p>
       </div>
 
@@ -959,7 +979,10 @@ const Step4Review: React.FC<{
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-cyan-400 mb-2">Review & Deploy</h2>
+        <div className="flex items-center gap-2 mb-2">
+          <CheckCircle2 className="text-cyan-400" />
+          <div className="font-bold text-white">Review & Deploy</div>
+        </div>
         <p className="text-gray-400 text-sm">Double-check everything before deployment</p>
       </div>
 
@@ -1359,10 +1382,10 @@ const FeeCalculator: React.FC<{
     <div className="sticky top-24 space-y-4">
       {/* Live Preview Card */}
       <div className="bg-[#0B0E14]/60 backdrop-blur-xl rounded-xl border border-white/10 p-6 shadow-2xl">
-        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-          <Zap className="w-5 h-5 text-cyan-400" />
-          Live Preview
-        </h3>
+        <div className="flex items-center gap-2 mb-4">
+          <Zap className="text-cyan-400" />
+          <div className="font-bold text-white">Live Preview</div>
+        </div>
 
         <div className="space-y-4">
           {/* Token Info */}
@@ -1396,7 +1419,10 @@ const FeeCalculator: React.FC<{
 
       {/* Fee Breakdown */}
       <div className="bg-[#0B0E14]/60 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-        <h3 className="text-lg font-bold text-white mb-4">Deployment Cost</h3>
+        <div className="flex items-center gap-2 mb-4">
+          <Wallet className="text-cyan-400" />
+          <div className="font-bold text-white">Deployment Cost</div>
+        </div>
 
         <div className="space-y-3">
           <div className="flex justify-between items-center text-sm">

@@ -1,5 +1,5 @@
 import GMTestnetABI from "../abis/GMTestnetABI.json";
-import GMMainnetABI from "../abis/GMMainnetABI.json"; 
+import GMMainnetABI from "../abis/GMMainnetABI.json";
 import ReferralABI from "../abis/ReferralABI.json";
 
 export const TEA_SEPOLIA_CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_TEA_SEPOLIA_CHAIN_ID || "10218", 10);
@@ -22,6 +22,8 @@ export const BASE_CHAIN_ID = 8453;
 export const SONEIUM_CHAIN_ID = 1868;
 export const INK_CHAIN_ID = 57073;
 export const OP_CHAIN_ID = 10;
+export const LISK_CHAIN_ID = 1135;
+export const LINEA_CHAIN_ID = 59144;
 
 export interface ChainConfig {
   chainId: string;
@@ -52,10 +54,10 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     rpcUrls: [process.env.NEXT_PUBLIC_TEA_SEPOLIA_RPC_URL || "https://tea-sepolia.g.alchemy.com/public"],
     blockExplorerUrls: [process.env.NEXT_PUBLIC_TEA_BLOCK_EXPLORER || "https://sepolia.tea.xyz"],
     contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0xaF8471a2968a30a63Cdced851cDA2B7ce9e5dB90",
-    logoUrl: "/assets/chains/tea.png", 
+    logoUrl: "/assets/chains/tea.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
   [BASE_SEPOLIA_CHAIN_ID]: {
     chainId: `0x${BASE_SEPOLIA_CHAIN_ID.toString(16)}`,
@@ -71,7 +73,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/base.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
   [SONEIUM_TESTNET_CHAIN_ID]: {
     chainId: `0x${SONEIUM_TESTNET_CHAIN_ID.toString(16)}`,
@@ -87,7 +89,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/soneium.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
   [INK_TESTNET_CHAIN_ID]: {
     chainId: `0x${INK_TESTNET_CHAIN_ID.toString(16)}`,
@@ -103,7 +105,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/ink.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
   [OP_SEPOLIA_CHAIN_ID]: {
     chainId: `0x${OP_SEPOLIA_CHAIN_ID.toString(16)}`,
@@ -119,7 +121,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/optimism.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
   [ARBITRUM_SEPOLIA_CHAIN_ID]: {
     chainId: `0x${ARBITRUM_SEPOLIA_CHAIN_ID.toString(16)}`,
@@ -135,7 +137,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/arbitrum.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
   [MONAD_TESTNET_CHAIN_ID]: {
     chainId: `0x${MONAD_TESTNET_CHAIN_ID.toString(16)}`,
@@ -151,7 +153,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/monad.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
   [MEGAETH_TESTNET_CHAIN_ID]: {
     chainId: `0x${MEGAETH_TESTNET_CHAIN_ID.toString(16)}`,
@@ -167,7 +169,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/megaeth.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
   [UNICHAIN_SEPOLIA_CHAIN_ID]: {
     chainId: `0x${UNICHAIN_SEPOLIA_CHAIN_ID.toString(16)}`,
@@ -183,7 +185,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/unichain.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
   [ABSTRACT_TESTNET_CHAIN_ID]: {
     chainId: `0x${ABSTRACT_TESTNET_CHAIN_ID.toString(16)}`,
@@ -199,7 +201,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/abstract.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
   [LISK_SEPOLIA_CHAIN_ID]: {
     chainId: `0x${LISK_SEPOLIA_CHAIN_ID.toString(16)}`,
@@ -215,7 +217,7 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/lisk.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
   [INCENTIV_TESTNET_CHAIN_ID]: {
     chainId: `0x${INCENTIV_TESTNET_CHAIN_ID.toString(16)}`,
@@ -231,10 +233,10 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/incentiv.png",
     status: "Ready!",
     isTestnet: true,
-    abi: GMTestnetABI, 
+    abi: GMTestnetABI,
   },
 
-  
+
 
   // Mainnet
   [BASE_CHAIN_ID]: {
@@ -245,13 +247,13 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
       symbol: "ETH",
       decimals: 18,
     },
-    rpcUrls: [process.env.BASE_MAINNET_RPC_URL || "https://mainnet.base.org", "https://base.llamarpc.com", "https://base-rpc.publicnode.com", ],
+    rpcUrls: [process.env.BASE_MAINNET_RPC_URL || "https://mainnet.base.org", "https://base.llamarpc.com", "https://base-rpc.publicnode.com",],
     blockExplorerUrls: ["https://basescan.org"],
     contractAddress: process.env.BASE_MAINNET_CONTRACT_ADDRESS || "0x8A0043A965dF6683A71a87a4B8F33e64290eB3E7",
     logoUrl: "/assets/chains/base.png",
     status: "Ready!",
     isTestnet: false,
-    abi: GMMainnetABI, 
+    abi: GMMainnetABI,
   },
   [SONEIUM_CHAIN_ID]: {
     chainId: `0x${SONEIUM_CHAIN_ID.toString(16)}`,
@@ -261,13 +263,13 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
       symbol: "ETH",
       decimals: 18,
     },
-    rpcUrls: [process.env.SONEIUM_MAINNET_RPC_URL || "https://rpc.soneium.org", "https://soneium-mainnet.rpc.caldera.xyz/http", ],
+    rpcUrls: [process.env.SONEIUM_MAINNET_RPC_URL || "https://rpc.soneium.org", "https://soneium-mainnet.rpc.caldera.xyz/http",],
     blockExplorerUrls: ["https://soneium.blocksout.com"],
     contractAddress: process.env.SONEIUM_MAINNET_CONTRACT_ADDRESS || "0xc636516508f8798c1d5F019A2C73BD7442213D94",
     logoUrl: "/assets/chains/soneium.png",
     status: "Ready!",
     isTestnet: false,
-    abi: GMMainnetABI, 
+    abi: GMMainnetABI,
   },
   [INK_CHAIN_ID]: {
     chainId: `0x${INK_CHAIN_ID.toString(16)}`,
@@ -277,13 +279,13 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
       symbol: "ETH",
       decimals: 18,
     },
-    rpcUrls: [process.env.INK_MAINNET_RPC_URL || "https://rpc-gel.inkonchain.com", "https://rpc-qnd.inkonchain.com", ],
+    rpcUrls: [process.env.INK_MAINNET_RPC_URL || "https://rpc-gel.inkonchain.com", "https://rpc-qnd.inkonchain.com",],
     blockExplorerUrls: ["https://explorer.inkonchain.com"],
     contractAddress: process.env.INK_MAINNET_CONTRACT_ADDRESS || "0x02a9107Bf30a38fEddA30FB83cC01ff5b44dC935",
     logoUrl: "/assets/chains/ink.png",
     status: "Ready!",
     isTestnet: false,
-    abi: GMMainnetABI, 
+    abi: GMMainnetABI,
   },
 
   [OP_CHAIN_ID]: {
@@ -300,7 +302,39 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     logoUrl: "/assets/chains/optimism.png",
     status: "Ready!",
     isTestnet: false,
-    abi: GMMainnetABI, 
+    abi: GMMainnetABI,
+  },
+  [LISK_CHAIN_ID]: {
+    chainId: `0x${LISK_CHAIN_ID.toString(16)}`,
+    chainName: "Lisk",
+    nativeCurrency: {
+      name: "Ethereum",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: [process.env.LISK_MAINNET_RPC_URL || "https://rpc.api.lisk.com"],
+    blockExplorerUrls: ["https://blockscout.lisk.com"],
+    contractAddress: process.env.LISK_MAINNET_CONTRACT_ADDRESS || "",
+    logoUrl: "/assets/chains/lisk.png",
+    status: "Ready!",
+    isTestnet: false,
+    abi: GMMainnetABI,
+  },
+  [LINEA_CHAIN_ID]: {
+    chainId: `0x${LINEA_CHAIN_ID.toString(16)}`,
+    chainName: "Linea",
+    nativeCurrency: {
+      name: "Ethereum",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: [process.env.LINEA_MAINNET_RPC_URL || "https://rpc.linea.build"],
+    blockExplorerUrls: ["https://lineascan.build/"],
+    contractAddress: process.env.LINEA_MAINNET_CONTRACT_ADDRESS || "",
+    logoUrl: "/assets/chains/linea.png",
+    status: "Ready!",
+    isTestnet: false,
+    abi: GMMainnetABI,
   },
 
 };
@@ -353,10 +387,10 @@ export const getNativeCurrencySymbol = (chainId: number): string => {
 export const isTestnetChain = (chainId: number): boolean => {
   const chainConfig = SUPPORTED_CHAINS[chainId];
   if (!chainConfig) return false;
-  
+
   return chainConfig.isTestnet === true ||
-         chainConfig.chainName.toLowerCase().includes('testnet') ||
-         chainConfig.chainName.toLowerCase().includes('sepolia');
+    chainConfig.chainName.toLowerCase().includes('testnet') ||
+    chainConfig.chainName.toLowerCase().includes('sepolia');
 };
 
 export const getMainnetChainIds = (): number[] => {
@@ -400,8 +434,8 @@ export const REFERRAL_CONTRACT_CONFIG = {
   }
 };
 
-export const REFERRAL_SUBGRAPH_ENDPOINT = 
-  process.env.NEXT_PUBLIC_REFERRAL_SUBGRAPH_URL || 
+export const REFERRAL_SUBGRAPH_ENDPOINT =
+  process.env.NEXT_PUBLIC_REFERRAL_SUBGRAPH_URL ||
   'https://api.studio.thegraph.com/query/XXXXX/gannetx-referral/version/latest';
 
 export const getReferralContractAddress = (): string => {

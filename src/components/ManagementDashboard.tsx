@@ -2,11 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ethers } from 'ethers';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Settings, 
-  TrendingUp, 
-  Shield, 
-  Pause, 
+import {
+  Settings,
+  TrendingUp,
+  Shield,
+  Pause,
   Play,
   UserCog,
   Wallet,
@@ -251,7 +251,10 @@ const ManagementDashboard: React.FC = () => {
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-3xl font-bold text-white mb-2">Token Management</h2>
+            <div className="flex items-center gap-2 mb-2">
+              <Wallet className="text-cyan-400" />
+              <div className="font-bold text-white">Token Management</div>
+            </div>
             <p className="text-gray-400">Manage and monitor your deployed tokens</p>
           </div>
           <button
@@ -451,9 +454,8 @@ const TokenCard: React.FC<{
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className={`bg-[#0B0E14]/60 backdrop-blur-xl border border-white/5 rounded-xl overflow-hidden transition-all ${
-        isSelected ? 'border-cyan-500/30 shadow-[0_0_20px_var(--glow-color)]' : 'border-white/5 hover:border-cyan-500/30/40'
-      }`}
+      className={`bg-[#0B0E14]/60 backdrop-blur-xl border border-white/5 rounded-xl overflow-hidden transition-all ${isSelected ? 'border-cyan-500/30 shadow-[0_0_20px_var(--glow-color)]' : 'border-white/5 hover:border-cyan-500/30/40'
+        }`}
     >
       <div className="p-5">
         <div className="flex items-start justify-between mb-4">
@@ -487,10 +489,10 @@ const TokenCard: React.FC<{
             </div>
             {token.deployedAt && (
               <p className="text-xs text-gray-500">
-                Deployed {new Date(token.deployedAt).toLocaleDateString('en-US', { 
-                  month: 'short', 
-                  day: 'numeric', 
-                  year: 'numeric' 
+                Deployed {new Date(token.deployedAt).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric'
                 })}
               </p>
             )}
@@ -689,7 +691,7 @@ const ManagementPanel: React.FC<{
   onTransferOwnership: (newOwner: string) => void;
   busy: boolean;
 }> = ({ token, features, buyTax, sellTax, setBuyTax, setSellTax, maxTx, setMaxTx, maxWallet, setMaxWallet, newOwner, setNewOwner, onUpdateTaxes, onUpdateLimits, onPauseToggle, onTransferOwnership, busy }) => {
-  
+
   const ManagementSection: React.FC<{ icon: any; title: string; color: string; children: React.ReactNode }> = ({ icon: Icon, title, color, children }) => (
     <div className="p-4 bg-[#0B0E14]/30 rounded-lg">
       <div className="flex items-center gap-2 mb-3">
@@ -789,11 +791,10 @@ const ManagementPanel: React.FC<{
           <button
             onClick={onPauseToggle}
             disabled={busy}
-            className={`w-full px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50 ${
-              features.isPausable
+            className={`w-full px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50 ${features.isPausable
                 ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]'
                 : 'bg-gradient-to-r from-red-600 to-orange-600 hover:shadow-[0_0_20px_rgba(220,38,38,0.5)]'
-            } text-white`}
+              } text-white`}
           >
             {busy ? 'Processing...' : features.isPausable ? 'Resume Trading' : 'Pause Trading'}
           </button>

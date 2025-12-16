@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaFire, FaTrophy, FaCheckCircle, FaRocket } from 'react-icons/fa';
+import { FaFire, FaTrophy, FaCheckCircle, FaCompactDisc } from 'react-icons/fa';
 
 interface SuccessAnimationProps {
   isVisible: boolean;
@@ -286,7 +286,7 @@ const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
               >
                 {/* Check-in Badge */}
                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 backdrop-blur-sm">
-                  <FaRocket className="text-cyan-400 text-xs" />
+                  <FaCompactDisc className="text-cyan-400 text-xs" />
                   <span className="text-sm font-bold text-white">+{checkinCount}</span>
                   <span className="text-[10px] text-cyan-400/70">GM</span>
                 </div>

@@ -14,7 +14,6 @@ import {
 } from 'react-icons/fa';
 import { SUPPORTED_CHAINS, BASE_CHAIN_ID } from '@/utils/constants';
 import { motion } from 'framer-motion';
-import AudioPlayer from '@/components/AudioPlayer';
 import { useUserStats, useUserCheckins } from '@/hooks/useSubgraph';
 import { useUserChainStats } from '@/hooks/useUserChainStats';
 import { useUserRanking } from '@/hooks/useUserRangking';
@@ -212,7 +211,6 @@ const CheckinPageIntegration: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#050608] relative overflow-x-hidden text-white">
-      <AudioPlayer />
 
       <Notification
         isOpen={showSuccessNotification}

@@ -8,7 +8,7 @@ import {
   FaArrowRight,
   FaFire,
   FaTrophy,
-  FaRocket
+  FaCompactDisc
 } from 'react-icons/fa';
 import { getChainConfig } from '@/utils/constants';
 
@@ -223,8 +223,8 @@ const Notification: React.FC<NotificationProps> = ({
                 </div>
 
                 <h3 className={`text-xl font-bold mb-2 ${type === 'success'
-                    ? 'text-cyan-400'
-                    : 'text-red-400'
+                  ? 'text-cyan-400'
+                  : 'text-red-400'
                   }`}>
                   {isStreakMilestone ? (
                     <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 bg-clip-text text-transparent">
@@ -249,7 +249,7 @@ const Notification: React.FC<NotificationProps> = ({
                   >
                     {checkinCount > 0 && (
                       <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 backdrop-blur-sm">
-                        <FaRocket className="text-cyan-400 text-xs" />
+                        <FaCompactDisc className="text-cyan-400 text-xs" />
                         <span className="text-sm font-bold text-white">+{checkinCount}</span>
                         <span className="text-[10px] text-cyan-400/70">GM</span>
                       </div>
@@ -302,8 +302,8 @@ const Notification: React.FC<NotificationProps> = ({
                   <button
                     onClick={handleAwesomeClick}
                     className={`py-2 px-4 rounded-lg text-white transition-colors flex items-center ${type === 'success'
-                        ? 'bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-400/50 text-cyan-400'
-                        : 'bg-red-500/20 border border-red-500/30 hover:border-red-400/50 text-red-400'
+                      ? 'bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-400/50 text-cyan-400'
+                      : 'bg-red-500/20 border border-red-500/30 hover:border-red-400/50 text-red-400'
                       }`}
                   >
                     <span>{type === 'success' ? 'Awesome!' : 'Dismiss'}</span>

@@ -769,10 +769,7 @@ const MultiChainCheckinGrid: React.FC<MultiChainCheckinGridProps> = ({
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className={`flex items-center justify-center w-9 h-9 rounded-lg ${isCurrentChain
-                        ? 'bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900/30'
-                        : 'bg-gray-100 dark:bg-slate-700/50'
-                        } transition-all duration-300`}>
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-300">
                         <ChainLogo
                           logoUrl={chain.logoUrl}
                           altText={chain.chainName}

@@ -11,8 +11,9 @@ import {
   FaCopy,
   FaExchangeAlt,
   FaGem,
-  FaRocket,
+  FaCompactDisc,
   FaComments,
+  FaCalendarAlt,
 } from "react-icons/fa"
 import ConnectWalletButton from "./ConnectWalletButton"
 import ChainLogo from "@/components/ChainLogo"
@@ -20,6 +21,7 @@ import { getMainnetChainIds, SUPPORTED_CHAINS } from '@/utils/constants'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import GannetXChatModal from './GannetXChatSidebar'
+import { usePathname } from "next/navigation"
 
 const LOGO_PATH = "/logo.png"
 
@@ -53,6 +55,7 @@ const Navbar: React.FC<NavbarProps> = ({
   currentChainId,
   onSwitchChain,
 }) => {
+  const pathname = usePathname()
   const [showCopyToast, setShowCopyToast] = useState(false)
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -164,7 +167,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const mainnetChains = mainnetChainIds.map(id => ({
     id,
     ...SUPPORTED_CHAINS[id]
-  }))
+  })).sort((a, b) => a.chainName.localeCompare(b.chainName))
 
   return (
     <>
@@ -199,15 +202,24 @@ const Navbar: React.FC<NavbarProps> = ({
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-4">
-              {/* Deploy Button with Tooltip */}
+              {/* Deploy / Check-ins Button */}
               {address && (
-              <div ref={deployButtonRef} className="relative" onMouseEnter={() => setShowDeployTooltip(true)} onMouseLeave={() => setShowDeployTooltip(false)}>
-                <Link href="/deploy">
-                  <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-2 px-4 py-2 bg-[#0B0E14] text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300">
-                    <span className="text-sm">Deploy</span>
-                  </motion.button>
-                </Link>
-              </div>
+                <div ref={deployButtonRef} className="relative" onMouseEnter={() => setShowDeployTooltip(true)} onMouseLeave={() => setShowDeployTooltip(false)}>
+                  {pathname === '/deploy' ? (
+                    <Link href="/">
+                      <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-2 px-4 py-2 bg-[#0B0E14] text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300">
+                        <FaCalendarAlt className="text-sm" />
+                        <span className="text-sm">Check-ins</span>
+                      </motion.button>
+                    </Link>
+                  ) : (
+                    <Link href="/deploy">
+                      <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-2 px-4 py-2 bg-[#0B0E14] text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300">
+                        <span className="text-sm">Deploy</span>
+                      </motion.button>
+                    </Link>
+                  )}
+                </div>
               )}
 
               {/* Mint NFT Button */}
@@ -452,15 +464,27 @@ const Navbar: React.FC<NavbarProps> = ({
             <div className="p-4 space-y-6">
               {/* Main Actions Grid */}
               <div className="grid grid-cols-3 gap-3">
-                <Link href="/deploy" onClick={() => setMobileMenuOpen(false)}>
-                  <motion.div
-                    whileTap={{ scale: 0.98 }}
-                    className="flex flex-col items-center justify-center gap-2 p-4 bg-[#0B0E14] border border-white/5 rounded-xl text-center"
-                  >
-                    <FaRocket className="text-cyan-400 text-xl" />
-                    <span className="text-sm font-semibold text-white">Deploy</span>
-                  </motion.div>
-                </Link>
+                {pathname === '/deploy' ? (
+                  <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+                    <motion.div
+                      whileTap={{ scale: 0.98 }}
+                      className="flex flex-col items-center justify-center gap-2 p-4 bg-[#0B0E14] border border-white/5 rounded-xl text-center"
+                    >
+                      <FaCalendarAlt className="text-cyan-400 text-xl" />
+                      <span className="text-sm font-semibold text-white">Check-ins</span>
+                    </motion.div>
+                  </Link>
+                ) : (
+                  <Link href="/deploy" onClick={() => setMobileMenuOpen(false)}>
+                    <motion.div
+                      whileTap={{ scale: 0.98 }}
+                      className="flex flex-col items-center justify-center gap-2 p-4 bg-[#0B0E14] border border-white/5 rounded-xl text-center"
+                    >
+                      <FaCompactDisc className="text-cyan-400 text-xl" />
+                      <span className="text-sm font-semibold text-white">Deploy</span>
+                    </motion.div>
+                  </Link>
+                )}
 
                 {/* <Link href="/mint" onClick={() => setMobileMenuOpen(false)}>
                   <motion.div

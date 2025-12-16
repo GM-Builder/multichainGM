@@ -1,80 +1,148 @@
 // src/pages/deploy.tsx
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Rocket, Settings } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Disc, Settings, ArrowLeft } from 'lucide-react';
 import TokenFactory from '@/components/TokenFactory';
 import ManagementDashboard from '@/components/ManagementDashboard';
+import DeployMenu from '@/components/DeployMenu';
+import SimpleDeploy from '@/components/SimpleDeploy';
 
-type TabType = 'factory' | 'management';
+type ViewState = 'menu' | 'simple' | 'create_token';
+type TabType = 'deploy' | 'management';
 
 const DeployPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabType>('factory');
+  const [view, setView] = useState<ViewState>('menu');
+  const [activeTab, setActiveTab] = useState<TabType>('deploy');
+
+  const handleMenuSelect = (option: 'simple' | 'factory') => {
+    if (option === 'simple') {
+      setView('simple');
+    } else {
+      setView('create_token');
+      setActiveTab('deploy');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#050608] text-white pt-40">
-      {/* Main Content Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center">
-              <Rocket className="w-6 h-6 text-cyan-400" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-cyan-400">
-                Token Hub <span className="text-md font-normal text-gray-300">| Base Mainnet</span>
-              </h1>
-              <p className="text-sm text-gray-400">Deploy and manage your ERC20 tokens</p>
-            </div>
-          </div>
 
-          {/* Tab Navigation */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className=""
-          >
-            <div className="flex bg-[#0B0E14]/60 px-2 py-1.5 rounded-full backdrop-blur-xl border border-white/5">
-              <button
-                onClick={() => setActiveTab('factory')}
-                className={`px-6 py-3 text-sm font-medium rounded-full transition-all duration-300 ${activeTab === 'factory'
-                  ? 'bg-[#1A1D24] text-white shadow-sm'
-                  : 'text-gray-400 hover:text-gray-200'
-                  }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Rocket className="w-4 h-4" />
-                  <span>Token Factory</span>
+        <AnimatePresence mode="wait">
+          {/* MENU VIEW */}
+          {view === 'menu' && (
+            <motion.div
+              key="menu"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <DeployMenu onSelect={handleMenuSelect} />
+            </motion.div>
+          )}
+
+          {/* SIMPLE DEPLOY VIEW */}
+          {view === 'simple' && (
+            <motion.div
+              key="simple"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <SimpleDeploy onBack={() => setView('menu')} />
+            </motion.div>
+          )}
+
+          {/* CREATE TOKEN VIEW (Factory + Management) */}
+          {view === 'create_token' && (
+            <motion.div
+              key="create_token"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="mb-6">
+                <button
+                  onClick={() => setView('menu')}
+                  className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Menu
+                </button>
+              </div>
+
+              {/* Page Header - NOW INSIDE CREATE TOKEN VIEW */}
+              <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-3">
+                  <div>
+                    <h1 className="text-3xl font-bold text-cyan-400">
+                      Token Hub <span className="text-md font-normal text-gray-300">| Deploy & Manage</span>
+                    </h1>
+                    <p className="text-sm text-gray-400">Launch contracts and manage your tokens</p>
+                  </div>
                 </div>
-              </button>
 
-              <button
-                onClick={() => setActiveTab('management')}
-                className={`px-6 py-3 text-sm font-medium rounded-full transition-all duration-300 ${activeTab === 'management'
-                  ? 'bg-[#1A1D24] text-white shadow-sm'
-                  : 'text-gray-400 hover:text-gray-200'
-                  }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Settings className="w-4 h-4" />
-                  <span>Management</span>
+                {/* Tab Navigation */}
+                <div className="flex bg-[#0B0E14]/60 px-2 py-1.5 rounded-full backdrop-blur-xl border border-white/5">
+                  <button
+                    onClick={() => setActiveTab('deploy')}
+                    className={`px-6 py-3 text-sm font-medium rounded-full transition-all duration-300 ${activeTab === 'deploy'
+                      ? 'bg-[#1A1D24] text-white shadow-sm'
+                      : 'text-gray-400 hover:text-gray-200'
+                      }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Disc className="w-4 h-4" />
+                      <span>Deploy</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTab('management')}
+                    className={`px-6 py-3 text-sm font-medium rounded-full transition-all duration-300 ${activeTab === 'management'
+                      ? 'bg-[#1A1D24] text-white shadow-sm'
+                      : 'text-gray-400 hover:text-gray-200'
+                      }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Settings className="w-4 h-4" />
+                      <span>Management</span>
+                    </div>
+                  </button>
                 </div>
-              </button>
-            </div>
-          </motion.div>
-        </div>
+              </div>
 
-        {/* Tab Content */}
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-        >
-          {activeTab === 'factory' && <TokenFactory />}
-          {activeTab === 'management' && <ManagementDashboard />}
-        </motion.div>
+              {/* Tab Content */}
+              <AnimatePresence mode="wait">
+                {activeTab === 'deploy' && (
+                  <motion.div
+                    key="deploy-tab"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <TokenFactory />
+                  </motion.div>
+                )}
+
+                {activeTab === 'management' && (
+                  <motion.div
+                    key="management-tab"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ManagementDashboard />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
