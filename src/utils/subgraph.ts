@@ -3,6 +3,7 @@ import {
   INK_CHAIN_ID, 
   SONEIUM_CHAIN_ID,
   OP_CHAIN_ID,
+  LINEA_CHAIN_ID
 } from './constants';
 
 export const SUBGRAPH_ENDPOINTS = {
@@ -10,6 +11,7 @@ export const SUBGRAPH_ENDPOINTS = {
   ink: 'https://api.studio.thegraph.com/query/106565/gannetx-ink/version/latest',
   soneium: 'https://api.studio.thegraph.com/query/106565/gannet-x-soneium/version/latest',
   op: 'https://api.studio.thegraph.com/query/110002/gannet-x-op/version/latest',
+  linea: 'https://api.studio.thegraph.com/query/110002/gannet-x-linea/version/latest'
 } as const;
 
 export type ChainName = keyof typeof SUBGRAPH_ENDPOINTS;
@@ -27,6 +29,7 @@ export const CHAIN_NAME_TO_ID: Record<ChainName, number> = {
   ink: INK_CHAIN_ID,
   soneium: SONEIUM_CHAIN_ID,
   op: OP_CHAIN_ID,
+  linea: LINEA_CHAIN_ID
 };
 
 export function chainIdToName(chainId: number): ChainName | undefined {

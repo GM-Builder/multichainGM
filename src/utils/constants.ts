@@ -424,7 +424,8 @@ export const SUBGRAPH_ENDPOINTS = {
   base: 'https://api.studio.thegraph.com/query/106565/gannet-x-base/version/latest',
   ink: 'https://api.studio.thegraph.com/query/106565/gannetx-ink/version/latest',
   soneium: 'https://api.studio.thegraph.com/query/106565/gannet-x-soneium/version/latest',
-  op: 'https://api.studio.thegraph.com/query/110002/gannet-x-op/version/latest'
+  op: 'https://api.studio.thegraph.com/query/110002/gannet-x-op/version/latest',
+  linea: 'https://api.studio.thegraph.com/query/110002/gannet-x-linea/version/latest'
 } as const;
 
 export const REFERRAL_CONTRACT_CONFIG = {
