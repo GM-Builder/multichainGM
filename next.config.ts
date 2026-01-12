@@ -88,7 +88,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  transpilePackages: ['ethers', '@farcaster/miniapp-sdk', 'wagmi', '@coinbase/onchainkit', '@metamask/sdk'],
+  transpilePackages: ['ethers', '@farcaster/miniapp-sdk'],
 };
 
 module.exports = nextConfig;

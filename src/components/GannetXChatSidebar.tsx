@@ -29,10 +29,9 @@ const shortAddr = (a?: string) => (a ? `${a.substring(0, 6)}...${a.substring(a.l
 interface GannetXChatModalProps {
   isOpen: boolean;
   onClose: () => void;
-  isEmbedded?: boolean; // New prop for embedded mode
 }
 
-const GannetXChatModal: React.FC<GannetXChatModalProps> = ({ isOpen, onClose, isEmbedded = false }) => {
+const GannetXChatModal: React.FC<GannetXChatModalProps> = ({ isOpen, onClose }) => {
   const { web3State, connectWallet, switchNetwork } = useWalletState();
   const [recentGMs, setRecentGMs] = useState<GMMessage[]>([]);
   const [input, setInput] = useState('');
@@ -248,14 +247,11 @@ const GannetXChatModal: React.FC<GannetXChatModalProps> = ({ isOpen, onClose, is
 
   const content = (
     <motion.div
-      initial={isEmbedded ? { opacity: 0 } : { scale: 0.9, opacity: 0 }}
-      animate={isEmbedded ? { opacity: 1 } : { scale: 1, opacity: 1 }}
-      exit={isEmbedded ? { opacity: 0 } : { scale: 0.9, opacity: 0 }}
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.9, opacity: 0 }}
       transition={{ type: "spring", damping: 20, stiffness: 300 }}
-      className={isEmbedded
-        ? "flex flex-col h-full bg-transparent"
-        : "relative bg-[#0B0E14]/60 backdrop-blur-xl rounded-2xl border border-white/5 shadow-2xl w-full max-w-2xl h-[600px] flex flex-col"
-      }
+      className="relative bg-[#0B0E14]/60 backdrop-blur-xl rounded-2xl border border-white/5 shadow-2xl w-full max-w-2xl h-[600px] flex flex-col"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header */}
@@ -275,14 +271,12 @@ const GannetXChatModal: React.FC<GannetXChatModalProps> = ({ isOpen, onClose, is
             </div>
           </div>
 
-          {!isEmbedded && (
-            <button
-              onClick={onClose}
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-red-500/20 hover:border-red-500/30 text-gray-400 hover:text-red-300 transition-all duration-200"
-            >
-              <FaTimes className="text-sm" />
-            </button>
-          )}
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-red-500/20 hover:border-red-500/30 text-gray-400 hover:text-red-300 transition-all duration-200"
+          >
+            <FaTimes className="text-sm" />
+          </button>
         </div>
 
         {/* Wallet Status */}
@@ -455,9 +449,7 @@ const GannetXChatModal: React.FC<GannetXChatModalProps> = ({ isOpen, onClose, is
     </motion.div>
   );
 
-  if (isEmbedded) {
-    return <div className="h-full w-full">{content}</div>;
-  }
+
 
   return (
     <AnimatePresence>
