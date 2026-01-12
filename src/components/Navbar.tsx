@@ -246,6 +246,20 @@ const Navbar: React.FC<NavbarProps> = ({
                 </motion.button>
               )}
 
+              {/* BaseApp Button */}
+              {address && (
+                <motion.a
+                  href="https://base.app/app/gannetx.vercel.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0B0E14] text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
+                >
+                  <span className="text-sm">BaseApp</span>
+                </motion.a>
+              )}
+
               {/* Chain Switcher Dropdown */}
               {networkInfo && address && (
                 <div className="relative" ref={chainDropdownRef}>
@@ -509,6 +523,20 @@ const Navbar: React.FC<NavbarProps> = ({
                     <FaComments className="text-green-400 text-xl" />
                     <span className="text-sm font-semibold text-white">Chat</span>
                   </motion.div>
+                )}
+
+                {address && (
+                  <motion.a
+                    href="https://base.app/app/gannetx.vercel.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex flex-col items-center justify-center gap-2 p-4 bg-[#0B0E14] border border-white/5 rounded-xl text-center cursor-pointer"
+                  >
+                    <FaGem className="text-blue-400 text-xl" />
+                    <span className="text-sm font-semibold text-white">BaseApp</span>
+                  </motion.a>
                 )}
               </div>
 
