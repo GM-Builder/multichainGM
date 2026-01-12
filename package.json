@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@apollo/client": "^4.0.7",
+    "@coinbase/onchainkit": "^1.1.2",
+    "@metamask/sdk": "^0.34.0",
+    "@tanstack/react-query": "^5.90.16",
     "axios": "^1.4.0",
     "canvas-confetti": "^1.9.3",
     "cross-fetch": "^4.1.0",
@@ -27,7 +30,10 @@
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.0.1",
     "react-toast": "^1.0.3",
-    "thirdweb": "^5.95.3"
+    "rxjs": "^7.8.2",
+    "thirdweb": "^5.95.3",
+    "viem": "^2.44.1",
+    "wagmi": "^2.19.5"
   },
   "devDependencies": {
     "@types/mongoose": "^5.11.97",

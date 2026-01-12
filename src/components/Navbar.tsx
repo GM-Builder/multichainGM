@@ -14,6 +14,7 @@ import {
   FaCompactDisc,
   FaComments,
   FaCalendarAlt,
+  FaRocket,
 } from "react-icons/fa"
 import ConnectWalletButton from "./ConnectWalletButton"
 import ChainLogo from "@/components/ChainLogo"
@@ -233,6 +234,19 @@ const Navbar: React.FC<NavbarProps> = ({
                 </motion.button>
               </Link> */}
 
+              {/* Base App Button */}
+              <button
+                onClick={() => {
+                  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://gannetx.space';
+                  const targetUrl = `${baseUrl}/baseapp`;
+                  const deepLink = `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(targetUrl)}`;
+                  window.location.href = deepLink;
+                }}
+                className="flex items-center gap-2 px-3 py-1.5 bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 rounded-lg font-semibold hover:bg-cyan-600/30 hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
+              >
+                <FaRocket className="text-sm" />
+                <span className="text-sm">Base App</span>
+              </button>
               {/* Chat Button */}
               {address && (
                 <motion.button
