@@ -51,9 +51,9 @@ The GannetX architecture is built with professional-grade safety measures:
 
 | Contract Name | Address |
 | :--- | :--- |
-| **GannetX Interactive Chat** | `0x...` |
-| **OnchainGM Engine** | `0x...` |
-| **Simple Deploy Factory** | `0x...` |
+| **GannetX Interactive Chat** | `0x4Be81a2966d52F1d7c5A9170e57DB7A8604186E5` |
+| **OnchainGM Engine** | `0x8A0043A965dF6683A71a87a4B8F33e64290eB3E7` |
+| **Token Factory** | `0x08B6E11A433fceF7b56bf9DDE331feA2f881AF3c` |
 
 ## 🗺️ Roadmap
 
