@@ -14,8 +14,9 @@ import {
     SUPPORTED_CHAINS
 } from '@/utils/constants';
 import { SIMPLE_DEPLOY_ADDRESSES, SIMPLE_DEPLOY_ABI } from '@/utils/constantsDeploy';
-import { switchToChain, getProvider } from '@/utils/web3';
+import { switchToChain, getProvider, withBuilderCode } from '@/utils/web3';
 import ChainLogo from '@/components/ChainLogo';
+import DeploymentSuccess from '@/components/DeploymentSuccess';
 
 interface SimpleDeployProps {
     onBack: () => void;
@@ -42,14 +43,16 @@ const SimpleDeploy: React.FC<SimpleDeployProps> = ({ onBack }) => {
     const [deploymentFee, setDeploymentFee] = useState<string>('0');
     const [isSwitchingChain, setIsSwitchingChain] = useState(false);
 
-    // Initialize selected chain based on current wallet chain if supported
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [deployedAddress, setDeployedAddress] = useState<string>('');
+    const [deployedTxHash, setDeployedTxHash] = useState<string>('');
+
     useEffect(() => {
         if (web3State.chainId && CHAIN_IDS.includes(web3State.chainId)) {
             setSelectedChain(web3State.chainId);
         }
     }, [web3State.chainId]);
 
-    // Fetch deployment fee when chain/contract is available
     useEffect(() => {
         const fetchFee = async () => {
             if (!selectedChain) return;
@@ -61,13 +64,6 @@ const SimpleDeploy: React.FC<SimpleDeployProps> = ({ onBack }) => {
                 const provider = getProvider();
                 if (!provider) return;
 
-                // If we are on the correct chain, we can read from the contract
-                // Note: We can read even if not connected if we have a public RPC provider, 
-                // but getProvider() usually returns the wallet provider. 
-                // For simplicity, we rely on wallet provider if connected to correct chain.
-                // Or we could use a JsonRpcProvider just for reading.
-
-                // Let's rely on the current provider.
                 const signer = provider.getSigner();
                 const contract = new ethers.Contract(contractAddress, SIMPLE_DEPLOY_ABI, provider);
                 const fee = await contract.deploymentFee();
@@ -139,7 +135,12 @@ const SimpleDeploy: React.FC<SimpleDeployProps> = ({ onBack }) => {
 
             toast.loading('Please confirm transaction...', { id: toastId });
 
-            const tx = await contract.deployContract(message, {
+            const txData = contract.interface.encodeFunctionData("deployContract", [message]);
+            const txDataWithSuffix = withBuilderCode(txData, selectedChain);
+
+            const tx = await signer.sendTransaction({
+                to: contractAddress,
+                data: txDataWithSuffix,
                 value: fee
             });
 
@@ -158,7 +159,12 @@ const SimpleDeploy: React.FC<SimpleDeployProps> = ({ onBack }) => {
 
             if (event) {
                 const parsed = contract.interface.parseLog(event);
-                toast.success(`Contract deployed at: ${parsed.args.contractAddress.slice(0, 6)}...${parsed.args.contractAddress.slice(-4)}`, { id: toastId });
+                const address = parsed.args.contractAddress;
+                toast.dismiss(toastId);
+
+                setDeployedAddress(address);
+                setDeployedTxHash(receipt.transactionHash);
+                setShowSuccessPopup(true);
             } else {
                 toast.success('Transaction successful!', { id: toastId });
             }
@@ -308,7 +314,18 @@ const SimpleDeploy: React.FC<SimpleDeployProps> = ({ onBack }) => {
                     )}
                 </button>
             </div>
-        </div>
+
+
+            <DeploymentSuccess
+                isVisible={showSuccessPopup}
+                onClose={() => setShowSuccessPopup(false)}
+                title="Simple Contract Deployed!"
+                contractAddress={deployedAddress}
+                txHash={deployedTxHash}
+                chainId={selectedChain || undefined}
+                networkName={selectedChain ? SUPPORTED_CHAINS[selectedChain]?.chainName : undefined}
+            />
+        </div >
     );
 };
 

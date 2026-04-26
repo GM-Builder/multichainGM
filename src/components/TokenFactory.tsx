@@ -30,11 +30,12 @@ import {
 } from 'lucide-react';
 import FactoryABI from '@/abis/GannetXTokenFactory.json';
 import { GANNETX_TOKEN_FACTORY_ADDRESS, BASE_CHAIN_ID } from '@/utils/constants';
-import { switchToChain, getProvider } from '@/utils/web3';
+import { switchToChain, getProvider, withBuilderCode } from '@/utils/web3';
 import { useWalletState } from '@/hooks/useWalletState';
 import { saveTokenMetadata, getTokenMetadata } from '@/utils/tokenStorage';
 import { TokenMetadata } from '@/types/token';
 import TokenBadge from '@/components/TokenBadge';
+import DeploymentSuccess from '@/components/DeploymentSuccess';
 
 // ==================== TYPES ====================
 interface TokenConfig {
@@ -92,6 +93,10 @@ const TokenFactory: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployedToken, setDeployedToken] = useState<string | null>(null);
+
+  // Success Popup State
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [deployedTxHash, setDeployedTxHash] = useState<string>('');
 
   const [config, setConfig] = useState<TokenConfig>({
     name: '',
@@ -201,7 +206,12 @@ const TokenFactory: React.FC = () => {
 
       toast.loading('Waiting for your confirmation...', { id: toastId });
 
-      const tx = await factory.deployToken(tokenConfig, features, {
+      const txData = factory.interface.encodeFunctionData("deployToken", [tokenConfig, features]);
+      const txDataWithSuffix = withBuilderCode(txData, BASE_CHAIN_ID);
+
+      const tx = await updatedSigner.sendTransaction({
+        to: GANNETX_TOKEN_FACTORY_ADDRESS,
+        data: txDataWithSuffix,
         value: ethers.utils.parseEther(totalFee),
       });
 
@@ -243,6 +253,9 @@ const TokenFactory: React.FC = () => {
       };
 
       saveTokenMetadata(tokenMetadata);
+
+      setDeployedTxHash(receipt.transactionHash);
+      setShowSuccessPopup(true);
 
       toast.success('Token deployed successfully!', { id: toastId });
       setCurrentStep(5);
@@ -381,7 +394,20 @@ const TokenFactory: React.FC = () => {
           <FeeCalculator features={features} totalFee={totalFee} config={config} />
         </div>
       </div>
-    </div>
+
+
+      <DeploymentSuccess
+        isVisible={showSuccessPopup}
+        onClose={() => setShowSuccessPopup(false)}
+        title="Token Deployed Successfully!"
+        tokenName={config.name}
+        tokenSymbol={config.symbol}
+        contractAddress={deployedToken || ''}
+        txHash={deployedTxHash}
+        chainId={BASE_CHAIN_ID}
+        networkName="Base"
+      />
+    </div >
   );
 };
 

@@ -14,7 +14,6 @@ export const UNICHAIN_SEPOLIA_CHAIN_ID = 1301;
 export const ABSTRACT_TESTNET_CHAIN_ID = 11124;
 export const LISK_SEPOLIA_CHAIN_ID = 4202;
 export const HUMANITY_TESTNET_CHAIN_ID = 1942999413;
-export const CHAINBASE_TESTNET_CHAIN_ID = 8453;
 export const INCENTIV_TESTNET_CHAIN_ID = 28802;
 
 //Mainnet
@@ -24,6 +23,10 @@ export const INK_CHAIN_ID = 57073;
 export const OP_CHAIN_ID = 10;
 export const LISK_CHAIN_ID = 1135;
 export const LINEA_CHAIN_ID = 59144;
+
+// Builder Code: bc_tn3f1j8w
+// Standardized ERC-8021 Data Suffix for Base onchain attribution (31-byte sequence)
+export const BUILDER_CODE_SUFFIX = "0x000062635f746e3366316a38770b0080218021802180218021802180218021";
 
 export interface ChainConfig {
   chainId: string;
@@ -236,8 +239,6 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     abi: GMTestnetABI,
   },
 
-
-
   // Mainnet
   [BASE_CHAIN_ID]: {
     chainId: `0x${BASE_CHAIN_ID.toString(16)}`,
@@ -336,7 +337,6 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     isTestnet: false,
     abi: GMMainnetABI,
   },
-
 };
 
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0xaF8471a2968a30a63Cdced851cDA2B7ce9e5dB90";
@@ -358,6 +358,7 @@ export const LOADING_STATES = {
   SUCCESS: "success",
   ERROR: "error",
 };
+
 
 export const getChainConfig = (chainId: number): ChainConfig | undefined => {
   return SUPPORTED_CHAINS[chainId] || undefined;

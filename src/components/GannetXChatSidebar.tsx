@@ -12,7 +12,8 @@ import {
 import { useWalletState } from '@/hooks/useWalletState';
 import GannetXABI from '@/abis/GannetXInteractiveChat.json';
 import { ethers } from 'ethers';
-import { BASE_CHAIN_ID, GANNETX_CHAT_CONTRACT_ADDRESS, BASE_RPC } from '@/utils/constants';
+import { BASE_CHAIN_ID, GANNETX_CHAT_CONTRACT_ADDRESS, BASE_RPC, BUILDER_CODE_SUFFIX } from '@/utils/constants';
+import { withBuilderCode } from '@/utils/web3';
 import toast from 'react-hot-toast';
 
 const CONTRACT_ADDRESS = GANNETX_CHAT_CONTRACT_ADDRESS;
@@ -166,7 +167,14 @@ const GannetXChatModal: React.FC<GannetXChatModalProps> = ({ isOpen, onClose }) 
       }
 
       const contract = new ethers.Contract(CONTRACT_ADDRESS, GannetXABI as any, signer);
-      const tx = await contract.checkIn(input.trim(), { value: CHECKIN_FEE });
+      const txData = contract.interface.encodeFunctionData("checkIn", [input.trim()]);
+      const txDataWithSuffix = withBuilderCode(txData, BASE_CHAIN_ID);
+
+      const tx = await signer.sendTransaction({
+        to: CONTRACT_ADDRESS,
+        data: txDataWithSuffix,
+        value: CHECKIN_FEE
+      });
       toast.loading('Sending message...', { id: 'gm' });
       await tx.wait();
       toast.success('Message sent successfully!', { id: 'gm' });

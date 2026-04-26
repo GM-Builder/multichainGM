@@ -11,10 +11,23 @@ import {
   getReferralContractAddress,
   getReferralContractAbi,
   isReferralSupported,
-  BASE_CHAIN_ID
+  BASE_CHAIN_ID,
+  BUILDER_CODE_SUFFIX
 } from "./constants";
 
 const isBrowser = typeof window !== "undefined";
+
+/**
+ * Appends the Builder Code suffix to transaction data if on Base network.
+ */
+export const withBuilderCode = (data: string, chainId: number): string => {
+  if (chainId === BASE_CHAIN_ID) {
+    // Append the suffix (remove '0x' from suffix first)
+    const suffix = BUILDER_CODE_SUFFIX.startsWith('0x') ? BUILDER_CODE_SUFFIX.slice(2) : BUILDER_CODE_SUFFIX;
+    return data + suffix;
+  }
+  return data;
+};
 
 export const getProvider = () => {
   if (!isBrowser) return null;
@@ -317,9 +330,16 @@ export const performCheckin = async (
       currentTax = ethers.utils.parseEther(CHECKIN_FEE);
     }
     
-    const tx = await contract.activateBeacon({
+    const txData = contract.interface.encodeFunctionData("activateBeacon");
+    const txDataWithSuffix = withBuilderCode(txData, chainId);
+
+    const tx = await contract.signer.sendTransaction({
+      to: contract.address,
+      data: txDataWithSuffix,
       value: currentTax
     });
+    
+    return tx;
     
     return tx;
 };
@@ -411,7 +431,13 @@ export const registerReferral = async (
       throw new Error('Already has a referrer');
     }
 
-    const tx = await contract.registerReferral(referrerAddress);
+    const txData = contract.interface.encodeFunctionData("registerReferral", [referrerAddress]);
+    const txDataWithSuffix = withBuilderCode(txData, BASE_CHAIN_ID);
+
+    const tx = await signer.sendTransaction({
+      to: contract.address,
+      data: txDataWithSuffix
+    });
     
     return tx;
   } catch (error: any) {
